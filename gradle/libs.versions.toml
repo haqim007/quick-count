@@ -1,0 +1,66 @@
+[versions]
+ktx = "1.12.0"
+material = "1.10.0"
+constraintlayout = "2.1.4"
+junit = "4.13.2"
+androidxTestExtJunit = "1.1.5"
+espressoCore = "3.5.1"
+navigationFragmentKtx = "2.7.4"
+navigationUiKtx = "2.7.4"
+lifecycleViewmodelKtx = "2.6.2"
+activityKtx = "1.8.0"
+retrofit = "2.9.0"
+converterGson = "2.9.0"
+okhttp = "5.0.0-alpha.11"
+loggingInterceptor = "5.0.0-alpha.11"
+pagingRuntimeKtx = "3.2.1"
+glide = "4.15.0"
+hilt = "2.47"
+hiltNavigationFragment = "1.0.0"
+roomKtx = "2.6.0"
+roomCompiler = "2.6.0"
+dataStore = "1.0.0"
+lottie = "6.1.0"
+# Plugin versions
+jetbrainsKotlinAndroid = "1.9.10"
+androidGradlePlugin = "8.1.1"
+kspPlugin = "1.9.10-1.0.13"
+safeArgsKotlinPlugin = "2.7.3"
+
+[libraries]
+androidx-ktx = {group = "androidx.core", name="core-ktx", version.ref="ktx"}
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref ="espressoCore" }
+navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref ="navigationFragmentKtx" }
+navigation-ui-ktx = { group = "androidx.navigation",  name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+lifecycle-viewmodel-ktx = { group = "androidx.lifecycle",  name = "lifecycle-viewmodel-ktx", version.ref ="lifecycleViewmodelKtx" }
+activity-ktx = { group = "androidx.activity", name = "activity-ktx",  version.ref = "activityKtx" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+logging-interceptor = { group = "com.squareup.okhttp3", name ="logging-interceptor", version.ref ="loggingInterceptor"}
+paging-runtime-ktx ={group ="androidx.paging", name ="paging-runtime-ktx", version.ref ="pagingRuntimeKtx"}
+glide ={group ="com.github.bumptech.glide", name ="glide", version.ref ="glide"}
+hilt-android = {group ="com.google.dagger", name ="hilt-android", version.ref ="hilt"}
+hilt-android-compiler = {group ="com.google.dagger", name ="hilt-android-compiler", version.ref ="hilt"}
+hilt-navigation-fragment = {group = "androidx.hilt", name = "hilt-navigation-fragment", version.ref = "hiltNavigationFragment"}
+room-ktx ={group ="androidx.room", name ="room-ktx", version.ref ="roomKtx"}
+room-compiler ={group ="androidx.room", name ="room-compiler", version.ref ="roomCompiler"}
+room-paging ={group ="androidx.room", name ="room-paging", version.ref ="roomCompiler"}
+datastore-preferences = {group= "androidx.datastore", name = "datastore-preferences", version.ref="dataStore"}
+airbnb-lottie = {group = "com.airbnb.android", name = "lottie", version.ref="lottie"}
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "jetbrainsKotlinAndroid" }
+jetbrains-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "jetbrainsKotlinAndroid" }
+jetbrains-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "jetbrainsKotlinAndroid" }
+devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "kspPlugin" }
+dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+navigation-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "safeArgsKotlinPlugin" }
+
+[bundles]
+

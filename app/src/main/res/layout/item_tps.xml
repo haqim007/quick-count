@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:layout_gravity="center"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="5dp"
+    android:layout_marginHorizontal="5dp"
+    android:layout_marginBottom="14dp">
+    
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingVertical="13dp">
+        <TextView
+            android:id="@+id/tv_tps_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.Bold"
+            android:layout_marginStart="16dp"
+            tools:text="TPS 1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/tv_tps_location"
+            style="@style/TextAppearance.Bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toStartOf="@+id/btn_open_tps"
+            app:layout_constraintStart_toStartOf="@+id/tv_tps_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_tps_name"
+            tools:ignore="SmallSp"
+            tools:text="Kel. Jugosari Kec. Candipuro" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_open_tps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open_election"
+            android:drawableEnd="@drawable/ic_arrow_circle_right"
+            android:textAllCaps="true"
+            android:paddingHorizontal="10dp"
+            android:layout_marginEnd="16dp"
+            android:drawableTint="@android:color/white"
+            app:cornerRadius="6dp"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_data_sent"
+            style="@style/TextAppearance.Bold.ExtraSmall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:alpha="0.5"
+            android:textSize="8sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_tps_location"
+            app:layout_constraintStart_toStartOf="@+id/tv_tps_location"
+            app:layout_constraintTop_toBottomOf="@id/tv_tps_location"
+            tools:ignore="SmallSp"
+            tools:text="Data terkirim: 2 Formulir" />
+
+        <TextView
+            android:id="@+id/tv_data_verified"
+            style="@style/TextAppearance.Bold.ExtraSmall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:alpha="0.5"
+            android:textSize="8sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_tps_location"
+            app:layout_constraintStart_toStartOf="@+id/tv_tps_location"
+            app:layout_constraintTop_toBottomOf="@id/tv_data_sent"
+            tools:ignore="SmallSp"
+            tools:text="Data terverifikasi: 2 Formulir" />
+
+        <TextView
+            android:id="@+id/tv_data_unverified"
+            style="@style/TextAppearance.Bold.ExtraSmall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:alpha="0.5"
+            app:layout_constraintEnd_toEndOf="@+id/tv_tps_location"
+            app:layout_constraintStart_toStartOf="@+id/tv_tps_location"
+            app:layout_constraintTop_toBottomOf="@id/tv_data_verified"
+            tools:ignore="SmallSp"
+            tools:text="Data Belum Terverifikasi : 1  Formulir" />
+        
+        
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    
+    
+
+</com.google.android.material.card.MaterialCardView>

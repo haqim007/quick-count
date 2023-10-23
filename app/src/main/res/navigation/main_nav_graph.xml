@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/unauthorized_nav_graph">
+
+    <navigation android:id="@+id/authorized_nav_graph"
+        app:startDestination="@id/TPSListFragment">
+        <fragment
+            android:id="@+id/electionActionFragment"
+            android:name="com.haltec.quickcount.ui.electiondetail.ElectionActionFragment"
+            android:label="fragment_election_action"
+            tools:layout="@layout/fragment_election_action">
+            <action
+                android:id="@+id/action_electionActionFragment_to_selfiAtTPSFragment"
+                app:destination="@id/selfiAtTPSFragment" />
+            <action
+                android:id="@+id/action_electionActionFragment_to_uploadEvidenceFragment"
+                app:destination="@id/uploadEvidenceFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/TPSListFragment"
+            android:name="com.haltec.quickcount.ui.tpslist.TPSListFragment"
+            android:label="fragment_tps_list"
+            tools:layout="@layout/fragment_tps_list">
+            <action
+                android:id="@+id/action_TPSListFragment_to_electionListFragment"
+                app:destination="@id/electionListFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/electionListFragment"
+            android:name="com.haltec.quickcount.ui.electionlist.ElectionListFragment"
+            android:label="fragment_election_list"
+            tools:layout="@layout/fragment_election_list">
+            <action
+                android:id="@+id/action_electionListFragment_to_electionActionFragment"
+                app:destination="@id/electionActionFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/uploadEvidenceFragment"
+            android:name="com.haltec.quickcount.ui.uploadevidence.UploadEvidenceFragment"
+            android:label="UploadEvidenceFragment"
+            tools:layout="@layout/fragment_upload_evidence" />
+        <fragment
+            android:id="@+id/selfiAtTPSFragment"
+            android:name="com.haltec.quickcount.ui.selfiattps.SelfiAtTPSFragment"
+            android:label="fragment_selfi_at_tps"
+            tools:layout="@layout/fragment_selfi_at_tps" />
+        
+        <action
+            android:id="@+id/action_logout"
+            app:destination="@id/unauthorized_nav_graph"
+            app:popUpTo="@id/authorized_nav_graph"
+            app:popUpToInclusive="true"/>
+    </navigation>
+    
+    <navigation android:id="@+id/unauthorized_nav_graph"
+        app:startDestination="@id/loginFragment">
+        <fragment
+            android:id="@+id/loginFragment"
+            android:name="com.haltec.quickcount.ui.login.LoginFragment"
+            android:label="fragment_login"
+            tools:layout="@layout/fragment_login">
+            <action
+                android:id="@+id/action_loginFragment_to_locationPermissionFragment"
+                app:destination="@id/locationPermissionFragment" />
+            <action
+                android:id="@+id/action_loginFragment_to_TPSListFragment"
+                app:destination="@id/authorized_nav_graph"
+                app:popUpTo="@id/loginFragment"
+                app:popUpToInclusive="true"/>
+        </fragment>
+        <fragment
+            android:id="@+id/locationPermissionFragment"
+            android:name="com.haltec.quickcount.ui.locationpermission.LocationPermissionFragment"
+            android:label="fragment_location_permission"
+            tools:layout="@layout/fragment_location_permission">
+            <action
+                android:id="@+id/action_locationPermissionFragment_to_loginFragment"
+                app:destination="@id/loginFragment"
+                app:popUpTo="@id/locationPermissionFragment"
+                app:popUpToInclusive="true"/>
+        </fragment>
+    </navigation>
+</navigation>

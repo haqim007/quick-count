@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.Bold" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/bold_700</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="TextAppearance.Bold.Small" parent="TextAppearance.Bold">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.Bold.Title" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/bold_700</item>
+        <item name="android:textSize">26sp</item>
+    </style>
+
+    <style name="TextAppearance.Bold.ExtraSmall" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/bold_700</item>
+        <item name="android:textSize">8sp</item>
+    </style>
+
+    <style name="TextAppearance.Medium" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/medium_500</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="ShapeAppearance_bottom_corners" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">0dp</item>
+        <item name="cornerSizeTopRight">0dp</item>
+        <item name="cornerSizeBottomLeft">20dp</item>
+        <item name="cornerSizeBottomRight">20dp</item>
+    </style>
+    
+    <style name="CustomChip" parent="Widget.Material3.Chip.Suggestion.Elevated">
+        <item name="chipCornerRadius">4dp</item>
+        <item name="chipStrokeColor">?attr/colorPrimary</item>
+        <item name="android:textColor">@drawable/chip_textcolor_state</item>
+        <item name="chipBackgroundColor">@drawable/chip_background_state</item>
+    </style>
+
+    <style name="CustomChip.Checked" parent="CustomChip">
+        <item name="chipBackgroundColor">?attr/colorPrimary</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:checkable">false</item>
+    </style>
+
+    <style name="CustomChip.Static" parent="CustomChip">
+        <item name="android:checkable">false</item>
+    </style>
+
+ 
+</resources>
