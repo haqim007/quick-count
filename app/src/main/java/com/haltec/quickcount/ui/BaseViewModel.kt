@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel<UiState>: ViewModel() {
@@ -16,7 +17,7 @@ abstract class BaseViewModel<UiState>: ViewModel() {
     
     fun <T> Flow<T>.launchCollectLatest(callback: (value: T) -> Unit){
         viewModelScope.launch { 
-            this@launchCollectLatest.collectLatest { 
+            this@launchCollectLatest.distinctUntilChanged().collectLatest { 
                 callback(it)
             }
         }
@@ -24,7 +25,7 @@ abstract class BaseViewModel<UiState>: ViewModel() {
 
     fun <T> Flow<T>.launchCollect(callback: (value: T) -> Unit){
         viewModelScope.launch {
-            this@launchCollect.collect {
+            this@launchCollect.distinctUntilChanged().collect {
                 callback(it)
             }
         }

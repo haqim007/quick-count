@@ -8,6 +8,7 @@ import dagger.hilt.android.scopes.ViewModelScoped
 import com.haltec.quickcount.data.remote.base.ApiConfig
 import com.haltec.quickcount.data.remote.service.AuthService
 import com.haltec.quickcount.data.remote.base.TokenInterceptor
+import com.haltec.quickcount.data.remote.service.ElectionService
 import com.haltec.quickcount.data.remote.service.TPSService
 import okhttp3.OkHttpClient
 import javax.inject.Qualifier
@@ -76,6 +77,13 @@ object NetworkModule {
         @AuthorizedApiConfig
         apiConfig: ApiConfig
     ): TPSService = apiConfig.createService(TPSService::class.java)
+
+    @ViewModelScoped
+    @Provides
+    fun provideElectionService(
+        @AuthorizedApiConfig
+        apiConfig: ApiConfig
+    ): ElectionService = apiConfig.createService(ElectionService::class.java)
 
 
 }

@@ -1,60 +1,109 @@
 package com.haltec.quickcount.ui.electionlist
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
+import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.haltec.quickcount.R
+import com.haltec.quickcount.data.mechanism.Resource
+import com.haltec.quickcount.data.mechanism.ResourceHandler
+import com.haltec.quickcount.data.mechanism.handle
+import com.haltec.quickcount.databinding.FragmentElectionListBinding
+import com.haltec.quickcount.domain.model.Election
+import com.haltec.quickcount.ui.BaseFragment
+import com.haltec.quickcount.ui.MainViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.map
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ElectionListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class ElectionListFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
+@AndroidEntryPoint
+class ElectionListFragment : BaseFragment() {
+    
+    private lateinit var binding: FragmentElectionListBinding
+    private val viewModel: ElectionListViewModel by hiltNavGraphViewModels(R.id.authorized_nav_graph)
+    private val mainViewModel: MainViewModel by activityViewModels()
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_election_list, container, false)
+    ): View {
+        binding = FragmentElectionListBinding.inflate(layoutInflater, container, false)
+        
+        val args : ElectionListFragmentArgs by navArgs()
+        val tps = args.tps
+        viewModel.setTps(tps)
+        
+        binding.apply {
+            btnBack.setOnClickListener { 
+                findNavController().navigateUp()
+            }
+            btnLogout.setOnClickListener {
+                mainViewModel.requestToLogout()
+            }
+            tvTpsName.text = tps.name
+            tvTpsLocation.text = getString(R.string.tps_location_, tps.village, tps.subdistrict)
+            val adapter = setupAdapter()
+            observeElectionList(adapter)
+        }
+        
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ElectionListFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ElectionListFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    private fun FragmentElectionListBinding.setupAdapter(): ElectionListAdapter {
+        val adapter = ElectionListAdapter(
+            object : ElectionListAdapter.ElectionListCallback {
+                override fun onClick(election: Election) {
+
                 }
-            }
+            })
+        rvElections.adapter = adapter
+        return adapter
     }
+
+    private fun FragmentElectionListBinding.observeElectionList(adapter: ElectionListAdapter) {
+        viewModel.state.map { it.data }.launchCollect {
+            
+            it.handle(
+                object : ResourceHandler<List<Election>> {
+                    override fun onSuccess(data: List<Election>?) {
+                        adapter.submitList(data)
+                        if (data.isNullOrEmpty()) {
+                            layoutLoader.lavAnimation.setAnimation(R.raw.empty_box)
+                            layoutLoader.lavAnimation.playAnimation()
+                            layoutLoader.tvErrorMessage.text = getString(R.string.data_is_empty)
+                        }
+                        layoutLoader.lavAnimation.isVisible = data.isNullOrEmpty()
+                        rvElections.isVisible = data?.isNotEmpty() == true
+                    }
+
+                    override fun onError(message: String?, data: List<Election>?) {
+                        layoutLoader.lavAnimation.setAnimation(R.raw.error_box)
+                        layoutLoader.lavAnimation.playAnimation()
+                        layoutLoader.lavAnimation.isVisible = true
+                        rvElections.isVisible = false
+                        layoutLoader.tvErrorMessage.text =
+                            message ?: getString(R.string.error_occured)
+                    }
+
+                    override fun onLoading() {
+                        layoutLoader.lavAnimation.setAnimation(R.raw.loading)
+                        layoutLoader.lavAnimation.playAnimation()
+                        layoutLoader.lavAnimation.isVisible = true
+                        rvElections.isVisible = false
+                    }
+
+                    override fun onAll(resource: Resource<List<Election>>) {
+                        tvElectionListTitle.isVisible = resource !is Resource.Error
+                        layoutLoader.btnTryAgain.isVisible = resource is Resource.Error
+                        layoutLoader.tvErrorMessage.isVisible = resource is Resource.Error
+                    }
+                }
+            )
+        }
+    }
+
 }

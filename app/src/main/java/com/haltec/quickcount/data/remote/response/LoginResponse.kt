@@ -1,6 +1,7 @@
 package com.haltec.quickcount.data.remote.response
 
 import com.google.gson.annotations.SerializedName
+import com.haltec.quickcount.data.util.DATE_TIME_FORMAT
 import com.haltec.quickcount.data.util.capitalizeWords
 import com.haltec.quickcount.data.util.stringToTimestamp
 import com.haltec.quickcount.domain.model.Login
@@ -39,7 +40,7 @@ data class LoginResponse(
 	fun toUserInfo() = UserInfo(
 		name = capitalizeWords(this.data?.name ?: ""),
 		token = this.data?.token,
-		expiredTimestamp = this.data?.exp?.let { stringToTimestamp(it) }
+		expiredTimestamp = this.data?.exp?.let { stringToTimestamp(it, DATE_TIME_FORMAT) }
 	)
 }
 

@@ -1,7 +1,10 @@
 package com.haltec.quickcount.data.mechanism
 
 import com.haltec.quickcount.data.preference.UserPreference
+import com.haltec.quickcount.data.util.DATE_TIME_FORMAT
+import com.haltec.quickcount.data.util.stringToTimestamp
 import com.haltec.quickcount.domain.model.UserInfo
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
@@ -21,7 +24,7 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
         try {
             val currentLocalData = loadCurrentLocalData()
             if(onBeforeRequest()){
-                val apiResponse = requestFromRemote()
+                val apiResponse = requestFromRemoteRunner()
                 if(apiResponse.isSuccess){
                     apiResponse.getOrNull()?.let { res ->
                         onFetchSuccess(res)
@@ -38,7 +41,7 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
                         Resource.Error(
                             message = apiResponse
                                 .exceptionOrNull()
-                                ?.localizedMessage ?: "Unknown error",
+                                ?.localizedMessage ?: "Failed to fetch data",
                             data = currentLocalData
                         )
                     )
@@ -51,10 +54,19 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
             onFetchFailed()
             emit(
                 Resource.Error(
-                    message = e.localizedMessage ?: "Unknown error"
+                    message = e.localizedMessage ?: "Failed to request"
                 )
             )
         }
+    }
+
+    /**
+     * To handle how requestFromRemote will be executed
+     *
+     * @return
+     */
+    protected open suspend fun requestFromRemoteRunner(): Result<RequestType>{
+        return requestFromRemote()
     }
 
     protected abstract suspend fun requestFromRemote(): Result<RequestType>
@@ -79,7 +91,7 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
     
     /*
     * 
-    * Will be called just before [requestFromRemote] triggered in case what to perform task 
+    * Will be called just before [requestFromRemote] triggered in case to perform task 
     * to determine whether to perform [requestFromRemote] or not
     * 
     * */
@@ -92,17 +104,35 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
 abstract class AuthorizedNetworkBoundResource<ResultType, RequestType>(
     private val userPreference: UserPreference
 ): NetworkBoundResource<ResultType, RequestType>(){
-    
-    override suspend fun onBeforeRequest(): Boolean {
-        val currentTimestampInSeconds = System.currentTimeMillis() / 1000
-        var tokenIsValid = false
-        userPreference.getUserInfo().first().expiredTimestamp?.let {
-            tokenIsValid = it > currentTimestampInSeconds
-            if (it < currentTimestampInSeconds){
-                userPreference.resetUserInfo()
+
+    final override suspend fun requestFromRemoteRunner(): Result<RequestType> {
+        var apiResponse: Result<RequestType>? = null
+        
+        // Repeat three times in case request failed because of http code 401.
+        // Because from the network API when the token expired, 
+        // it will response refreshed token instead of just (error) message
+        run repeatBlock@{
+            repeat(3){
+                apiResponse = requestFromRemote()
+                if (apiResponse?.isSuccess == false){
+                    val exception = apiResponse?.exceptionOrNull() as CustomThrowable
+                    if (exception.code == 401 && exception.data?.data != null){
+                        userPreference.updateToken(
+                            exception.data.data.token,
+                            stringToTimestamp(exception.data.data.exp, DATE_TIME_FORMAT) ?: 0
+                        )
+                        delay(3000)
+                    }else{
+                        return@repeatBlock
+                    }
+                }else{
+                    return@repeatBlock
+                }
             }
         }
-        return tokenIsValid
+        
+        
+        return apiResponse!!
     }
 
     override suspend fun onFetchFailed(exceptionOrNull: CustomThrowable?) {

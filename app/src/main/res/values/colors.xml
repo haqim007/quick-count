@@ -5,8 +5,25 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
-    <color name="colorPrimary">@color/blue</color>
+    <color name="color_primary">@color/blue</color>
     <color name="light_blue">#2655ed</color>
     <color name="disable_blue">#4B69CB</color>
     <color name="gray">#E9E9E9</color>
+    <color name="black_55_alpha">#8C000000</color>
+    <color name="black_10_alpha">#1A000000</color>
+    <color name="color_danger">#DB0D0D</color>
+    <color name="color_warning">#FFB800</color>
+    <color name="color_success">#56B819</color>
+    
+    <color name="color_status_election_not_sent">@color/color_danger</color>
+    <color name="color_status_election_not_verified">@color/color_warning</color>
+    <color name="color_status_election_verified">@color/color_success</color>
+
+    <color name="color_danger_25_alpha">#40DB0D0D</color>
+    <color name="color_warning_25_alpha">#40FFB800</color>
+    <color name="color_success_25_alpha">#4056B819</color>
+
+    <color name="color_border_election_not_sent">@color/color_danger_25_alpha</color>
+    <color name="color_border_election_not_verified">@color/color_warning_25_alpha</color>
+    <color name="color_border_election_verified">@color/color_success_25_alpha</color>
 </resources>

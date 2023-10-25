@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView 
+    android:id="@+id/mcv_election_item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,8 +11,7 @@
     app:cardCornerRadius="16dp"
     app:cardElevation="5dp"
     android:layout_marginHorizontal="5dp"
-    android:layout_marginBottom="14dp"
-    app:strokeColor="@color/blue">
+    android:layout_marginBottom="14dp">
     
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -21,8 +22,8 @@
             android:id="@+id/tv_election_name"
             style="@style/TextAppearance.Bold.Small"
             android:layout_width="0dp"
-            android:layout_marginHorizontal="16dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -57,24 +58,17 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_open_election"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/choose"
-            android:drawableEnd="@drawable/ic_arrow_circle_right"
-            android:textAllCaps="true"
-            android:paddingHorizontal="10dp"
+            android:layout_height="30dp"
+            android:textStyle="bold"
             android:layout_marginEnd="16dp"
-            android:drawableTint="@android:color/white"
-            app:cornerRadius="6dp"
-            android:textSize="11sp"
+            app:icon="@drawable/ic_arrow_circle_right_small"
+            app:iconGravity="textEnd"
+            style="@style/SmallButton"
+            android:text="@string/choose"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        
-        
+            app:layout_constraintTop_toBottomOf="@+id/tv_election_name" />
         
     </androidx.constraintlayout.widget.ConstraintLayout>
-    
-    
 
 </com.google.android.material.card.MaterialCardView>

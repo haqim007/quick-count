@@ -9,7 +9,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
@@ -18,10 +18,10 @@ import com.haltec.quickcount.databinding.FragmentTpsListBinding
 import com.haltec.quickcount.domain.model.TPS
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
-import kotlinx.coroutines.delay
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class TPSListFragment : BaseFragment() {
     
     private lateinit var binding: FragmentTpsListBinding
@@ -38,9 +38,8 @@ class TPSListFragment : BaseFragment() {
             observeUserName()
             tpsListSetup()
             
-            // remove
-            ivTask.setOnClickListener {
-                activityViewModel.logout()
+            btnLogout.setOnClickListener {
+                activityViewModel.requestToLogout()
             }
         }
         
@@ -57,7 +56,10 @@ class TPSListFragment : BaseFragment() {
         val adapter = TPSListAdapter(
             object : TPSListAdapter.TPSListCallback {
                 override fun onClick(tps: TPS) {
-                    Toast.makeText(requireContext(), tps.name, Toast.LENGTH_LONG).show()
+                    findNavController().navigate(
+                        TPSListFragmentDirections.actionTPSListFragmentToElectionListFragment(tps)
+                    )
+                    Toast.makeText(requireContext(), tps.name, Toast.LENGTH_SHORT).show()
                 }
             }
         )
@@ -68,40 +70,40 @@ class TPSListFragment : BaseFragment() {
                     override fun onSuccess(data: List<TPS>?) {
                         adapter.submitList(data)
                         if (data.isNullOrEmpty()) {
-                            lavAnimation.setAnimation(R.raw.empty_box)
-                            lavAnimation.playAnimation()
-                            tvErrorMessage.text = getString(R.string.data_is_empty)
+                            layoutLoader.lavAnimation.setAnimation(R.raw.empty_box)
+                            layoutLoader.lavAnimation.playAnimation()
+                            layoutLoader.tvErrorMessage.text = getString(R.string.data_is_empty)
                         }
-                        lavAnimation.isVisible = data.isNullOrEmpty()
+                        layoutLoader.lavAnimation.isVisible = data.isNullOrEmpty()
                         rvTps.isVisible = data?.isNotEmpty() == true
                     }
 
                     override fun onError(message: String?, data: List<TPS>?) {
-                        lavAnimation.setAnimation(R.raw.error_box)
-                        lavAnimation.playAnimation()
-                        lavAnimation.isVisible = true
+                        layoutLoader.lavAnimation.setAnimation(R.raw.error_box)
+                        layoutLoader.lavAnimation.playAnimation()
+                        layoutLoader.lavAnimation.isVisible = true
                         rvTps.isVisible = false
-                        tvErrorMessage.text = message ?: getString(R.string.error_occured)
-                        btnTryAgain.isVisible = true
+                        layoutLoader.tvErrorMessage.text = message ?: getString(R.string.error_occured)
                     }
 
                     override fun onLoading() {
-                        lavAnimation.setAnimation(R.raw.loading)
-                        lavAnimation.playAnimation()
-                        lavAnimation.isVisible = true
+                        layoutLoader.lavAnimation.setAnimation(R.raw.loading)
+                        layoutLoader.lavAnimation.playAnimation()
+                        layoutLoader.lavAnimation.isVisible = true
                         rvTps.isVisible = false
-                        btnTryAgain.isVisible = false
                     }
 
                     override fun onAll(resource: Resource<List<TPS>>) {
                         cgMenu.isVisible = resource !is Resource.Error
                         tvTpsListTitle.isInvisible = resource is Resource.Error
+                        layoutLoader.tvErrorMessage.isVisible = resource is Resource.Error
+                        layoutLoader.btnTryAgain.isVisible = resource is Resource.Error
                     }
                 }
             )
         }
 
-        btnTryAgain.setOnClickListener { 
+        layoutLoader.btnTryAgain.setOnClickListener { 
             viewModel.getTPSList()
         }
     }

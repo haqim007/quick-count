@@ -30,6 +30,7 @@
         <item name="cornerSizeTopRight">0dp</item>
         <item name="cornerSizeBottomLeft">20dp</item>
         <item name="cornerSizeBottomRight">20dp</item>
+        <item name="android:background">@color/light_blue</item>
     </style>
     
     <style name="CustomChip" parent="Widget.Material3.Chip.Suggestion.Elevated">
@@ -47,6 +48,27 @@
 
     <style name="CustomChip.Static" parent="CustomChip">
         <item name="android:checkable">false</item>
+    </style>
+    
+    <style name="CustomButton" parent="Widget.Material3.Button">
+        <item name="android:drawableTint">@android:color/white</item>
+        <item name="android:textSize">11sp</item>
+        <item name="cornerRadius">6dp</item>
+    </style>
+    
+    <style name="SmallButton" parent="CustomButton">
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="LogoutButton" parent="SmallButton">
+        <item name="strokeColor">@android:color/white</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="backgroundTint">@color/black_10_alpha</item>
+        <item name="android:drawableEnd">@drawable/ic_logout_small</item>
     </style>
 
  

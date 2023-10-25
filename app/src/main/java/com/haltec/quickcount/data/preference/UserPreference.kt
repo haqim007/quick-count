@@ -6,8 +6,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.haltec.quickcount.data.util.currentTimestamp
 import com.haltec.quickcount.di.UserPreference
+import com.haltec.quickcount.domain.model.SessionValidity
 import com.haltec.quickcount.domain.model.UserInfo
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,6 +30,13 @@ class UserPreference @Inject constructor(
                 preferences[TOKEN_EXPIRE] = it
             }
             preferences[HAS_LOGOUT] = false
+        }
+    }
+
+    suspend fun updateToken(token: String, expiredTime: Long){
+        dataStore.edit {preferences ->
+            preferences[TOKEN] = token
+            preferences[TOKEN_EXPIRE] = expiredTime
         }
     }
     
@@ -49,6 +59,17 @@ class UserPreference @Inject constructor(
     
     fun getUserName() = dataStore.data.map {preferences ->
         preferences[USER_NAME] ?: ""
+    }
+    
+    fun getSessionValidity(): Flow<SessionValidity> = dataStore.data.map { preferences ->
+        val isValid: Boolean = preferences[TOKEN_EXPIRE]?.let {expiredTimestamp ->
+                expiredTimestamp > currentTimestamp() } ?: false || 
+                preferences[TOKEN]?.isNotEmpty() == true ||
+                preferences[USER_NAME]?.isNotEmpty() == true
+
+        SessionValidity(
+            isValid, preferences[HAS_LOGOUT] ?: false
+        )
     }
     
     companion object{

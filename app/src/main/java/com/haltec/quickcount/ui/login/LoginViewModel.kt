@@ -3,16 +3,15 @@ package com.haltec.quickcount.ui.login
 import dagger.hilt.android.lifecycle.HiltViewModel
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.domain.model.Login
-import com.haltec.quickcount.domain.repository.ILoginRepository
+import com.haltec.quickcount.domain.repository.IAuthRepository
 import com.haltec.quickcount.ui.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginRepository: ILoginRepository
+    private val loginRepository: IAuthRepository
 ): BaseViewModel<LoginUiState>() {
     override val _state = MutableStateFlow(LoginUiState())
     

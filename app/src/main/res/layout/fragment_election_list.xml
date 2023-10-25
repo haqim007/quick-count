@@ -20,7 +20,7 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/light_blue"
+            android:background="@color/black_55_alpha"
             app:shapeAppearance="?attr/shapeAppearanceMediumComponent"
             app:shapeAppearanceOverlay="@style/ShapeAppearance_bottom_corners"
             />
@@ -29,16 +29,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/iv_task"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_logout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:backgroundTint="@android:color/transparent"
-                android:src="@drawable/task"
+                android:layout_height="30dp"
+                android:text="@string/log_out"
+                style="@style/LogoutButton"
+                android:paddingVertical="0dp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="25dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.4"
+                />
 
             <ImageView
                 android:id="@+id/btn_back"
@@ -60,7 +64,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:layout_marginTop="22dp"
-                app:layout_constraintEnd_toStartOf="@+id/iv_task"
+                app:layout_constraintEnd_toStartOf="@+id/btn_logout"
                 app:layout_constraintStart_toEndOf="@id/btn_back"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="TPS 1" />
@@ -120,5 +124,14 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_election"
         tools:itemCount="10"/>
+
+    <include
+        android:id="@+id/layout_loader"
+        android:layout_width="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_election_list_title"
+        layout="@layout/layout_loader_and_error"
+        android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

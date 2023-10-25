@@ -22,7 +22,8 @@ suspend fun <T> getResult(callback: suspend () -> T): Result<T> {
         
     }
     catch (e: HttpException){
-        Result.failure(CustomThrowable(code = e.code(), message = e.toErrorMessage()))
+        val response = e.toErrorMessage()
+        Result.failure(CustomThrowable(code = e.code(), message = response.message, data = response))
     }
     catch (e: ConnectException){
         Result.failure(CustomThrowable(message = "Unable to connect"))
@@ -32,10 +33,16 @@ suspend fun <T> getResult(callback: suspend () -> T): Result<T> {
     }
 }
 
-fun HttpException.toErrorMessage(): String {
+fun HttpException.toErrorMessage(): BasicResponse {
     val errorJson = this.response()?.errorBody()?.string()
-    val gson = Gson()
-    return gson.fromJson(errorJson, BasicResponse::class.java).message
+    return if (errorJson.isNullOrEmpty()){
+        BasicResponse(
+            message = "Internal server error"
+        )
+    }else{
+        val gson = Gson()
+        gson.fromJson(errorJson, BasicResponse::class.java)
+    }
 }
 
-class CustomThrowable(val code: Int = 999, override val message: String?) : Throwable(message)
+class CustomThrowable(val code: Int = 999, override val message: String?, val data: BasicResponse? = null) : Throwable(message)

@@ -38,7 +38,7 @@ class TPSListAdapter(
                     R.string.data_sent_, tps.submitted
                 )
                 tvDataUnverified.text = itemView.context.getString(
-                    R.string.data_unverified_, tps.pending
+                    R.string.data_not_verified_, tps.pending
                 )
                 tvDataVerified.text = itemView.context.getString(
                     R.string.data_verified_, tps.approved

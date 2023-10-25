@@ -38,7 +38,6 @@ class LoginFragment : BaseFragment() {
         MaterialAlertDialogBuilder(requireContext())
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -139,16 +138,16 @@ class LoginFragment : BaseFragment() {
             val isPermissionLocationGranted = mainViewModel.state.map { it.isPermissionLocationGranted }.distinctUntilChanged()
             val isSessionValid = mainViewModel.state.map { it.sessionValid }
             val loginResult = viewModel.state.map { it.result }
-            val combineFlow = combine(isPermissionLocationGranted, isSessionValid,loginResult, ::Triple)
-            combineFlow.collectLatest {(isPermissionLocationGranted, isSessionStillValid, loginResult) ->
+            val combineFlow = combine(isPermissionLocationGranted, isSessionValid, loginResult, ::Triple)
+            combineFlow.collectLatest {(isPermissionLocationGranted, sessionValid, loginResult) ->
                 if (isPermissionLocationGranted == false && findNavController().currentDestination?.id == R.id.loginFragment) {
                     findNavController().navigate(
                         LoginFragmentDirections.actionLoginFragmentToLocationPermissionFragment()
                     )
                 }
                 else if(
-                    isPermissionLocationGranted == true && 
-                    isSessionStillValid == true && 
+                    isPermissionLocationGranted == true &&
+                    sessionValid?.isValid == true && 
                     loginResult is Resource.Idle && 
                     findNavController().currentDestination?.id == R.id.loginFragment
                 ){

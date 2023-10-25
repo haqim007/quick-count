@@ -10,10 +10,8 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -22,15 +20,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.haltec.quickcount.databinding.ActivityMainBinding
 import com.haltec.quickcount.ui.MainViewModel
-import com.haltec.quickcount.ui.login.LoginFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -68,7 +64,20 @@ class MainActivity : AppCompatActivity() {
             .setMessage(getString(R.string.please_relogin_to_continue))
             .setPositiveButton(getString(R.string.ok)) { dialog, which ->
                 navController.navigate(R.id.action_logout)
+            }
+            .setCancelable(false)
+            .create()
+    }
 
+    private val logoutDialog by lazy {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.are_you_done)
+            .setMessage(R.string.you_need_to_relogin_to_continue)
+            .setPositiveButton(getString(R.string.yes)) { dialog, which ->
+                viewModel.logout()
+            }
+            .setNegativeButton(R.string.no){dialog, which ->
+                viewModel.cancelLogout()
             }
             .setCancelable(false)
             .create()
@@ -104,26 +113,34 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-//        lifecycleScope.launch { 
-//            viewModel.state.map { it.sessionValid }.collectLatest {isSessionStillValid ->
-//                if(isSessionStillValid == true){
-//                    navController.popBackStack(R.id.authorized_nav_graph, false)
-//                }
-//            }
-//        }
+        
+        lifecycleScope.launch { 
+            viewModel.state.map { it.requestToLogout }
+                .distinctUntilChanged()
+                .collectLatest { 
+                if (it){
+                    if (!logoutDialog.isShowing) logoutDialog.show()
+                }
+            }
+        }
     }
 
     private fun observeSessionValidity() {
         lifecycleScope.launch {
             viewModel.state.map { it.sessionValid }.collect {
-                if (it == false && navHostFragment.navController.currentDestination?.id !in listOf(
+                if(navHostFragment.navController.currentDestination?.id !in listOf(
                         R.id.loginFragment,
                         R.id.locationPermissionFragment
                     )
-                ) {
-                    if (locationTrackerDialog.isShowing) locationTrackerDialog.dismiss()
-                    if (!sessionDialog.isShowing) sessionDialog.show()
+                ){
+                    if (it?.isValid == false && !it.hasLogout) {
+                        if (locationTrackerDialog.isShowing) locationTrackerDialog.dismiss()
+                        if (!sessionDialog.isShowing) sessionDialog.show()
+                    }else if (it?.isValid == false && it.hasLogout) {
+                        navController.navigate(R.id.action_logout)
+                    }
                 }
+                
             }
         }
     }

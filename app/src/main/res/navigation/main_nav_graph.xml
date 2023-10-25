@@ -33,6 +33,11 @@
             android:name="com.haltec.quickcount.ui.electionlist.ElectionListFragment"
             android:label="fragment_election_list"
             tools:layout="@layout/fragment_election_list">
+            
+            <argument
+                app:argType="com.haltec.quickcount.domain.model.TPS"
+                android:name="tps"/>
+            
             <action
                 android:id="@+id/action_electionListFragment_to_electionActionFragment"
                 app:destination="@id/electionActionFragment" />

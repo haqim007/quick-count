@@ -5,9 +5,11 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
-import com.haltec.quickcount.data.repository.LoginRepository
+import com.haltec.quickcount.data.repository.AuthRepository
+import com.haltec.quickcount.data.repository.ElectionRepository
 import com.haltec.quickcount.data.repository.TPSRepository
-import com.haltec.quickcount.domain.repository.ILoginRepository
+import com.haltec.quickcount.domain.repository.IAuthRepository
+import com.haltec.quickcount.domain.repository.IElectionRepository
 import com.haltec.quickcount.domain.repository.ITPSRepository
 
 @Module
@@ -15,9 +17,13 @@ import com.haltec.quickcount.domain.repository.ITPSRepository
 interface RepositoryModule {
     @Binds
     @ViewModelScoped
-    fun provideLoginRepository(repository: LoginRepository): ILoginRepository
+    fun provideLoginRepository(repository: AuthRepository): IAuthRepository
     
     @Binds
     @ViewModelScoped
     fun provideTPSRepository(repository: TPSRepository): ITPSRepository
+
+    @Binds
+    @ViewModelScoped
+    fun provideElectionRepository(repository: ElectionRepository): IElectionRepository
 }

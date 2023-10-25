@@ -6,13 +6,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import com.haltec.quickcount.hideKeyboard
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 abstract class BaseFragment() : Fragment(){
     fun <T> Flow<T>.launchCollectLatest(callback: suspend (value: T) -> Unit){
         viewLifecycleOwner.lifecycleScope.launch {
-            this@launchCollectLatest.collectLatest {
+            this@launchCollectLatest.distinctUntilChanged().collectLatest {
                 callback(it)
             }
         }
@@ -20,7 +20,7 @@ abstract class BaseFragment() : Fragment(){
 
     fun <T> Flow<T>.launchCollect(callback: suspend (value: T) -> Unit){
         viewLifecycleOwner.lifecycleScope.launch {
-            this@launchCollect.collect {
+            this@launchCollect.distinctUntilChanged().collect {
                 callback(it)
             }
         }

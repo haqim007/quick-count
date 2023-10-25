@@ -1,6 +1,5 @@
 package com.haltec.quickcount.data.repository
 
-import android.util.Log
 import dagger.hilt.android.scopes.ViewModelScoped
 import com.haltec.quickcount.data.mechanism.NetworkBoundResource
 import com.haltec.quickcount.data.mechanism.Resource
@@ -9,13 +8,11 @@ import com.haltec.quickcount.data.preference.UserPreference
 import com.haltec.quickcount.data.remote.datasource.LoginRemoteDataSource
 import com.haltec.quickcount.data.remote.request.LoginRequest
 import com.haltec.quickcount.data.remote.response.LoginResponse
-import com.haltec.quickcount.data.util.capitalizeWords
 import com.haltec.quickcount.data.util.currentTimestamp
-import com.haltec.quickcount.data.util.stringToTimestamp
 import com.haltec.quickcount.di.DispatcherIO
 import com.haltec.quickcount.domain.model.Login
-import com.haltec.quickcount.domain.model.UserInfo
-import com.haltec.quickcount.domain.repository.ILoginRepository
+import com.haltec.quickcount.domain.model.SessionValidity
+import com.haltec.quickcount.domain.repository.IAuthRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -23,24 +20,18 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-import kotlin.math.log
 
 @ViewModelScoped
-class LoginRepository @Inject constructor(
+class AuthRepository @Inject constructor(
     private val devicePreference: DevicePreference,
     private val userPreference: UserPreference,
     private val remoteDataSource: LoginRemoteDataSource,
     @DispatcherIO
     private val dispatcher: CoroutineDispatcher
-) : ILoginRepository {
+) : IAuthRepository {
 
-    override fun checkSessionValid(): Flow<Boolean> {
-        return userPreference.getUserInfo().map {   
-//            it.expiredTimestamp?.let {expiredTimestamp ->
-//                expiredTimestamp > currentTimestamp()
-//            } ?: false || 
-            !it.token.isNullOrEmpty() || it.name.isNotEmpty()
-        }
+    override fun checkSessionValid(): Flow<SessionValidity> {
+        return userPreference.getSessionValidity()
     }
 
     override suspend fun storeDeviceToken(token: String) {

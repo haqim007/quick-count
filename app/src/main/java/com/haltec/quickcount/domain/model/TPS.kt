@@ -1,5 +1,9 @@
 package com.haltec.quickcount.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class TPS(
     val villageCode: String,
     val address: String,
@@ -17,4 +21,4 @@ data class TPS(
     val submitted: String,
     val village: String,
     val longitude: String
-)
+): Parcelable

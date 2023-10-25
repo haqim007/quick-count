@@ -13,7 +13,7 @@
     <string name="open_election">Pilih Pemilu</string>
     <string name="data_sent_">Data Terkirim : %s</string>
     <string name="data_verified_">Data Terverifikasi : %s</string>
-    <string name="data_unverified_">Data belum terverifikasi : %s</string>
+    <string name="data_not_verified_">Data Belum Terverifikasi : %s</string>
     <string name="choose">Pilih</string>
     <string name="choose_running_election">Pilih Pemilu Berlangsung</string>
     <string name="selfi_at_tps">Yuk, Selfie di TPS</string>
@@ -45,4 +45,11 @@
     <string name="open_settings">Buka Pengaturan</string>
     <string name="location_access_permission_required">Izin Akses Lokasi Dibutuhkan</string>
     <string name="please_give_location_access_permission">Mohon berikan izin aplikasi ini untuk mengakses lokasi Anda</string>
+    <string name="log_out">Log Out</string>
+    <string name="sent_at_date_time">Terkirim pada %s</string>
+    <string name="status_s">Status : %s</string>
+    <string name="yes">Ya</string>
+    <string name="no">Tidak</string>
+    <string name="are_you_done">Sudah selesai?</string>
+    <string name="you_need_to_relogin_to_continue">Anda perlu login kembali jika ingin melanjutkan pekerjaan</string>
 </resources>
