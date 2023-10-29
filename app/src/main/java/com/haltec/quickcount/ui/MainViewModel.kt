@@ -69,11 +69,16 @@ class MainViewModel @Inject constructor(
         _state.update { state -> state.copy(requestToLogout = false) }
     }
     
+    fun showCameraPermissionDialog(show: Boolean = true){
+        _state.update { state -> state.copy(showCameraPermissionDialog = show) }
+    }
+    
 }
 
 data class MainUiState(
     val isPermissionLocationGranted: Boolean? = null,
     val showLocationPermissionDialog: Boolean = false,
     val sessionValid: SessionValidity? = null,
-    val requestToLogout: Boolean = false
+    val requestToLogout: Boolean = false,
+    val showCameraPermissionDialog: Boolean = false,
 )

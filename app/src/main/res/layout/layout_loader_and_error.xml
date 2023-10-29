@@ -42,6 +42,8 @@
         android:drawableTint="@android:color/white"
         android:text="@string/try_again"
         android:textAllCaps="true"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:textSize="11sp"
         app:cornerRadius="6dp"
         app:layout_constraintEnd_toEndOf="@+id/lav_animation"

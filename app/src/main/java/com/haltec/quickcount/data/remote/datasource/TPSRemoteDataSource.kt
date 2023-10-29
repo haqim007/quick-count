@@ -14,6 +14,10 @@ class TPSRemoteDataSource @Inject constructor(
         tpsService.getTPSList()
     }
 
+    suspend fun getTPSElectionList(filter: String) = getResult {
+        tpsService.getTPSElectionList(filter)
+    }
+
     suspend fun getTPS(@Path("id") tpsId: Int) = getResult { 
         tpsService.getTPS(tpsId)
     }

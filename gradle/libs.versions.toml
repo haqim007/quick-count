@@ -21,11 +21,18 @@ roomKtx = "2.6.0"
 roomCompiler = "2.6.0"
 dataStore = "1.0.0"
 lottie = "6.1.0"
+camera = "1.4.0-alpha02"
+touchImageView = "3.6"
+maps = "18.2.0"
+location = "21.0.1"
 # Plugin versions
 jetbrainsKotlinAndroid = "1.9.10"
 androidGradlePlugin = "8.1.1"
 kspPlugin = "1.9.10-1.0.13"
 safeArgsKotlinPlugin = "2.7.3"
+legacy-support-v4 = "1.0.0"
+lifecycle-livedata-ktx = "2.6.2"
+google-services = "4.4.0"
 
 [libraries]
 androidx-ktx = {group = "androidx.core", name="core-ktx", version.ref="ktx"}
@@ -52,6 +59,14 @@ room-compiler ={group ="androidx.room", name ="room-compiler", version.ref ="roo
 room-paging ={group ="androidx.room", name ="room-paging", version.ref ="roomCompiler"}
 datastore-preferences = {group= "androidx.datastore", name = "datastore-preferences", version.ref="dataStore"}
 airbnb-lottie = {group = "com.airbnb.android", name = "lottie", version.ref="lottie"}
+androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref="camera"}
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref="camera"}
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref="camera"}
+github-mikeortiz-touchimageview = {group = "com.github.MikeOrtiz", name="TouchImageView", version.ref="touchImageView"}
+gms-playservices-maps = {group = "com.google.android.gms", name = "play-services-maps", version.ref="maps"}
+gms-playservices-location = {group = "com.google.android.gms", name = "play-services-location", version.ref="location"}
+legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacy-support-v4" }
+lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -61,6 +76,7 @@ jetbrains-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", ver
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "kspPlugin" }
 dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 navigation-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "safeArgsKotlinPlugin" }
+gms-google-services = { id = "com.google.gms.google-services", version.ref="google-services"}
 
 [bundles]
 

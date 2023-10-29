@@ -41,6 +41,11 @@ class TPSListFragment : BaseFragment() {
             btnLogout.setOnClickListener {
                 activityViewModel.requestToLogout()
             }
+            chipFormList.setOnClickListener {
+                findNavController().navigate(
+                    TPSListFragmentDirections.actionTPSListFragmentToTPSElectionListFragment()
+                )
+            }
         }
         
         return binding.root
@@ -59,7 +64,6 @@ class TPSListFragment : BaseFragment() {
                     findNavController().navigate(
                         TPSListFragmentDirections.actionTPSListFragmentToElectionListFragment(tps)
                     )
-                    Toast.makeText(requireContext(), tps.name, Toast.LENGTH_SHORT).show()
                 }
             }
         )

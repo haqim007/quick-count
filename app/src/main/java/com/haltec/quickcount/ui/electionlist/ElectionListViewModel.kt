@@ -29,14 +29,12 @@ class ElectionListViewModel @Inject constructor(
             state.map { it.tps }.distinctUntilChanged().collectLatest {
                 it?.let {
                     getElectionlist()
-                    Log.d("http hehe", it.name)
                 }
             }
         }
     }
     
     fun setTps(tps: TPS){
-        Log.d("http hihi", tps.name)
         _state.update { state ->
             state.copy(
                 tps = tps

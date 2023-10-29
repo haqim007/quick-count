@@ -7,4 +7,5 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.parcelize) apply false
     alias(libs.plugins.dagger.hilt.android) apply false
     alias(libs.plugins.navigation.safeargs.kotlin) apply false
+    alias(libs.plugins.gms.google.services) apply false
 }

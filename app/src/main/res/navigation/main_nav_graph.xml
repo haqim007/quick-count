@@ -8,16 +8,35 @@
     <navigation android:id="@+id/authorized_nav_graph"
         app:startDestination="@id/TPSListFragment">
         <fragment
+            android:id="@+id/voteFragment"
+            android:name="com.haltec.quickcount.ui.vote.VoteFragment"
+            android:label="fragment_vote"
+            tools:layout="@layout/fragment_vote" >
+            <argument
+                android:name="tps"
+                app:argType="com.haltec.quickcount.domain.model.TPS"/>
+            <argument
+                android:name="election"
+                app:argType="com.haltec.quickcount.domain.model.Election"/>
+        </fragment>
+        <fragment
             android:id="@+id/electionActionFragment"
-            android:name="com.haltec.quickcount.ui.electiondetail.ElectionActionFragment"
+            android:name="com.haltec.quickcount.ui.electionaction.ElectionActionFragment"
             android:label="fragment_election_action"
             tools:layout="@layout/fragment_election_action">
             <action
-                android:id="@+id/action_electionActionFragment_to_selfiAtTPSFragment"
-                app:destination="@id/selfiAtTPSFragment" />
-            <action
                 android:id="@+id/action_electionActionFragment_to_uploadEvidenceFragment"
                 app:destination="@id/uploadEvidenceFragment" />
+
+            <argument
+                android:name="tps"
+                app:argType="com.haltec.quickcount.domain.model.TPS"/>
+            <argument
+                android:name="election"
+                app:argType="com.haltec.quickcount.domain.model.Election"/>
+            <action
+                android:id="@+id/action_electionActionFragment_to_voteFragment"
+                app:destination="@id/voteFragment" />
         </fragment>
         <fragment
             android:id="@+id/TPSListFragment"
@@ -27,6 +46,9 @@
             <action
                 android:id="@+id/action_TPSListFragment_to_electionListFragment"
                 app:destination="@id/electionListFragment" />
+            <action
+                android:id="@+id/action_TPSListFragment_to_TPSElectionListFragment"
+                app:destination="@id/TPSElectionListFragment" />
         </fragment>
         <fragment
             android:id="@+id/electionListFragment"
@@ -46,13 +68,26 @@
             android:id="@+id/uploadEvidenceFragment"
             android:name="com.haltec.quickcount.ui.uploadevidence.UploadEvidenceFragment"
             android:label="UploadEvidenceFragment"
-            tools:layout="@layout/fragment_upload_evidence" />
+            tools:layout="@layout/fragment_upload_evidence" >
+            
+            <argument
+                android:name="tps"
+                app:argType="com.haltec.quickcount.domain.model.TPS"/>
+            <argument
+                android:name="election"
+                app:argType="com.haltec.quickcount.domain.model.Election"/>
+        </fragment>
+
         <fragment
-            android:id="@+id/selfiAtTPSFragment"
-            android:name="com.haltec.quickcount.ui.selfiattps.SelfiAtTPSFragment"
-            android:label="fragment_selfi_at_tps"
-            tools:layout="@layout/fragment_selfi_at_tps" />
-        
+            android:id="@+id/TPSElectionListFragment"
+            android:name="com.haltec.quickcount.ui.tpselectionlist.TPSElectionListFragment"
+            android:label="TPSElectionListFragment"
+            tools:layout="@layout/fragment_tps_election_list">
+            <action
+                android:id="@+id/action_TPSElectionListFragment_to_electionActionFragment"
+                app:destination="@id/electionActionFragment" />
+        </fragment>
+
         <action
             android:id="@+id/action_logout"
             app:destination="@id/unauthorized_nav_graph"
@@ -88,4 +123,6 @@
                 app:popUpToInclusive="true"/>
         </fragment>
     </navigation>
+    
+
 </navigation>

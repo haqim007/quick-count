@@ -1,6 +1,7 @@
 package com.haltec.quickcount.data.remote.response
 
 import com.google.gson.annotations.SerializedName
+import com.haltec.quickcount.data.util.capitalizeWords
 import com.haltec.quickcount.data.util.stringToDate
 import com.haltec.quickcount.data.util.stringToStringDateID
 import com.haltec.quickcount.domain.model.Election
@@ -47,7 +48,7 @@ data class ElectionListResponse(
 	fun toModel() = this.data?.map { 
 		Election(
 			id = it.id,
-			title = it.title,
+			title = capitalizeWords(it.title),
 			createdBy =  it.createdBy,
 			createdAt = stringToStringDateID(it.createdAt),
 			updatedBy =  it.updatedBy,

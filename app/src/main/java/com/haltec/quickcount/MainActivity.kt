@@ -2,8 +2,11 @@ package com.haltec.quickcount
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.Manifest.permission.CAMERA
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
+import android.content.DialogInterface.OnClickListener
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -50,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.fitur_lokasi_nonaktif))
             .setMessage(getString(R.string.activate_location_tracker_via_settings))
-            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
                 val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                 startActivity(intent)
             }
@@ -62,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.session_end))
             .setMessage(getString(R.string.please_relogin_to_continue))
-            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
                 navController.navigate(R.id.action_logout)
             }
             .setCancelable(false)
@@ -73,10 +76,10 @@ class MainActivity : AppCompatActivity() {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.are_you_done)
             .setMessage(R.string.you_need_to_relogin_to_continue)
-            .setPositiveButton(getString(R.string.yes)) { dialog, which ->
+            .setPositiveButton(getString(R.string.yes)) { _, _ ->
                 viewModel.logout()
             }
-            .setNegativeButton(R.string.no){dialog, which ->
+            .setNegativeButton(R.string.no){ _, _ ->
                 viewModel.cancelLogout()
             }
             .setCancelable(false)
@@ -89,13 +92,24 @@ class MainActivity : AppCompatActivity() {
         if(permissions[ACCESS_COARSE_LOCATION] == true){
             checkLocationTrackerOn()
             if(permissions[ACCESS_FINE_LOCATION] == false){
-                dialogLocationAccessDenied()
+                dialogPermissionWhenNotAllowed(
+                    R.string.location_access_permission_required,
+                    R.string.please_give_location_access_permission
+                )
                 viewModel.setPermissionLocationGrant(false)
             }else{
                 viewModel.setPermissionLocationGrant(true)
             }
         }else if(permissions[ACCESS_COARSE_LOCATION] == false || permissions[ACCESS_FINE_LOCATION] == false){
-            dialogLocationAccessDenied()
+            dialogPermissionWhenNotAllowed(
+                R.string.location_access_permission_required,
+                R.string.please_give_location_access_permission
+            )
+        }else if(permissions[CAMERA] == false){
+            dialogPermissionWhenNotAllowed(
+                R.string.camera_access_permission_required,
+                R.string.please_give_camera_access_permission
+            ) { _, _ -> navController.navigateUp() }
         }
     }
     
@@ -110,6 +124,15 @@ class MainActivity : AppCompatActivity() {
             viewModel.state.map { it.showLocationPermissionDialog }.collectLatest {
                 if(it){
                     launchLocationAccessPermission()
+                }
+            }
+        }
+        
+        lifecycleScope.launch { 
+            viewModel.state.map { it.showCameraPermissionDialog }.collectLatest { 
+                if(it){
+                    launchCameraAccessPermission()
+                    viewModel.showCameraPermissionDialog(false)
                 }
             }
         }
@@ -149,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
 
-        navHostFragment.navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navHostFragment.navController.addOnDestinationChangedListener { controller, destination, _ ->
             navController = controller
             lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -187,12 +210,30 @@ class MainActivity : AppCompatActivity() {
                 ACCESS_FINE_LOCATION
             )
         ){
-            dialogLocationAccessDenied()
+            dialogPermissionWhenNotAllowed(
+                R.string.location_access_permission_required,
+                R.string.please_give_location_access_permission
+            )
         }else{
             requestPermissionLauncher.launch(
                 arrayOf(
                     ACCESS_COARSE_LOCATION,
                     ACCESS_FINE_LOCATION
+                )
+            )
+        }
+    }
+    
+    private fun launchCameraAccessPermission(){
+        if(shouldShowRequestPermissionRationale(CAMERA)){
+            dialogPermissionWhenNotAllowed(
+                R.string.camera_access_permission_required,
+                R.string.please_give_camera_access_permission
+            ){ _, _ -> navController.navigateUp()}
+        }else{
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    CAMERA
                 )
             )
         }
@@ -205,21 +246,25 @@ class MainActivity : AppCompatActivity() {
 
     private fun isPermissionGranted(permission: String) =
         ActivityCompat.checkSelfPermission(
-            this@MainActivity,
+            this,
             permission
         ) == PackageManager.PERMISSION_GRANTED
 
-    private fun dialogLocationAccessDenied(){
+    private fun dialogPermissionWhenNotAllowed(
+        title: Int,
+        message: Int,
+        onClose: OnClickListener? = null
+    ){
         MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.location_access_permission_required)
-            .setMessage(R.string.please_give_location_access_permission)
+            .setTitle(title)
+            .setMessage(message)
             .setPositiveButton(R.string.open_settings) { dialog, _ ->
                 dialog.dismiss()
                 startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", packageName, null)
                 })
             }
-            .setNegativeButton(R.string.close, null)
+            .setNegativeButton(R.string.close, onClose)
             .show()
     }
 }

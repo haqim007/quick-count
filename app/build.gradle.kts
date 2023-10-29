@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.parcelize)
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.navigation.safeargs.kotlin)
+    alias(libs.plugins.gms.google.services)
 }
 
 android {
@@ -57,6 +58,8 @@ dependencies {
     implementation(libs.androidx.ktx)
     implementation(libs.material)
     implementation(libs.constraintlayout)
+    implementation(libs.legacy.support.v4)
+    implementation(libs.lifecycle.livedata.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -79,6 +82,13 @@ dependencies {
     implementation(libs.paging.runtime.ktx)
     implementation(libs.room.paging)
     implementation(libs.airbnb.lottie)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.github.mikeortiz.touchimageview)
+    implementation(libs.gms.playservices.maps)
+    implementation(libs.gms.playservices.location)
+    implementation(platform("com.google.firebase:firebase-bom:32.4.0"))
 }
 
 inline fun <reified ValueT> com.android.build.api.dsl.VariantDimension.buildConfigField(

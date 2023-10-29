@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "556827282961",
+    "project_id": "quick-count-haltec",
+    "storage_bucket": "quick-count-haltec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556827282961:android:4ea02bcf615c2b4637ebb0",
+        "android_client_info": {
+          "package_name": "com.haltec.quickcount"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQlDsbQHH0HTqoJpfvtUfXzedBvYT67ks"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

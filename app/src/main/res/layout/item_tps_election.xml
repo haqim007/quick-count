@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView 
+    android:id="@+id/mcv_election_item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:layout_gravity="center"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="5dp"
+    android:layout_marginHorizontal="5dp"
+    android:layout_marginBottom="14dp">
+    
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingVertical="13dp">
+
+        <TextView
+            android:id="@+id/tv_tps_name"
+            style="@style/TextAppearance.Bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="TPS 1" />
+
+        <TextView
+            android:id="@+id/tv_election_name"
+            style="@style/TextAppearance.Bold.Small"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_tps_name"
+            tools:text="Presiden &amp; Wakil Presiden" />
+
+        <TextView
+            android:id="@+id/tv_election_info"
+            style="@style/TextAppearance.Bold.ExtraSmall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/btn_open_election"
+            app:layout_constraintStart_toStartOf="@+id/tv_election_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_election_name"
+            tools:ignore="SmallSp"
+            tools:text="Terkirim pada 20 Oktober 2023 pukul 05.00" />
+
+        <TextView
+            android:id="@+id/tv_election_status"
+            style="@style/TextAppearance.Bold.ExtraSmall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toStartOf="@+id/btn_open_election"
+            app:layout_constraintStart_toStartOf="@+id/tv_election_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_election_info"
+            tools:ignore="SmallSp"
+            tools:text="Status : Sudah Terverifikasi" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_open_election"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:textStyle="bold"
+            android:layout_marginEnd="16dp"
+            app:icon="@drawable/ic_arrow_circle_right_small"
+            app:iconGravity="textEnd"
+            style="@style/SmallButton"
+            android:text="@string/choose"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_election_name" />
+        
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

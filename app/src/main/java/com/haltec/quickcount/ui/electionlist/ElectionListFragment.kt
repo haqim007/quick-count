@@ -14,9 +14,14 @@ import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.databinding.FragmentElectionListBinding
+import com.haltec.quickcount.domain.model.BELUM_DIKIRIM
+import com.haltec.quickcount.domain.model.BELUM_TERVERIFIKASI
 import com.haltec.quickcount.domain.model.Election
+import com.haltec.quickcount.domain.model.statusVoteNote
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
+import com.haltec.quickcount.ui.electionaction.ElectionActionFragment
+import com.haltec.quickcount.ui.electionaction.ElectionActionFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 
@@ -57,7 +62,14 @@ class ElectionListFragment : BaseFragment() {
         val adapter = ElectionListAdapter(
             object : ElectionListAdapter.ElectionListCallback {
                 override fun onClick(election: Election) {
-
+                    if (election.statusVoteNote in listOf(BELUM_DIKIRIM, BELUM_TERVERIFIKASI)){
+                        viewModel.state.value.tps?.let {
+                            findNavController().navigate(
+                                ElectionListFragmentDirections
+                                    .actionElectionListFragmentToElectionActionFragment(it, election)
+                            )
+                        }
+                    }
                 }
             })
         rvElections.adapter = adapter

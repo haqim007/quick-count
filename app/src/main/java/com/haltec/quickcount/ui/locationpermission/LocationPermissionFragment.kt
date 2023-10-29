@@ -35,7 +35,6 @@ class LocationPermissionFragment : Fragment() {
                     findNavController().navigate(
                         LocationPermissionFragmentDirections.actionLocationPermissionFragmentToLoginFragment()
                     )
-                    Log.d("hehehe", "actionLocationPermissionFragmentToLoginFragment")
                 }
             }
         }

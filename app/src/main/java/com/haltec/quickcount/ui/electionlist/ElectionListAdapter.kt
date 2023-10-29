@@ -10,10 +10,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
-import com.haltec.quickcount.data.util.capitalizeWords
 import com.haltec.quickcount.databinding.ItemElectionBinding
-import com.haltec.quickcount.databinding.ItemTpsBinding
 import com.haltec.quickcount.domain.model.Election
+import com.haltec.quickcount.domain.model.statusVoteNote
 
 
 class ElectionListAdapter(
@@ -35,10 +34,14 @@ class ElectionListAdapter(
 
             binding.apply {
                 tvElectionName.text = election.title
-                tvElectionInfo.text = itemView.context.getString(R.string.sent_at_date_time, election.createdAt)
+                tvElectionInfo.text = if (election.statusVote == ""){
+                    itemView.context.getString(R.string.input_data_before_date_time, election.createdAt)
+                }else{
+                    itemView.context.getString(R.string.sent_at_date_time, election.updatedAt)
+                }
                 val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, election.statusVoteNote))
-                var statusColor = ContextCompat.getColor(itemView.context, R.color.color_status_election_not_sent)
-                var borderColor = ContextCompat.getColor(itemView.context, R.color.color_border_election_not_sent)
+                val statusColor: Int
+                val borderColor: Int
                 when(election.statusVote) {
                     "0" -> {
                         statusColor = ContextCompat.getColor(

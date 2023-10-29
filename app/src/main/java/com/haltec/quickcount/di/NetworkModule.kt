@@ -10,6 +10,8 @@ import com.haltec.quickcount.data.remote.service.AuthService
 import com.haltec.quickcount.data.remote.base.TokenInterceptor
 import com.haltec.quickcount.data.remote.service.ElectionService
 import com.haltec.quickcount.data.remote.service.TPSService
+import com.haltec.quickcount.data.remote.service.UploadEvidenceService
+import com.haltec.quickcount.data.remote.service.VoteService
 import okhttp3.OkHttpClient
 import javax.inject.Qualifier
 
@@ -85,5 +87,18 @@ object NetworkModule {
         apiConfig: ApiConfig
     ): ElectionService = apiConfig.createService(ElectionService::class.java)
 
+    @ViewModelScoped
+    @Provides
+    fun provideUploadEvidenceService(
+        @AuthorizedApiConfig
+        apiConfig: ApiConfig
+    ): UploadEvidenceService = apiConfig.createService(UploadEvidenceService::class.java)
 
+    @ViewModelScoped
+    @Provides
+    fun provideVoteService(
+        @AuthorizedApiConfig
+        apiConfig: ApiConfig
+    ): VoteService = apiConfig.createService(VoteService::class.java)
+    
 }

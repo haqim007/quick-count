@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.electiondetail.ElectionActionFragment"
+    tools:context=".ui.electionaction.ElectionActionFragment"
     android:background="@android:color/white">
 
     <com.google.android.material.card.MaterialCardView
@@ -20,7 +20,7 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/light_blue"
+            android:background="@color/black_55_alpha"
             app:shapeAppearance="?attr/shapeAppearanceMediumComponent"
             app:shapeAppearanceOverlay="@style/ShapeAppearance_bottom_corners"
             />
@@ -29,16 +29,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <ImageView
-                android:id="@+id/iv_task"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_logout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:backgroundTint="@android:color/transparent"
-                android:src="@drawable/task"
+                android:layout_height="30dp"
+                android:text="@string/log_out"
+                style="@style/LogoutButton"
+                android:paddingVertical="0dp"
+                android:paddingHorizontal="10dp"
+                android:layout_marginEnd="25dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.4"
+                />
 
             <ImageView
                 android:id="@+id/btn_back"
@@ -60,7 +64,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:layout_marginTop="22dp"
-                app:layout_constraintEnd_toStartOf="@+id/iv_task"
+                app:layout_constraintEnd_toStartOf="@+id/btn_logout"
                 app:layout_constraintStart_toEndOf="@id/btn_back"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="TPS 1" />
@@ -90,11 +94,11 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_tps_name"
                 tools:ignore="SmallSp"
                 tools:text="Kel. Tumpeng Kec. Candipuro" />
-            
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
         
     </com.google.android.material.card.MaterialCardView>
-
 
     <TextView
         android:id="@+id/tv_tps_name1"
@@ -189,17 +193,18 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:text="Formulir" />
+                        android:text="@string/form" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_action1"
+                        android:id="@+id/btn_open_form"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="4dp"
-                        android:drawableEnd="@drawable/ic_arrow_circle_right"
+                        app:icon="@drawable/ic_arrow_circle_right_small"
+                        app:iconGravity="textEnd"
                         android:drawableTint="@android:color/white"
-                        android:paddingHorizontal="10dp"
+                        style="@style/SmallButton"
                         android:text="@string/choose"
                         app:cornerRadius="6dp"
                         app:strokeColor="@android:color/white"
@@ -234,7 +239,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="7dp"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_camera"
                         app:tint="@android:color/white"/>
@@ -250,17 +255,18 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:text="Upload Foto Bukti" />
+                        android:text="@string/upload_photo_evidence" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_action2"
+                        android:id="@+id/btn_upload_evidence"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        android:layout_height="30dp"
                         android:layout_gravity="center"
-                        android:layout_marginTop="8dp"
-                        android:drawableEnd="@drawable/ic_arrow_circle_right"
+                        android:layout_marginTop="4dp"
+                        app:icon="@drawable/ic_arrow_circle_right_small"
+                        app:iconGravity="textEnd"
                         android:drawableTint="@android:color/white"
-                        android:paddingHorizontal="10dp"
+                        style="@style/SmallButton"
                         android:text="@string/choose"
                         app:cornerRadius="6dp"
                         app:strokeColor="@android:color/white"
