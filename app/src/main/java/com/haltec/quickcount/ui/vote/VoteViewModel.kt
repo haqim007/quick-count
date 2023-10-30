@@ -38,7 +38,9 @@ class VoteViewModel @Inject constructor(
                 state.value.tps!!,
                 state.value.election!!
             ).launchCollectLatest {
-                _state.update { state -> state.copy(voteData = it) }
+                _state.update { state -> 
+                    state.copy(voteData = it) 
+                }
             }
         }
     }
@@ -101,12 +103,45 @@ class VoteViewModel @Inject constructor(
         return newPartyListItem
     }
 
+    fun resetCandidateFocus(
+        partyId: Int,
+        candidateId: Int,
+    ) {
+        val newPartyListItem = state.value.voteData.data?.partyLists?.map {
+            if (it.id == partyId) {
+                it.copy(
+                    candidateList = it.candidateList.map { candidate ->
+                        candidate.copy(
+                            requestFocus = if (candidate.id == candidateId) false else candidate.requestFocus
+                        )
+//                        if (candidate.id == candidateId) {
+//                            candidate.copy(
+//                                requestFocus = false
+//                            )
+//                        } else {
+//                            candidate
+//                        }
+                    }
+                )
+            } else {
+                it
+            }
+        } ?: listOf()
+        val newVoteData = state.value.voteData.data?.copy(
+            partyLists = newPartyListItem
+        )
+        _state.update { state ->
+            state.copy(
+                voteData = Resource.Success(newVoteData!!)
+            )
+        }
+    }
+
 
     private var updatePartyVote: Job? = null
     fun setPartyVote(partyId: Int, vote: Int){
         updatePartyVote?.cancel()
-        updatePartyVote = viewModelScope.launch { 
-            delay(3000)
+        updatePartyVote = viewModelScope.launch {
             val newPartiesVote = state.value.partiesVote.filter{ pair ->
                 pair.first != partyId
             } + (partyId to vote)
@@ -120,6 +155,7 @@ class VoteViewModel @Inject constructor(
                     voteData = Resource.Success(newVoteData!!)
                 )
             }
+            delay(3000)
             // reset focus cursor after 3 seconds delay
 //            resetFocusPartyVote()
         }
@@ -163,15 +199,11 @@ class VoteViewModel @Inject constructor(
         }
     }
 
-    fun toggleView(position: Int, data: VoteData.PartyListsItem){
-        val newPartyListsItem = state.value.voteData.data?.partyLists?.map { 
-            if (it.id == data.id){
-                data.copy(
-                    isExpanded = !data.isExpanded
-                )
-            }else{
-                data
-            }
+    fun toggleView(position: Int, partyId: Int){
+        val newPartyListsItem = state.value.voteData.data?.partyLists?.map { party ->
+            party.copy(
+                isExpanded = if(party.id == partyId) !party.isExpanded else party.isExpanded
+            )
         } ?: listOf()
         val newData = state.value.voteData.data!!.copy(
             partyLists = newPartyListsItem

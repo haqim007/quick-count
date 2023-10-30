@@ -94,7 +94,6 @@
                 style="@style/TextAppearance.Bold"
                 android:layout_marginTop="25dp"
                 android:layout_marginStart="27dp"
-                android:text="@string/choose_running_election"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="TPS 1" />

@@ -46,6 +46,11 @@ class TPSListFragment : BaseFragment() {
                     TPSListFragmentDirections.actionTPSListFragmentToTPSElectionListFragment()
                 )
             }
+            
+            srlTpsList.setOnRefreshListener { 
+                viewModel.getTPSList()
+                srlTpsList.isRefreshing = false
+            }
         }
         
         return binding.root

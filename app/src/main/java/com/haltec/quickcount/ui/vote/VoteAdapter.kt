@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -14,11 +13,6 @@ import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
 import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.ItemVoteBinding
 import com.haltec.quickcount.domain.model.VoteData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class VoteAdapter(
    private val callback: Callback
@@ -46,21 +40,18 @@ class VoteAdapter(
             callback: Callback
         ){
             binding.apply {
-                var totalPartyVote = data.totalPartyVote.toString()
+                val totalPartyVote = data.totalPartyVote.toString()
                 etTotalPartyVote.setText(totalPartyVote)
                 if (data.requestFocus){
                     etTotalPartyVote.requestFocus()
                 }
                 
                 etTotalPartyVote.addTextChangedListener(object : TextWatcher {
-
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                     override fun afterTextChanged(s: Editable?) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            if (data.totalPartyVote.toString() != s.toString()) {
-                                callback.onTotalPartyVoteChange(data.id, s.toString().toIntOrNull() ?: 0)
-                            }
+                        if (data.totalPartyVote.toString() != s.toString()) {
+                            callback.onTotalPartyVoteChange(data.id, s.toString().toIntOrNull() ?: 0)
                         }
                     }
                 })
@@ -72,12 +63,16 @@ class VoteAdapter(
                     override fun onCandidateVoteChange(candidateId: Int, vote: Int) {
                         callback.onCandidateVoteChange(data.id, candidateId, vote)
                     }
+
+                    override fun onLostFocus(candidateId: Int) {
+                        callback.onCandidateLostFocus(data.id, candidateId)
+                    }
                 })
                 rvCandidate.adapter = childAdapter
                 rvCandidate.setRecycledViewPool(viewPool)
                 childAdapter.submitList(data.candidateList)
                 btnToggle.setOnClickListener { 
-                    callback.toggleView(position, data)
+                    callback.toggleView(position, data.id)
                 }
                 if (data.isExpanded){
                     btnToggle.setImageDrawable(
@@ -104,7 +99,9 @@ class VoteAdapter(
     interface Callback{
         fun onCandidateVoteChange(partyId: Int, candidateId: Int, vote: Int)
         fun onTotalPartyVoteChange(partyId: Int, vote: Int)
-        fun toggleView(position: Int, data: VoteData.PartyListsItem)
+        fun toggleView(position: Int, partyId: Int)
+        
+        fun onCandidateLostFocus(partyId: Int, candidateId: Int)
     }
 
 

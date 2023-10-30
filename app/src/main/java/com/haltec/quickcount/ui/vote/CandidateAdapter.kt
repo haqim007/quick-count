@@ -58,6 +58,11 @@ class CandidateAdapter(
                         }
                     }
                 })
+                etCandidateVote.setOnFocusChangeListener { view, isFocused -> 
+                    if(!isFocused){
+                        callback.onLostFocus(candidateId = data.id)
+                    }
+                }
 
             }
         }
@@ -72,6 +77,7 @@ class CandidateAdapter(
 
     interface Callback{
         fun onCandidateVoteChange(candidateId: Int, vote: Int)
+        fun onLostFocus(candidateId: Int)
     }
 
 

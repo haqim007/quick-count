@@ -57,7 +57,7 @@ class VoteFragment : BaseFragment() {
             btnBack.setOnClickListener { 
                 findNavController().navigateUp()
             }
-            
+            tvTpsName.text = args.tps.name
             tvElectionName.text = args.election.title
             
             etTotalInvalidVote.setText(viewModel.state.value.invalidVote.toString())
@@ -152,8 +152,12 @@ class VoteFragment : BaseFragment() {
                 viewModel.setPartyVote(partyId, vote)
             }
 
-            override fun toggleView(position: Int, data: VoteData.PartyListsItem) {
-                viewModel.toggleView(position, data)
+            override fun toggleView(position: Int, partyId: Int) {
+                viewModel.toggleView(position, partyId)
+            }
+
+            override fun onCandidateLostFocus(partyId: Int, candidateId: Int) {
+                viewModel.resetCandidateFocus(partyId, candidateId)
             }
         })
         

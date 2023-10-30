@@ -218,12 +218,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mcv_action2"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_marginHorizontal="6dp"
-                android:minHeight="100dp"
                 app:cardBackgroundColor="?attr/colorPrimary"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="5dp"
+                app:layout_constraintBottom_toBottomOf="@+id/mcv_action1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/mcv_action1"
                 app:layout_constraintTop_toTopOf="@+id/mcv_action1"
@@ -242,7 +242,7 @@
                         android:layout_marginTop="7dp"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_camera"
-                        app:tint="@android:color/white"/>
+                        app:tint="@android:color/white" />
 
                     <TextView
                         android:id="@+id/tv_election_action2"
@@ -251,24 +251,24 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="4dp"
+                        android:text="@string/upload_photo_evidence"
                         android:textColor="@android:color/white"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        android:text="@string/upload_photo_evidence" />
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_upload_evidence"
+                        style="@style/SmallButton"
                         android:layout_width="wrap_content"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="4dp"
-                        app:icon="@drawable/ic_arrow_circle_right_small"
-                        app:iconGravity="textEnd"
                         android:drawableTint="@android:color/white"
-                        style="@style/SmallButton"
                         android:text="@string/choose"
                         app:cornerRadius="6dp"
+                        app:icon="@drawable/ic_arrow_circle_right_small"
+                        app:iconGravity="textEnd"
                         app:strokeColor="@android:color/white"
                         app:strokeWidth="1dp" />
 

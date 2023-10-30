@@ -20,5 +20,6 @@ fun hashString(type: String, input: String): String {
 
 fun generateDeviceToken(): String{
     val salt = UUID.randomUUID().toString()
-    return if(BuildConfig.DEBUG) "1234567890" else generateToken(salt)
+    val token = if(BuildConfig.DEBUG) "1234567890" else generateToken(salt)
+    return token
 }

@@ -88,7 +88,8 @@ dependencies {
     implementation(libs.github.mikeortiz.touchimageview)
     implementation(libs.gms.playservices.maps)
     implementation(libs.gms.playservices.location)
-    implementation(platform("com.google.firebase:firebase-bom:32.4.0"))
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.androidx.swiperefreshlayout)
 }
 
 inline fun <reified ValueT> com.android.build.api.dsl.VariantDimension.buildConfigField(

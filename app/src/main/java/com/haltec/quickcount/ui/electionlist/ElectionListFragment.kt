@@ -53,6 +53,11 @@ class ElectionListFragment : BaseFragment() {
             tvTpsLocation.text = getString(R.string.tps_location_, tps.village, tps.subdistrict)
             val adapter = setupAdapter()
             observeElectionList(adapter)
+
+            srlElectionList.setOnRefreshListener {
+                viewModel.getElectionlist()
+                srlElectionList.isRefreshing = false
+            }
         }
         
         return binding.root
