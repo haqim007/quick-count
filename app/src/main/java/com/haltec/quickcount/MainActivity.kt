@@ -3,6 +3,7 @@ package com.haltec.quickcount
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.Manifest.permission.CAMERA
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
@@ -11,6 +12,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -143,6 +145,16 @@ class MainActivity : AppCompatActivity() {
                 .collectLatest { 
                 if (it){
                     if (!logoutDialog.isShowing) logoutDialog.show()
+                }
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            lifecycleScope.launch { 
+                repeatOnLifecycle(Lifecycle.State.STARTED){
+                    if (!isPermissionGranted(POST_NOTIFICATIONS)) {
+                        requestPermissionLauncher.launch(arrayOf(POST_NOTIFICATIONS))
+                    }
                 }
             }
         }

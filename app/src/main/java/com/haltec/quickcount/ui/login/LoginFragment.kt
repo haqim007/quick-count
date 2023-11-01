@@ -128,7 +128,7 @@ class LoginFragment : BaseFragment() {
             it?.let {
                 binding.tvDeviceToken.text = getString(R.string.device_token_s, it)
             } ?: run {
-                viewModel.saveDeviceToken(generateDeviceToken())
+                viewModel.saveDeviceToken(generateDeviceToken(requireContext()))
             }
         }
     }

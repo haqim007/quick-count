@@ -27,6 +27,7 @@ maps = "18.2.0"
 location = "21.0.1"
 swiperefreshlayout = "1.1.0"
 firebaseBom = "32.4.0"
+chucker = "3.5.2"
 # Plugin versions
 jetbrainsKotlinAndroid = "1.9.10"
 androidGradlePlugin = "8.1.1"
@@ -71,6 +72,9 @@ legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", ver
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
 androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+chucker = { group = "com.github.chuckerteam.chucker", name = "library", version.ref = "chucker"}
+chucker-noop = { group = "com.github.chuckerteam.chucker", name = "library-no-op", version.ref = "chucker"}
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

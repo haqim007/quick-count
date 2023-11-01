@@ -1,5 +1,8 @@
 package com.haltec.quickcount.data.remote.base
 
+import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerCollector
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.haltec.quickcount.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -8,6 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class ApiConfig private constructor(
+    private val context: Context,
     private val okHttpClient: OkHttpClient.Builder
 ) {
 
@@ -19,21 +23,21 @@ class ApiConfig private constructor(
             .connectTimeout(120, TimeUnit.SECONDS)
             .readTimeout(120, TimeUnit.SECONDS)
             .writeTimeout(120, TimeUnit.SECONDS)
-//            .addInterceptor { chain ->
-//                val originalRequest = chain.request()
-//                val modifiedRequest = originalRequest
-//                    .newBuilder()
-//                    .header("Content-Type", "application/json")
-//                    .method(originalRequest.method, originalRequest.body)
-//                    .build()
-//                chain.proceed(modifiedRequest)
-//            }
+
 
         if(BuildConfig.DEBUG){
             val loggingInterceptor =
                 HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
             okHttpClient
                 .addInterceptor(loggingInterceptor)
+                .addInterceptor(
+                    ChuckerInterceptor.Builder(context)
+                        .collector(ChuckerCollector(context))
+                        .maxContentLength(250000L)
+                        .redactHeaders(emptySet())
+                        .alwaysReadResponseBody(false)
+                        .build()
+                    )
         }
 
 
@@ -51,8 +55,8 @@ class ApiConfig private constructor(
     }
     
     companion object{
-        fun getInstance(okHttpClient: OkHttpClient.Builder): ApiConfig {
-            return ApiConfig(okHttpClient)
+        fun getInstance(okHttpClient: OkHttpClient.Builder, context: Context): ApiConfig {
+            return ApiConfig(context, okHttpClient)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.haltec.quickcount.di
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,6 +13,7 @@ import com.haltec.quickcount.data.remote.service.ElectionService
 import com.haltec.quickcount.data.remote.service.TPSService
 import com.haltec.quickcount.data.remote.service.UploadEvidenceService
 import com.haltec.quickcount.data.remote.service.VoteService
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
 import javax.inject.Qualifier
 
@@ -54,16 +56,18 @@ object NetworkModule {
     @Provides
     fun provideApiConfig(
         @AuthorizedOkHttpClient
-        okHttpClient: OkHttpClient.Builder
-    ): ApiConfig = ApiConfig.getInstance(okHttpClient)
+        okHttpClient: OkHttpClient.Builder,
+        @ApplicationContext context: Context
+    ): ApiConfig = ApiConfig.getInstance(okHttpClient, context)
 
     @UnauthorizedApiConfig
     @ViewModelScoped
     @Provides
     fun provideUnauthorizedApiConfig(
         @UnauthorizedOkHttpClient
-        okHttpClient: OkHttpClient.Builder
-    ): ApiConfig = ApiConfig.getInstance(okHttpClient)
+        okHttpClient: OkHttpClient.Builder,
+        @ApplicationContext context: Context
+    ): ApiConfig = ApiConfig.getInstance(okHttpClient, context)
 
 
     @ViewModelScoped

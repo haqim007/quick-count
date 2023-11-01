@@ -90,6 +90,8 @@ dependencies {
     implementation(libs.gms.playservices.location)
     implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.swiperefreshlayout)
+    debugImplementation(libs.chucker)
+    releaseImplementation(libs.chucker.noop)
 }
 
 inline fun <reified ValueT> com.android.build.api.dsl.VariantDimension.buildConfigField(
