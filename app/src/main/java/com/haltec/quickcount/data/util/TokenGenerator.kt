@@ -24,9 +24,11 @@ fun hashString(type: String, input: String): String {
 fun generateDeviceToken(context: Context): String{
     val salt = UUID.randomUUID().toString()
     val token = if(BuildConfig.DEBUG) "1234567890" else generateToken(salt)
-    return if (Build.VERSION.SDK_INT >= 26){
-        Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-    }else{
-        generateToken(salt)
-    }
+    return lowerAllWords(
+        if (Build.VERSION.SDK_INT >= 26){
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+        }else{
+            generateToken(salt)
+        }
+    )
 }
