@@ -8,10 +8,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.SimpleItemAnimator
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
@@ -21,16 +21,11 @@ import com.haltec.quickcount.databinding.FragmentVoteBinding
 import com.haltec.quickcount.domain.model.BasicMessage
 import com.haltec.quickcount.domain.model.VoteData
 import com.haltec.quickcount.ui.BaseFragment
+import com.haltec.quickcount.ui.voteform.VoteFormDialogCallback
+import com.haltec.quickcount.ui.voteform.VoteFormDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class VoteFragment : BaseFragment() {
@@ -41,6 +36,8 @@ class VoteFragment : BaseFragment() {
     private val voteDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
     }
+    
+    private lateinit var formDialog: VoteFormDialogFragment
     
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,7 +52,17 @@ class VoteFragment : BaseFragment() {
         binding.apply {
             
             btnBack.setOnClickListener { 
-                findNavController().navigateUp()
+                voteDialog
+                    .setTitle(R.string.are_you_done)
+                    .setMessage(R.string.you_need_to_reinput)
+                    .setPositiveButton(getString(R.string.yes)) { _, _ ->
+                        viewModel.clear()
+                        findNavController().navigateUp()
+                    }
+                    .setNegativeButton(R.string.no, null)
+                    .setCancelable(false)
+                    .show()
+                
             }
             tvTpsName.text = args.tps.name
             tvElectionName.text = args.election.title
@@ -116,7 +123,11 @@ class VoteFragment : BaseFragment() {
                             getString(R.string.data_sent_successfully)
                         )
                         .setIcon(R.drawable.ic_success)
-                        .setPositiveButton(getString(R.string.ok), null)
+                        .setPositiveButton(getString(R.string.ok)){ _, _ ->
+                            viewModel.clear()
+                            findNavController().navigateUp()
+                        }
+                        .setCancelable(false)
                         .show()
                 }
 
@@ -144,20 +155,36 @@ class VoteFragment : BaseFragment() {
 
     private fun FragmentVoteBinding.setupVoteAdapter() {
         val adapter = VoteAdapter(object: VoteAdapter.Callback{
-            override fun onCandidateVoteChange(partyId: Int, candidateId: Int, vote: Int) {
-                viewModel.setCandidateVote(partyId, candidateId, vote)
+            
+            override fun toggleView(partyId: Int) {
+                viewModel.toggleView(partyId)
             }
 
-            override fun onTotalPartyVoteChange(partyId: Int, vote: Int) {
-                viewModel.setPartyVote(partyId, vote)
-            }
+            override fun onEdit(data: VoteData.PartyListsItem) {
+                formDialog = VoteFormDialogFragment.newInstance(object : VoteFormDialogCallback(){
+                    override fun getData(): VoteData.PartyListsItem {
+                        return data
+                    }
 
-            override fun toggleView(position: Int, partyId: Int) {
-                viewModel.toggleView(position, partyId)
-            }
+                    override fun onCandidateVoteChange(partyId: Int, candidateId: Int, vote: Int) {
+                        viewModel.setCandidateVote(partyId, candidateId, vote)
+                    }
 
-            override fun onCandidateLostFocus(partyId: Int, candidateId: Int) {
-                viewModel.resetCandidateFocus(partyId, candidateId)
+                    override fun onPartyVoteChange(partyId: Int, vote: Int) {
+                        viewModel.setPartyVote(partyId, vote)
+                    }
+
+                    override fun getTotalVote(partyId: Int): Flow<Int> {
+                        return viewModel.getTotalVote(partyId)
+                    }
+
+                    override fun getCandidateList(partyInt: Int): Flow<List<VoteData.Candidate>>{
+                        return viewModel.getCandidateListData(partyInt)
+                    }
+                })
+
+                formDialog.show(requireActivity().supportFragmentManager, VoteFormDialogFragment.TAG)
+                
             }
         })
         
@@ -193,9 +220,7 @@ class VoteFragment : BaseFragment() {
                             } else {
 
                                 tvVillageName.text = data!!.village
-                                tvCityName.text = data.city
                                 tvSubdistrictName.text = data.subdistrict
-                                tvProvinceName.text = data.province
                                 
                                 adapter.submitList(data.partyLists)
                             }

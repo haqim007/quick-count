@@ -4,16 +4,19 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
+import com.haltec.quickcount.data.util.formatNumberWithSeparator
 import com.haltec.quickcount.databinding.ItemCandidateBinding
+import com.haltec.quickcount.databinding.ItemCandidateViewBinding
 import com.haltec.quickcount.domain.model.VoteData
+import java.util.Locale
 
-class CandidateAdapter(
-    private val callback: Callback
-): ListAdapter<VoteData.Candidate, CandidateAdapter.ViewHolder>(ItemDiffCallback()) {
+
+class CandidateViewAdapter: ListAdapter<VoteData.Candidate, CandidateViewAdapter.ViewHolder>(ItemDiffCallback()) {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -22,54 +25,33 @@ class CandidateAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.setIsRecyclable(false)
-        holder.onBind(getItem(position), callback)
+        holder.onBind(getItem(position))
     }
 
     class ViewHolder(
-        private val binding: ItemCandidateBinding
+        private val binding: ItemCandidateViewBinding
     ): RecyclerView.ViewHolder(binding.root){
 
         fun onBind(
-            data: VoteData.Candidate,
-            callback: Callback
+            data: VoteData.Candidate
         ){
             binding.apply {
-
                 tvOrderNumber.text = itemView.context.getString(R.string.candidate_order_number_, data.orderNumber)
                 tvCandidateName.text = data.candidateName
-                etCandidateVote.setText(data.totalCandidateVote.toString())
-                btnIncrease.setOnClickListener {
-                    val newVotes = (data.totalCandidateVote + 1)
-                    etCandidateVote.setText(newVotes.toString())
-                }
-                btnDecrese.setOnClickListener {
-                    val newVotes = (data.totalCandidateVote - 1)
-                    etCandidateVote.setText(newVotes.toString())
-                }
-                etCandidateVote.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                    override fun afterTextChanged(s: Editable?) {
-                        if (data.totalCandidateVote.toString() != s.toString()) {
-                            callback.onCandidateVoteChange(data.id, s.toString().toIntOrNull() ?: 0)
-                            etCandidateVote.setSelection(s.toString().length)
-                        }
-                    }
-                })
-
+                tvCandidateVote.text = itemView.context.getString(
+                    R.string.total_vote_,
+                    formatNumberWithSeparator(data.totalCandidateVote)
+                )
             }
         }
 
         companion object{
             fun onCreate(parent: ViewGroup): ViewHolder{
-                val itemView = ItemCandidateBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                val itemView = ItemCandidateViewBinding
+                    .inflate(LayoutInflater.from(parent.context), parent, false)
                 return ViewHolder(itemView)
             }
         }
-    }
-
-    interface Callback{
-        fun onCandidateVoteChange(candidateId: Int, vote: Int)
     }
 
 

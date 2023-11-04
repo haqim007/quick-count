@@ -75,6 +75,7 @@
     <string name="province_title">Provinsi</string>
     <string name="total">JUMLAH</string>
     <string name="total_vote">Jumlah Suara</string>
+    <string name="total_vote_">Jumlah Suara: %s</string>
     <string name="total_vote_total">Total Suara</string>
     <string name="total_party_vote">Jumlah Suara Partai</string>
     <string name="hasil_suara_tidak_sah">Hasil Suara Tidak Sah</string>
@@ -87,4 +88,13 @@
     <string name="list_party_empty">Daftar partai / kandidat kosong!</string>
     <string name="filter_based_on_status">Pilih berdasarkan status</string>
     <string name="detail_semua_formulir">Detail Semua Formulir</string>
+    <string name="save">Simpan</string>
+    <string name="you_need_to_reinput">Anda perlu memasukkan ulang semua data jika kembali</string>
+    <string name="all">Semua</string>
+    <string name="not_sent_yet">Belum Dikirim</string>
+    <string name="not_verified_yet">Belum Terverifikasi</string>
+    <string name="verified">Sudah Terverifikasi</string>
+    <string name="rejected">Ditolak</string>
+    <string name="election_">Data %s</string>
+    <string name="election_data_cannot_be_changed_anymore">Data sudah tidak dapat diubah kembali. Silahkan hubungi administrator jika ada perubahan</string>
 </resources>

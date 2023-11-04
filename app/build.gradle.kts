@@ -17,8 +17,8 @@ android {
         applicationId = "com.haltec.quickcount"
         minSdk = 24
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.0.0.6"
+        versionCode = 7
+        versionName = "1.0.0.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.legacy.support.v4)
     implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.recyclerview)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

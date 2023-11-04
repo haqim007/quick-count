@@ -36,6 +36,7 @@ safeArgsKotlinPlugin = "2.7.3"
 legacy-support-v4 = "1.0.0"
 lifecycle-livedata-ktx = "2.6.2"
 google-services = "4.4.0"
+recyclerview = "1.3.2"
 
 [libraries]
 androidx-ktx = {group = "androidx.core", name="core-ktx", version.ref="ktx"}
@@ -74,6 +75,7 @@ androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "s
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 chucker = { group = "com.github.chuckerteam.chucker", name = "library", version.ref = "chucker"}
 chucker-noop = { group = "com.github.chuckerteam.chucker", name = "library-no-op", version.ref = "chucker"}
+recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 
 
 [plugins]

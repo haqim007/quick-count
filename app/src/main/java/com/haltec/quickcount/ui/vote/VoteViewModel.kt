@@ -11,7 +11,11 @@ import com.haltec.quickcount.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -49,7 +53,6 @@ class VoteViewModel @Inject constructor(
     fun setCandidateVote(partyId: Int, candidateId: Int, vote: Int){
         updateCandidateVote?.cancel()
         updateCandidateVote = viewModelScope.launch {
-           
             val newCandidatesVote = state.value.candidatesVote.filter{ pair ->
                 pair.first != candidateId
             } + (candidateId to vote)
@@ -86,13 +89,10 @@ class VoteViewModel @Inject constructor(
                     candidateList = it.candidateList.map { candidate ->
                         if (candidate.id == candidateId) {
                             candidate.copy(
-                                totalCandidateVote = vote,
-                                requestFocus = true
+                                totalCandidateVote = vote
                             )
                         } else {
-                            candidate.copy(
-                                requestFocus = false
-                            )
+                            candidate
                         }
                     }
                 )
@@ -102,41 +102,6 @@ class VoteViewModel @Inject constructor(
         } ?: listOf()
         return newPartyListItem
     }
-
-    fun resetCandidateFocus(
-        partyId: Int,
-        candidateId: Int,
-    ) {
-        val newPartyListItem = state.value.voteData.data?.partyLists?.map {
-            if (it.id == partyId) {
-                it.copy(
-                    candidateList = it.candidateList.map { candidate ->
-                        candidate.copy(
-                            requestFocus = if (candidate.id == candidateId) false else candidate.requestFocus
-                        )
-//                        if (candidate.id == candidateId) {
-//                            candidate.copy(
-//                                requestFocus = false
-//                            )
-//                        } else {
-//                            candidate
-//                        }
-                    }
-                )
-            } else {
-                it
-            }
-        } ?: listOf()
-        val newVoteData = state.value.voteData.data?.copy(
-            partyLists = newPartyListItem
-        )
-        _state.update { state ->
-            state.copy(
-                voteData = Resource.Success(newVoteData!!)
-            )
-        }
-    }
-
 
     private var updatePartyVote: Job? = null
     fun setPartyVote(partyId: Int, vote: Int){
@@ -156,14 +121,34 @@ class VoteViewModel @Inject constructor(
                 )
             }
             delay(3000)
-            // reset focus cursor after 3 seconds delay
-//            resetFocusPartyVote()
+        }
+    }
+    
+    fun getTotalVote(partyId: Int): Flow<Int> {
+        return state
+            .map { it.voteData.data?.partyLists?.first { it.id == partyId }?.totalVote ?: 0 }
+            .distinctUntilChanged()
+    }
+    
+    fun getCandidateListData(partyId: Int): Flow<List<VoteData.Candidate>> {
+        return state.map { 
+            val item = it.voteData.data?.partyLists?.first { it.id == partyId }
+                ?.candidateList ?: listOf()
+            //dummy
+//            val result = mutableListOf<VoteData.Candidate>()
+//            for (i in 99..105){
+//                result.add(item[0].copy(
+//                    id = i
+//                ))
+//            }
+            //dummy
+            item
         }
     }
 
     private fun updatePartyVote(
         partyId: Int,
-        vote: Int,
+        vote: Int
     ): List<VoteData.PartyListsItem> {
         val newPartyListItem = state.value.voteData.data?.partyLists?.map {
             if (it.id == partyId) {
@@ -171,35 +156,16 @@ class VoteViewModel @Inject constructor(
                     totalPartyVote = vote,
                     totalVote = vote + it.candidateList.sumOf { candidate ->
                         candidate.totalCandidateVote
-                    },
-                    requestFocus = true
+                    }
                 )
             } else {
-                it.copy(
-                    requestFocus = false
-                )
+                it
             }
         } ?: listOf()
         return newPartyListItem
     }
 
-    private fun resetFocusPartyVote() {
-        val newPartyListItem = state.value.voteData.data?.partyLists?.map {
-            it.copy(
-                requestFocus = false
-            )
-        } ?: listOf()
-        val newVoteData = state.value.voteData.data?.copy(
-            partyLists = newPartyListItem
-        )
-        _state.update { state ->
-            state.copy(
-                voteData = Resource.Success(newVoteData!!)
-            )
-        }
-    }
-
-    fun toggleView(position: Int, partyId: Int){
+    fun toggleView(partyId: Int){
         val newPartyListsItem = state.value.voteData.data?.partyLists?.map { party ->
             party.copy(
                 isExpanded = if(party.id == partyId) !party.isExpanded else party.isExpanded
@@ -210,7 +176,6 @@ class VoteViewModel @Inject constructor(
         )
         _state.update { state ->
             state.copy(
-                updateThePosition = position,
                 voteData = Resource.Success(newData)
             )
         }
@@ -245,6 +210,21 @@ class VoteViewModel @Inject constructor(
             }
         }
     }
+    
+    fun clear(){
+        _state.update { state -> 
+            state.copy(
+                voteData = Resource.Idle(),
+                candidatesVote = listOf(),
+                partiesVote = listOf(),
+                invalidVote = 0,
+                termsIsApproved = false,
+                tps = null,
+                election = null,
+                submitResult = Resource.Idle()
+            )
+        }
+    }
 }
 
 data class VoteUiState(
@@ -257,7 +237,5 @@ data class VoteUiState(
     val termsIsApproved: Boolean = false,
     val tps: TPS? = null,
     val election: Election? = null,
-    // Position to be updated in recyclerview
-    val updateThePosition: Int? = null,
     val submitResult: Resource<BasicMessage> = Resource.Idle()
 )

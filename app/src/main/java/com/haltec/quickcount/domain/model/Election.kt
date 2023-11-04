@@ -15,13 +15,10 @@ data class Election(
     val createdBy: String
 ): Parcelable
 
-const val BELUM_TERVERIFIKASI = "Belum Terverifikasi"
-const val SUDAH_TERVERIFIKASI = "Sudah Terverifikasi"
-const val BELUM_DIKIRIM = "Belum Dikirim"
-
 val Election.statusVoteNote: String
     get() = when(statusVote){
-        "0" -> BELUM_TERVERIFIKASI
-        "1" -> SUDAH_TERVERIFIKASI
-        else -> BELUM_DIKIRIM
+        ElectionStatus.SUBMITTED.valueNumber -> ElectionStatus.SUBMITTED.text
+        ElectionStatus.VERIFIED.valueNumber -> ElectionStatus.VERIFIED.text
+        ElectionStatus.REJECTED.valueNumber -> ElectionStatus.REJECTED.text
+        else -> ElectionStatus.PENDING.text
     }

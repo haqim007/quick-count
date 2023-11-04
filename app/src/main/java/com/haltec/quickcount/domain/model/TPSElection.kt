@@ -1,12 +1,28 @@
 package com.haltec.quickcount.domain.model
 
-import com.haltec.quickcount.data.util.lowerAllWords
+enum class ElectionFilter{
+    BELUM_DIKIRIM,
+    BELUM_TERVERIFIKASI,
+    SUDAH_TERVERIFIKASI,
+    DITOLAK,
+    SEMUA
+}
 
-fun stringToFilter(value: String): String{
-    return when(lowerAllWords(value)){
-        "belum dikirim" -> "pending"
-        "belum terverifikasi" -> "submitted"
-        "sudah terverifikasi" -> "approved"
+val ElectionFilter.text
+    get() = when(this){
+        ElectionFilter.BELUM_DIKIRIM -> ElectionStatus.PENDING.text
+        ElectionFilter.BELUM_TERVERIFIKASI -> ElectionStatus.SUBMITTED.text
+        ElectionFilter.SUDAH_TERVERIFIKASI -> ElectionStatus.VERIFIED.text
+        ElectionFilter.DITOLAK -> ElectionStatus.REJECTED.text
+        else -> "Semua"
+    }
+
+fun stringToFilter(value: String): String {
+    return when (value) {
+        ElectionStatus.PENDING.text -> ElectionStatus.PENDING.valueText
+        ElectionStatus.SUBMITTED.text -> ElectionStatus.SUBMITTED.valueText
+        ElectionStatus.VERIFIED.text -> ElectionStatus.VERIFIED.valueText
+        ElectionStatus.REJECTED.text -> ElectionStatus.REJECTED.valueText
         else -> ""
     }
 }
@@ -31,9 +47,11 @@ data class TPSElection(
 ){
     val statusVoteNote: String
         get() = when(statusVote){
-            "0" -> BELUM_TERVERIFIKASI
-            "1" -> SUDAH_TERVERIFIKASI
-            else -> BELUM_DIKIRIM
+            ElectionStatus.SUBMITTED.valueText -> ElectionStatus.SUBMITTED.text
+            ElectionStatus.VERIFIED.valueText -> ElectionStatus.VERIFIED.text
+            ElectionStatus.REJECTED.valueText -> ElectionStatus.REJECTED.text
+            ElectionStatus.PENDING.valueText -> ElectionStatus.PENDING.text
+            else -> ElectionStatus.PENDING.text
         }
     
     fun toTPS() = TPS(
@@ -47,9 +65,9 @@ data class TPSElection(
         city = city,
         latitude = latitude,
         longitude = longitude,
-        approved = if (statusVote == "1") "1" else "0",
-        submitted = if (statusVote == "0") "1" else "0",
-        pending = if (statusVote == "") "1" else "0",
+        approved = if (statusVote == ElectionStatus.VERIFIED.valueText) "1" else "0",
+        submitted = if (statusVote == ElectionStatus.SUBMITTED.valueText) "1" else "0",
+        pending = if (statusVote == ElectionStatus.PENDING.valueText) "1" else "0",
         dpt = dpt,
         createdBy = createdBy,
         createdAt = createdAt

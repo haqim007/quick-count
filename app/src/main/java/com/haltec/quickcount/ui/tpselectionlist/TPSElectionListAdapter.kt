@@ -10,9 +10,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
-import com.haltec.quickcount.databinding.ItemElectionBinding
 import com.haltec.quickcount.databinding.ItemTpsElectionBinding
-import com.haltec.quickcount.domain.model.Election
+import com.haltec.quickcount.domain.model.ElectionStatus
 import com.haltec.quickcount.domain.model.TPSElection
 
 
@@ -45,18 +44,18 @@ class TPSElectionListAdapter(
                 val statusColor: Int
                 val borderColor: Int
                 when(data.statusVote) {
-                    "0" -> {
+                    ElectionStatus.SUBMITTED.valueText -> {
                         statusColor = ContextCompat.getColor(
                             itemView.context,
-                            R.color.color_status_election_not_verified
+                            R.color.color_status_election_submitted
                         )
                         borderColor = ContextCompat.getColor(
                             itemView.context,
-                            R.color.color_border_election_not_verified
+                            R.color.color_border_election_submitted
                         )
                     }
 
-                    "1" -> {
+                    ElectionStatus.VERIFIED.valueText -> {
                         statusColor = ContextCompat.getColor(
                             itemView.context,
                             R.color.color_status_election_verified

@@ -11,13 +11,16 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.databinding.FragmentTpsElectionListBinding
+import com.haltec.quickcount.domain.model.ElectionFilter
 import com.haltec.quickcount.domain.model.TPSElection
+import com.haltec.quickcount.domain.model.text
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,6 +42,10 @@ class TPSElectionListFragment : BaseFragment() {
 
         binding.apply {
             tpsElectionListSetup()
+            
+            srlTpsElection.setOnRefreshListener { 
+                viewModel.getTPSElectionlist()
+            }
 
             btnLogout.setOnClickListener {
                 mainViewModel.requestToLogout()
@@ -46,11 +53,15 @@ class TPSElectionListFragment : BaseFragment() {
             
             btnBack.setOnClickListener { findNavController().navigateUp() }
 
-            val items = arrayOf("Semua", "Belum Dikirim", "Belum Terverifikasi", "Sudah Terverifikasi")
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, items)
-            etFilter.setAdapter(adapter)
-            etFilter.setOnItemClickListener { adapterView, view, position, l -> 
-                viewModel.setFilter(items[position])
+            val items = ElectionFilter.entries.map { 
+                it.text
+            }
+            cgFilter.setOnCheckedStateChangeListener { _, checkedIds ->
+                val typeChip = cgFilter.findViewById<Chip>(checkedIds[0])
+                if (items.contains(typeChip.text.toString())){
+                    viewModel.setFilter(typeChip.text.toString())
+                }
+                
             }
         }
         
@@ -83,7 +94,7 @@ class TPSElectionListFragment : BaseFragment() {
                         }
                         layoutLoader.tvErrorMessage.isVisible = data.isNullOrEmpty()
                         layoutLoader.btnTryAgain.isVisible = data.isNullOrEmpty()
-                        tilFilterDropdown.isVisible = true
+                        hsvFilter.isVisible = true
                         layoutLoader.lavAnimation.isVisible = data.isNullOrEmpty()
                         rvTps.isVisible = data?.isNotEmpty() == true
                     }
@@ -106,7 +117,8 @@ class TPSElectionListFragment : BaseFragment() {
                     }
 
                     override fun onAll(resource: Resource<List<TPSElection>>) {
-                        tilFilterDropdown.isInvisible = resource is Resource.Error
+//                        hsvFilter.isInvisible = resource is Resource.Error
+                        srlTpsElection.isRefreshing = resource is Resource.Loading
                     }
                 }
             )

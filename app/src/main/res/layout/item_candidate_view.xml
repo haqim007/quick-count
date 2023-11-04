@@ -58,85 +58,22 @@
         tools:text="Budiyono S. - Budiyani M." />
 
     <TextView
-        android:id="@+id/tv_total_title"
+        android:id="@+id/tv_candidate_vote"
         style="@style/TextAppearance.Bold.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="@string/total_vote"
-        app:layout_constraintEnd_toEndOf="@+id/linearLayout"
-        app:layout_constraintStart_toStartOf="@+id/linearLayout"
-        app:layout_constraintTop_toBottomOf="@id/tv_candidate_name" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:layout_marginBottom="16dp"
+        android:text="@string/total_vote_"
+        tools:text="Jumlah Suara: 1000"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_total_title">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_decrese"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="5dp"
-            android:padding="0dp"
-            android:text="-"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:backgroundTint="@color/white"
-            app:cornerRadius="4dp"
-            app:strokeColor="@color/black"
-            app:strokeWidth="1dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_input_total_vote_candidate"
-            android:layout_width="120dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="5dp"
-            app:hintEnabled="false"
-            app:layout_constraintBottom_toBottomOf="@+id/btn_increase"
-            app:layout_constraintEnd_toStartOf="@id/btn_increase"
-            app:layout_constraintTop_toTopOf="@id/btn_increase">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_candidate_vote"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:inputType="number"
-                tools:text="1.000.000"
-                style="@style/TextAppearance.Bold.Small"/>
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_increase"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="5dp"
-            android:padding="0dp"
-            android:text="+"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:backgroundTint="@color/white"
-            app:cornerRadius="4dp"
-            app:layout_constraintEnd_toStartOf="@id/til_input_total_vote_candidate"
-            app:layout_constraintTop_toBottomOf="@id/tv_total_title"
-            app:strokeColor="@color/black"
-            app:strokeWidth="1dp" />
-    </LinearLayout>
+        app:layout_constraintStart_toStartOf="@+id/tv_candidate_name"
+        app:layout_constraintTop_toBottomOf="@id/tv_candidate_name"
+        android:layout_marginBottom="16dp"/>
+    
 
     <View
         android:id="@+id/divider3"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="1dp"
         android:background="?android:attr/listDivider"
         app:layout_constraintEnd_toEndOf="parent"

@@ -17,7 +17,6 @@ data class VoteData(
         val isExpanded: Boolean = false,
         val totalPartyVote: Int = 0,
         val totalVote: Int = 0,
-        val requestFocus: Boolean = false
     )
 
     data class Candidate(
@@ -25,7 +24,6 @@ data class VoteData(
         val candidateName: String,
         val id: Int,
         val totalCandidateVote: Int = 0,
-        val requestFocus: Boolean = false
     )
 }
 

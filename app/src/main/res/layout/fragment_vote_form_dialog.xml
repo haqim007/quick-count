@@ -1,91 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="15dp"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardBackgroundColor="@android:color/white"
-    app:cardCornerRadius="2dp"
-    app:cardElevation="10dp"
-    android:layout_margin="10dp">
-    
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:backgroundTint="@android:color/white"
+    >
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/cl_main">
+        android:id="@+id/bottom_sheet_vote_form"
+        style="?attr/bottomSheetStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/tv_party_title"
-                style="@style/TextAppearance.Bold"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginStart="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btn_edit"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Data Perolehan Partai Golkar" />
-
-            <ImageButton
-                android:id="@+id/btn_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_edit"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btn_toggle"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/btn_toggle"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_marginEnd="8dp"
-                android:background="@android:color/transparent"
-                android:src="@drawable/ic_arrow_top"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                android:id="@+id/divider"
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:layout_marginTop="7dp"
-                android:background="?android:attr/listDivider"
-                android:foreground="@color/black_10_alpha"
-                app:layout_constraintTop_toBottomOf="@+id/btn_toggle" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_content"
-            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:minHeight="300dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cl_header">
+            android:id="@+id/cl_main"
+            android:layout_margin="10dp"
+            android:layout_marginTop="15dp"
+            android:background="@android:color/white"
+            >
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tv_party_title"
+                    style="@style/TextAppearance.Bold"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:maxLines="1"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_close"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Data Perolehan Partai Golkar" />
+
+                <ImageButton
+                    android:id="@+id/btn_close"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_close"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"
+                    android:layout_marginTop="7dp"
+                    android:background="?android:attr/listDivider"
+                    android:foreground="@color/black_10_alpha"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_close" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.core.widget.NestedScrollView
-                android:layout_width="match_parent"
+                android:id="@+id/cl_content"
+                android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:fillViewport="true"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cl_header"
+                android:fillViewport="true">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -95,28 +86,26 @@
                         android:id="@+id/rv_candidate"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:layout_marginBottom="10dp"
-                        android:descendantFocusability="beforeDescendants"
-                        android:nestedScrollingEnabled="true"
+                        android:layout_marginBottom="25dp"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
                         app:layout_constraintBottom_toTopOf="@id/mcv_total_party_vote"
+                        android:nestedScrollingEnabled="true"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:itemCount="1"
-                        tools:listitem="@layout/item_candidate_view" />
+                        tools:itemCount="2"
+                        tools:listitem="@layout/item_candidate" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/mcv_total_party_vote"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginBottom="10dp"
                         android:minHeight="50dp"
-                        app:cardBackgroundColor="@color/gray"
+                        app:cardBackgroundColor="@android:color/transparent"
                         app:cardCornerRadius="5dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/btn_close1"
                         app:layout_constraintEnd_toStartOf="@id/mcv_total_vote"
                         app:layout_constraintStart_toStartOf="parent"
                         app:strokeColor="@color/black_55_alpha"
@@ -148,16 +137,22 @@
                                 android:background="?android:attr/listDivider"
                                 android:foreground="@color/black_55_alpha" />
 
-                            <TextView
-                                android:id="@+id/tv_total_party_vote"
-                                style="@style/TextAppearance.Bold"
+                            <com.google.android.material.textfield.TextInputLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_gravity="center"
-                                android:layout_weight="1"
-                                android:gravity="center"
-                                android:minHeight="50dp"
-                                tools:text="10000" />
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:minHeight="30dp"
+                                app:hintEnabled="false">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/et_total_party_vote"
+                                    style="@style/TextAppearance.Bold.Small"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:inputType="number" />
+
+                            </com.google.android.material.textfield.TextInputLayout>
 
 
                         </LinearLayout>
@@ -187,10 +182,10 @@
                             android:weightSum="5">
 
                             <TextView
+                                android:layout_gravity="center"
                                 style="@style/TextAppearance.Bold"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center"
                                 android:layout_marginHorizontal="8dp"
                                 android:layout_marginTop="7dp"
                                 android:layout_weight="1"
@@ -207,24 +202,47 @@
                                 android:foreground="@color/black_55_alpha" />
 
                             <TextView
+                                android:layout_gravity="center"
                                 android:id="@+id/tv_total_vote"
                                 style="@style/TextAppearance.Bold"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_gravity="center"
                                 android:layout_weight="1"
                                 android:gravity="center"
                                 android:minHeight="50dp"
                                 tools:text="10000" />
 
-
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_close1"
+                        app:layout_constraintBottom_toTopOf="@id/view_spacer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:drawableTint="@android:color/white"
+                        android:text="@string/close"
+                        style="@style/CustomButton"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginBottom="100dp"/>
+                    
+                    <View
+                        android:visibility="gone"
+                        android:id="@+id/view_spacer"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.core.widget.NestedScrollView>
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-        
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-    
-</com.google.android.material.card.MaterialCardView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

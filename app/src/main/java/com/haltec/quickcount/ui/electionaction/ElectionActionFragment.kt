@@ -5,15 +5,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.FragmentElectionActionBinding
 import com.haltec.quickcount.ui.BaseFragment
+import com.haltec.quickcount.ui.MainViewModel
 
 class ElectionActionFragment : BaseFragment() {
     
     private lateinit var binding: FragmentElectionActionBinding
+    private val activityViewModel by activityViewModels<MainViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -28,11 +31,12 @@ class ElectionActionFragment : BaseFragment() {
             btnBack.setOnClickListener { 
                 findNavController().navigateUp()
             }
+            btnLogout.setOnClickListener {
+                activityViewModel.requestToLogout()
+            }
             tvTpsName.text = tps.name
             tvTpsLocation.text = getString(R.string.tps_location_, tps.village, tps.subdistrict)
             tvElectionName.text = election.title
-            tvTpsLocation1.text = getString(R.string.tps_location_, tps.village, tps.subdistrict)
-            tvTpsName1.text = tps.name
             btnUploadEvidence.setOnClickListener { 
                 findNavController().navigate(
                     ElectionActionFragmentDirections.actionElectionActionFragmentToUploadEvidenceFragment(

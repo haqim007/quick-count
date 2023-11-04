@@ -9,19 +9,17 @@ import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.databinding.FragmentElectionListBinding
-import com.haltec.quickcount.domain.model.BELUM_DIKIRIM
-import com.haltec.quickcount.domain.model.BELUM_TERVERIFIKASI
 import com.haltec.quickcount.domain.model.Election
+import com.haltec.quickcount.domain.model.ElectionStatus
 import com.haltec.quickcount.domain.model.statusVoteNote
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
-import com.haltec.quickcount.ui.electionaction.ElectionActionFragment
-import com.haltec.quickcount.ui.electionaction.ElectionActionFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 
@@ -56,7 +54,6 @@ class ElectionListFragment : BaseFragment() {
 
             srlElectionList.setOnRefreshListener {
                 viewModel.getElectionlist()
-                srlElectionList.isRefreshing = false
             }
         }
         
@@ -67,13 +64,20 @@ class ElectionListFragment : BaseFragment() {
         val adapter = ElectionListAdapter(
             object : ElectionListAdapter.ElectionListCallback {
                 override fun onClick(election: Election) {
-                    if (election.statusVoteNote in listOf(BELUM_DIKIRIM, BELUM_TERVERIFIKASI)){
+                    if (election.statusVoteNote in listOf(ElectionStatus.PENDING.text, ElectionStatus.SUBMITTED.text)){
                         viewModel.state.value.tps?.let {
                             findNavController().navigate(
                                 ElectionListFragmentDirections
                                     .actionElectionListFragmentToElectionActionFragment(it, election)
                             )
                         }
+                    }else{
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setIcon(R.drawable.ic_warning)
+                            .setTitle(getString(R.string.election_, election.statusVoteNote))
+                            .setMessage(getString(R.string.election_data_cannot_be_changed_anymore))
+                            .setPositiveButton(R.string.ok, null)
+                            .show()
                     }
                 }
             })
@@ -117,6 +121,8 @@ class ElectionListFragment : BaseFragment() {
                         tvElectionListTitle.isVisible = resource !is Resource.Error
                         layoutLoader.btnTryAgain.isVisible = resource is Resource.Error
                         layoutLoader.tvErrorMessage.isVisible = resource is Resource.Error
+
+                        srlElectionList.isRefreshing = resource is Resource.Loading
                     }
                 }
             )

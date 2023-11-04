@@ -46,11 +46,11 @@ class ElectionListAdapter(
                     "0" -> {
                         statusColor = ContextCompat.getColor(
                             itemView.context,
-                            R.color.color_status_election_not_verified
+                            R.color.color_status_election_submitted
                         )
                         borderColor = ContextCompat.getColor(
                             itemView.context,
-                            R.color.color_border_election_not_verified
+                            R.color.color_border_election_submitted
                         )
                     }
 

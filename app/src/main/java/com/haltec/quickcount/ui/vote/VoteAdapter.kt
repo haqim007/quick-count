@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
 import com.haltec.quickcount.R
+import com.haltec.quickcount.data.util.formatNumberWithSeparator
 import com.haltec.quickcount.databinding.ItemVoteBinding
 import com.haltec.quickcount.domain.model.VoteData
 
@@ -24,9 +25,14 @@ class VoteAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.setIsRecyclable(false)
+//        holder.setIsRecyclable(false)
         val item = getItem(position)
         holder.onBind(item, position, callback)
+    }
+
+    override fun getItemId(position: Int): Long {
+        val item = getItem(position) as  VoteData.PartyListsItem
+        return item.id.toLong()
     }
 
     class ViewHolder(
@@ -40,39 +46,22 @@ class VoteAdapter(
             callback: Callback
         ){
             binding.apply {
-                val totalPartyVote = data.totalPartyVote.toString()
-                etTotalPartyVote.setText(totalPartyVote)
-                if (data.requestFocus){
-                    etTotalPartyVote.requestFocus()
-                }
+                tvTotalPartyVote.text = formatNumberWithSeparator(data.totalPartyVote)
+
                 
-                etTotalPartyVote.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                    override fun afterTextChanged(s: Editable?) {
-                        if (data.totalPartyVote.toString() != s.toString()) {
-                            callback.onTotalPartyVoteChange(data.id, s.toString().toIntOrNull() ?: 0)
-                        }
-                    }
-                })
                 tvPartyTitle.text = itemView.context.getString(R.string.data_perolehan_partai_s, data.partyName)
-                
                 tvTotalVote.text = data.totalVote.toString()
                 
-                val childAdapter = CandidateAdapter(object : CandidateAdapter.Callback{
-                    override fun onCandidateVoteChange(candidateId: Int, vote: Int) {
-                        callback.onCandidateVoteChange(data.id, candidateId, vote)
-                    }
-
-                    override fun onLostFocus(candidateId: Int) {
-                        callback.onCandidateLostFocus(data.id, candidateId)
-                    }
-                })
+                val childAdapter = CandidateViewAdapter()
                 rvCandidate.adapter = childAdapter
+                rvCandidate.itemAnimator = null
                 rvCandidate.setRecycledViewPool(viewPool)
                 childAdapter.submitList(data.candidateList)
                 btnToggle.setOnClickListener { 
-                    callback.toggleView(position, data.id)
+                    callback.toggleView(data.id)
+                }
+                tvPartyTitle.setOnClickListener {
+                    callback.toggleView(data.id)
                 }
                 if (data.isExpanded){
                     btnToggle.setImageDrawable(
@@ -84,6 +73,9 @@ class VoteAdapter(
                         ContextCompat.getDrawable(itemView.context, R.drawable.ic_arrow_top)
                     )
                     clContent.visibility = View.GONE
+                }
+                btnEdit.setOnClickListener { 
+                    callback.onEdit(data)
                 }
             }
         }
@@ -97,11 +89,8 @@ class VoteAdapter(
     }
     
     interface Callback{
-        fun onCandidateVoteChange(partyId: Int, candidateId: Int, vote: Int)
-        fun onTotalPartyVoteChange(partyId: Int, vote: Int)
-        fun toggleView(position: Int, partyId: Int)
-        
-        fun onCandidateLostFocus(partyId: Int, candidateId: Int)
+        fun toggleView(partyId: Int)
+        fun onEdit(data: VoteData.PartyListsItem)
     }
 
 

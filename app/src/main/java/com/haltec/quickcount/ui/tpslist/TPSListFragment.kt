@@ -49,7 +49,6 @@ class TPSListFragment : BaseFragment() {
             
             srlTpsList.setOnRefreshListener { 
                 viewModel.getTPSList()
-                srlTpsList.isRefreshing = false
             }
         }
         
@@ -107,6 +106,8 @@ class TPSListFragment : BaseFragment() {
                         tvTpsListTitle.isInvisible = resource is Resource.Error
                         layoutLoader.tvErrorMessage.isVisible = resource is Resource.Error
                         layoutLoader.btnTryAgain.isVisible = resource is Resource.Error
+
+                        srlTpsList.isRefreshing = resource is Resource.Loading
                     }
                 }
             )
