@@ -32,7 +32,16 @@ data class CandidateListResponse(
 		val village: String,
 
 		@field:SerializedName("tps_name")
-		val tpsName: String
+		val tpsName: String,
+		
+		@field:SerializedName("amount")
+		val amount: Int,
+
+		@field:SerializedName("invalid_vote")
+		val invalidVote: Int,
+
+		@field:SerializedName("note")
+		val note: String?,
 	)
 	
 	fun toModel(city: String): VoteData{
@@ -45,6 +54,9 @@ data class CandidateListResponse(
 			province = data.province,
 			subdistrict = data.subdistrict,
 			village = data.village,
+			validVote = data.amount,
+			invalidVote = data.invalidVote,
+			note = data.note
 		)
 	}
 }
@@ -58,12 +70,17 @@ data class PartyListsItemResponse(
 	val partaiName: String,
 
 	@field:SerializedName("id")
-	val id: Int
+	val id: Int,
+
+	@field:SerializedName("amount")
+	val amount: Int
 ){
 	fun toModel() = VoteData.PartyListsItem(
 		candidateList = this.candidateList.map { it.toModel() },
 		partyName = partaiName,
-		id
+		id,
+		totalPartyVote = amount,
+		totalVote = amount + candidateList.sumOf { it.amount }
 	)
 }
 
@@ -76,11 +93,15 @@ data class CandidateListItemResponse(
 	val name: String,
 
 	@field:SerializedName("id")
-	val id: Int
+	val id: Int,
+
+	@field:SerializedName("amount")
+	val amount: Int
 ){
 	fun toModel() = VoteData.Candidate(
 		orderNumber = noUrut,
-		name,
-		id
+		candidateName = name,
+		id = id,
+		totalCandidateVote = amount
 	)
 }

@@ -4,10 +4,11 @@ import com.haltec.quickcount.data.mechanism.AuthorizedNetworkBoundResource
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.preference.UserPreference
 import com.haltec.quickcount.data.remote.datasource.UploadEvidenceRemoteDataSource
+import com.haltec.quickcount.data.remote.response.CurrentEvidenceResponse
 import com.haltec.quickcount.data.remote.response.UploadEvidenceResponse
 import com.haltec.quickcount.domain.model.Election
 import com.haltec.quickcount.domain.model.TPS
-import com.haltec.quickcount.domain.model.UploadEvidenceResult
+import com.haltec.quickcount.domain.model.VoteEvidence
 import com.haltec.quickcount.domain.repository.IUploadEvidenceRepository
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.flow.Flow
@@ -28,8 +29,8 @@ class UploadEvidenceRepository @Inject constructor(
         type: String,
         description: String,
         image: File,
-    ): Flow<Resource<UploadEvidenceResult>> {
-        return object: AuthorizedNetworkBoundResource<UploadEvidenceResult, UploadEvidenceResponse>(
+    ): Flow<Resource<VoteEvidence>> {
+        return object: AuthorizedNetworkBoundResource<VoteEvidence, UploadEvidenceResponse>(
             userPreference
         ){
             override suspend fun requestFromRemote(): Result<UploadEvidenceResponse> {
@@ -44,7 +45,27 @@ class UploadEvidenceRepository @Inject constructor(
                 )
             }
 
-            override fun loadResult(data: UploadEvidenceResponse): Flow<UploadEvidenceResult> {
+            override fun loadResult(data: UploadEvidenceResponse): Flow<VoteEvidence> {
+                return flowOf(data.toModel())
+            }
+        }.asFlow()
+    }
+
+    override fun getCurrent(
+        tps: TPS,
+        election: Election,
+    ): Flow<Resource<List<VoteEvidence>>> {
+        return object: AuthorizedNetworkBoundResource<List<VoteEvidence>, CurrentEvidenceResponse>(
+            userPreference
+        ){
+            override suspend fun requestFromRemote(): Result<CurrentEvidenceResponse> {
+                return remoteDataSource.get(
+                    tpsId = tps.id,
+                    electionId = election.id
+                )
+            }
+
+            override fun loadResult(data: CurrentEvidenceResponse): Flow<List<VoteEvidence>> {
                 return flowOf(data.toModel())
             }
         }.asFlow()

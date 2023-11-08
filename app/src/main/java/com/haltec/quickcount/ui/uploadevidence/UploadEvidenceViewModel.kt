@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.domain.model.Election
 import com.haltec.quickcount.domain.model.TPS
-import com.haltec.quickcount.domain.model.UploadEvidenceResult
+import com.haltec.quickcount.domain.model.VoteEvidence
 import com.haltec.quickcount.domain.repository.IUploadEvidenceRepository
 import com.haltec.quickcount.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,12 +31,28 @@ class UploadEvidenceViewModel @Inject constructor(
         validateAll()
     }
     
+    fun fetchPrevData(){
+        if (state.value.tps != null && state.value.election != null){
+            repository.getCurrent(state.value.tps!!, state.value.election!!).launchCollectLatest {
+                it.data?.forEach {voteEvidence ->
+                    _state.update { state ->
+                        val copyFormState = state.formState
+                        copyFormState[voteEvidence.type] =
+                            FormInputState(imageUrl = voteEvidence.file, description = voteEvidence.description)
+                        state.copy(
+                            formState = copyFormState
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
     fun setImage(file: File){
         _state.update { state ->
             state.type?.let {type ->
                 val formState = state.formState
                 state.formState[type]?.let {formInputState ->
-//                    state.formState[type]
                     formState[type] = formInputState.copy(
                         image = file
                     )
@@ -121,10 +137,11 @@ data class UploadEvidenceUiState(
     val formState: HashMap<Type, FormInputState?> = hashMapOf(),
     val allowToSubmit: Boolean = false,
     val type: Type? = null,
-    val submitResult: Resource<UploadEvidenceResult> = Resource.Idle()
+    val submitResult: Resource<VoteEvidence> = Resource.Idle()
 )
 
 data class FormInputState(
     val image: File? = null,
+    val imageUrl: String? = null,
     val description: String? = null,
 )

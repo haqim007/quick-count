@@ -1,11 +1,10 @@
 package com.haltec.quickcount.ui.vote
 
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +15,7 @@ import com.haltec.quickcount.databinding.ItemVoteBinding
 import com.haltec.quickcount.domain.model.VoteData
 
 class VoteAdapter(
+   private val isEditable: Boolean = true,
    private val callback: Callback
 ): ListAdapter<VoteData.PartyListsItem, VoteAdapter.ViewHolder>(ItemDiffCallback()) {
     
@@ -25,9 +25,8 @@ class VoteAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        holder.setIsRecyclable(false)
         val item = getItem(position)
-        holder.onBind(item, position, callback)
+        holder.onBind(item, isEditable, callback)
     }
 
     override fun getItemId(position: Int): Long {
@@ -42,7 +41,7 @@ class VoteAdapter(
         
         fun onBind(
             data: VoteData.PartyListsItem,
-            position: Int,
+            isEditable: Boolean,
             callback: Callback
         ){
             binding.apply {
@@ -74,9 +73,14 @@ class VoteAdapter(
                     )
                     clContent.visibility = View.GONE
                 }
-                btnEdit.setOnClickListener { 
-                    callback.onEdit(data)
+                
+                btnEdit.isVisible = isEditable
+                if (isEditable){
+                    btnEdit.setOnClickListener {
+                        callback.onEdit(data)
+                    }
                 }
+                
             }
         }
         

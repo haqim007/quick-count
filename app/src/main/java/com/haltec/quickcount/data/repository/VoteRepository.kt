@@ -64,10 +64,10 @@ class VoteRepository @Inject constructor(
             userPreference
         ) {
             override suspend fun requestFromRemote(): Result<BasicResponse> {
-                val totalCandidatesVotes = candidates.map { 
+                val totalCandidatesVotes = candidates.sumOf {
                     it.second
-                }.sum()
-                val totalPartiesVotes = parties.map { it.second }.sum()
+                }
+                val totalPartiesVotes = parties.sumOf { it.second }
                 val validVotes = totalCandidatesVotes + totalPartiesVotes
                 return remoteDataSource.vote(
                     VoteRequest(
@@ -80,7 +80,7 @@ class VoteRepository @Inject constructor(
                             VoteRequest.CandidateItem(it.first, it.second)
                         },
                         partai = parties.map {
-                            VoteRequest.PartyItem(it.first, it.second)
+                            VoteRequest.PartyItem(partaiId = it.first, amount = it.second)
                         }
                     )
                 )

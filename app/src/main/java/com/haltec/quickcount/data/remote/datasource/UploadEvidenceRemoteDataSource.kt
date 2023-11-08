@@ -2,8 +2,8 @@ package com.haltec.quickcount.data.remote.datasource
 
 import com.haltec.quickcount.data.mechanism.getResult
 import com.haltec.quickcount.data.remote.service.UploadEvidenceService
-import com.haltec.quickcount.data.util.fileRequestBody
 import com.haltec.quickcount.data.util.multipartRequestBody
+import com.haltec.quickcount.data.util.textPlainRequestBody
 import dagger.hilt.android.scopes.ViewModelScoped
 import java.io.File
 import javax.inject.Inject
@@ -12,6 +12,11 @@ import javax.inject.Inject
 class UploadEvidenceRemoteDataSource @Inject constructor(
     private val service: UploadEvidenceService
 ) {
+    
+    suspend fun get(tpsId: Int, electionId: Int) = getResult { 
+        service.get(tpsId, electionId)
+    }
+    
     suspend fun upload(
         tpsId: Int,
         electionId: Int,
@@ -24,10 +29,10 @@ class UploadEvidenceRemoteDataSource @Inject constructor(
         service.upload(
             tpsId,
             electionId,
-            type,
-            description,
-            longitude,
-            latitude,
+            textPlainRequestBody(type),
+            textPlainRequestBody(description),
+            textPlainRequestBody(longitude),
+            textPlainRequestBody(latitude),
             file = multipartRequestBody(file, name = "file")
         )
     }

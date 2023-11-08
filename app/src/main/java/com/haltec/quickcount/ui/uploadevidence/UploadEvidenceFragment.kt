@@ -16,6 +16,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.chip.Chip
@@ -26,7 +27,8 @@ import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.data.util.rotateBitmap
 import com.haltec.quickcount.databinding.FragmentUploadEvidenceBinding
-import com.haltec.quickcount.domain.model.UploadEvidenceResult
+import com.haltec.quickcount.domain.model.ElectionStatus
+import com.haltec.quickcount.domain.model.VoteEvidence
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
 import com.haltec.quickcount.ui.camera.CameraActivity
@@ -79,7 +81,9 @@ class UploadEvidenceFragment : BaseFragment() {
         val args: UploadEvidenceFragmentArgs by navArgs()
         val tps = args.tps
         val election = args.election
+        val isEditable = election.statusVote != ElectionStatus.VERIFIED
         viewModel.setTpsElection(tps, election)
+        viewModel.fetchPrevData()
         binding.apply { 
             
             btnBack.setOnClickListener { 
@@ -100,6 +104,10 @@ class UploadEvidenceFragment : BaseFragment() {
                 btnUpload.isEnabled = it
                 btnUpload.isClickable = it
             }
+            
+            btnUpload.isVisible = isEditable
+            btnEditPhoto.isVisible = isEditable
+            mcvVerifiedMessage.isVisible = !isEditable
             
             btnUpload.setOnClickListener { 
                 if(
@@ -152,6 +160,12 @@ class UploadEvidenceFragment : BaseFragment() {
                         isBackCamera
                     )
                     ivPhotoResult.setImageBitmap(result)
+                }else if(formInputState.imageUrl != null){
+                    Glide.with(requireContext())
+                        .load(formInputState.imageUrl)
+                        .into(ivPhotoResult)
+                    ivPhotoResult.isVisible = true
+                    btnEditPhoto.isVisible = true
                 } else {
                     ivPhotoResult.isVisible = false
                     btnEditPhoto.isVisible = false
@@ -170,9 +184,9 @@ class UploadEvidenceFragment : BaseFragment() {
 
     private fun FragmentUploadEvidenceBinding.observeSubmitResult() {
         viewModel.state.map { it.submitResult }.launchCollectLatest {
-            it.handle(object : ResourceHandler<UploadEvidenceResult> {
+            it.handle(object : ResourceHandler<VoteEvidence> {
 
-                override fun onSuccess(data: UploadEvidenceResult?) {
+                override fun onSuccess(data: VoteEvidence?) {
 
                     val notSelectedChipsTitles = arrayListOf<String>()
                     for (i in 0 until cgType.childCount) {
@@ -196,7 +210,7 @@ class UploadEvidenceFragment : BaseFragment() {
                         .show()
                 }
 
-                override fun onError(message: String?, data: UploadEvidenceResult?) {
+                override fun onError(message: String?, data: VoteEvidence?) {
                     var title = ""
                     var content = ""
                     message?.let {
@@ -215,7 +229,7 @@ class UploadEvidenceFragment : BaseFragment() {
 
                 }
 
-                override fun onAll(resource: Resource<UploadEvidenceResult>) {
+                override fun onAll(resource: Resource<VoteEvidence>) {
                     hsvChips.isVisible = resource !is Resource.Loading
                     mcvTakePhoto.isVisible = resource !is Resource.Loading
                     tilNotes.isVisible = resource !is Resource.Loading

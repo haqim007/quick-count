@@ -1,8 +1,6 @@
 package com.haltec.quickcount.domain.model
 
-import com.google.gson.annotations.SerializedName
-
-data class UploadEvidenceResult(
+data class VoteEvidence(
     val latitude: String,
     val description: String,
     val createdAt: String,

@@ -10,8 +10,6 @@ import androidx.core.widget.addTextChangedListener
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
@@ -19,6 +17,7 @@ import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.databinding.FragmentVoteBinding
 import com.haltec.quickcount.domain.model.BasicMessage
+import com.haltec.quickcount.domain.model.ElectionStatus
 import com.haltec.quickcount.domain.model.VoteData
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.voteform.VoteFormDialogCallback
@@ -47,32 +46,43 @@ class VoteFragment : BaseFragment() {
         
         val args: VoteFragmentArgs by navArgs()
         viewModel.setTpsElection(args.tps, args.election)
-        
+        val isEditable = args.election.statusVote != ElectionStatus.VERIFIED
         
         binding.apply {
             
             btnBack.setOnClickListener { 
-                voteDialog
-                    .setTitle(R.string.are_you_done)
-                    .setMessage(R.string.you_need_to_reinput)
-                    .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                        viewModel.clear()
-                        findNavController().navigateUp()
-                    }
-                    .setNegativeButton(R.string.no, null)
-                    .setCancelable(false)
-                    .show()
-                
+                if (viewModel.state.value.hasInputData){
+                    voteDialog
+                        .setTitle(R.string.are_you_done)
+                        .setMessage(R.string.you_need_to_reinput)
+                        .setPositiveButton(getString(R.string.yes)) { _, _ ->
+                            viewModel.clear()
+                            findNavController().navigateUp()
+                        }
+                        .setNegativeButton(R.string.no, null)
+                        .setCancelable(false)
+                        .show()
+                }else{
+                    viewModel.clear()
+                    findNavController().navigateUp()
+                }
             }
             tvTpsName.text = args.tps.name
             tvElectionName.text = args.election.title
             
-            etTotalInvalidVote.setText(viewModel.state.value.invalidVote.toString())
-            etTotalInvalidVote.addTextChangedListener { 
-                viewModel.setInvalidVote(it.toString().toIntOrNull() ?: 0)
+            viewModel.state.map { it.invalidVote }.launchCollectLatest {
+                if (it.toString() != etTotalInvalidVote.text.toString()) {
+                    etTotalInvalidVote.setText(it.toString())
+                }
+            }
+            
+            etTotalInvalidVote.addTextChangedListener {
+                if (it.toString() != viewModel.state.value.invalidVote.toString()){
+                    viewModel.setInvalidVote(it.toString().toIntOrNull() ?: 0)
+                }
             }
 
-            setupVoteAdapter()
+            setupVoteAdapter(isEditable, args.election.statusVote)
             
             cbApproveTerms.setOnCheckedChangeListener { _, isChecked -> 
                 viewModel.setTermIsApproved(isChecked)
@@ -103,11 +113,13 @@ class VoteFragment : BaseFragment() {
 
                 invalidVoteExpanded = !invalidVoteExpanded
             }
-            etTotalInvalidVote.addTextChangedListener { 
-                viewModel.setInvalidVote(it.toString().toIntOrNull() ?: 0)
-            }
 
             observeSubmitResult()
+            
+            //
+            cbApproveTerms.isVisible = isEditable
+            btnSubmit.isVisible = isEditable
+            mcvVerifiedMessage.isVisible = !isEditable
         }
         
         return binding.root
@@ -153,8 +165,11 @@ class VoteFragment : BaseFragment() {
         }
     }
 
-    private fun FragmentVoteBinding.setupVoteAdapter() {
-        val adapter = VoteAdapter(object: VoteAdapter.Callback{
+    private fun FragmentVoteBinding.setupVoteAdapter(
+        isEditable: Boolean,
+        electionStatus: ElectionStatus
+    ) {
+        val adapter = VoteAdapter(isEditable, object: VoteAdapter.Callback{
             
             override fun toggleView(partyId: Int) {
                 viewModel.toggleView(partyId)
@@ -190,14 +205,18 @@ class VoteFragment : BaseFragment() {
         
         rvVote.adapter = adapter
         rvVote.itemAnimator = null
-        setDataToAdapter(adapter)
+        bindVoteData(adapter, electionStatus)
     }
 
-    private fun FragmentVoteBinding.setDataToAdapter(adapter: VoteAdapter) {
+    private fun FragmentVoteBinding.bindVoteData(
+        adapter: VoteAdapter,
+        electionStatus: ElectionStatus
+    ) {
         viewModel.state.apply {
             map { it.voteData }.launchCollectLatest { voteData ->
                 voteData.handle(
                     object : ResourceHandler<VoteData> {
+                        
                         override fun onSuccess(data: VoteData?) {
                             val dataEmpty = data == null || data.partyLists.isEmpty()
                             val dataNotEmpty = data != null && data.partyLists.isNotEmpty()
@@ -221,8 +240,25 @@ class VoteFragment : BaseFragment() {
 
                                 tvVillageName.text = data!!.village
                                 tvSubdistrictName.text = data.subdistrict
-                                
+                                // show data in list
                                 adapter.submitList(data.partyLists)
+                                
+                                // show note
+                                if (electionStatus == ElectionStatus.REJECTED){
+                                    if (!data.note.isNullOrBlank()){
+                                        tvRejectedMessage.text = data.note
+                                        mcvRejectedMessage.isVisible = true
+                                        btnShowNote.isVisible = false
+                                        btnCloseNote.setOnClickListener { 
+                                            mcvRejectedMessage.isVisible = false
+                                            btnShowNote.isVisible = true
+                                        }
+                                        btnShowNote.setOnClickListener {
+                                            mcvRejectedMessage.isVisible = true
+                                            btnShowNote.isVisible = false
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -259,7 +295,7 @@ class VoteFragment : BaseFragment() {
         }
 
         layoutLoader.btnTryAgain.setOnClickListener {
-            viewModel.getCandidates()
+            viewModel.fetchCandidates()
         }
     }
 

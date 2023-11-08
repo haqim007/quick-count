@@ -9,15 +9,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.databinding.FragmentElectionListBinding
 import com.haltec.quickcount.domain.model.Election
-import com.haltec.quickcount.domain.model.ElectionStatus
-import com.haltec.quickcount.domain.model.statusVoteNote
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,20 +61,11 @@ class ElectionListFragment : BaseFragment() {
         val adapter = ElectionListAdapter(
             object : ElectionListAdapter.ElectionListCallback {
                 override fun onClick(election: Election) {
-                    if (election.statusVoteNote in listOf(ElectionStatus.PENDING.text, ElectionStatus.SUBMITTED.text)){
-                        viewModel.state.value.tps?.let {
-                            findNavController().navigate(
-                                ElectionListFragmentDirections
-                                    .actionElectionListFragmentToElectionActionFragment(it, election)
-                            )
-                        }
-                    }else{
-                        MaterialAlertDialogBuilder(requireContext())
-                            .setIcon(R.drawable.ic_warning)
-                            .setTitle(getString(R.string.election_, election.statusVoteNote))
-                            .setMessage(getString(R.string.election_data_cannot_be_changed_anymore))
-                            .setPositiveButton(R.string.ok, null)
-                            .show()
+                    viewModel.state.value.tps?.let {
+                        findNavController().navigate(
+                            ElectionListFragmentDirections
+                                .actionElectionListFragmentToElectionActionFragment(it, election)
+                        )
                     }
                 }
             })

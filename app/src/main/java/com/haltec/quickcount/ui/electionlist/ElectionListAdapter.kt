@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.ItemElectionBinding
 import com.haltec.quickcount.domain.model.Election
-import com.haltec.quickcount.domain.model.statusVoteNote
+import com.haltec.quickcount.domain.model.ElectionStatus
 
 
 class ElectionListAdapter(
@@ -34,16 +34,16 @@ class ElectionListAdapter(
 
             binding.apply {
                 tvElectionName.text = election.title
-                tvElectionInfo.text = if (election.statusVote == ""){
+                tvElectionInfo.text = if (election.statusVote == ElectionStatus.PENDING){
                     itemView.context.getString(R.string.input_data_before_date_time, election.createdAt)
                 }else{
                     itemView.context.getString(R.string.sent_at_date_time, election.updatedAt)
                 }
-                val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, election.statusVoteNote))
+                val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, election.statusVote.text))
                 val statusColor: Int
                 val borderColor: Int
                 when(election.statusVote) {
-                    "0" -> {
+                    ElectionStatus.SUBMITTED -> {
                         statusColor = ContextCompat.getColor(
                             itemView.context,
                             R.color.color_status_election_submitted
@@ -54,7 +54,7 @@ class ElectionListAdapter(
                         )
                     }
 
-                    "1" -> {
+                    ElectionStatus.VERIFIED -> {
                         statusColor = ContextCompat.getColor(
                             itemView.context,
                             R.color.color_status_election_verified

@@ -86,16 +86,73 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <com.google.android.material.card.MaterialCardView
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:id="@+id/mcv_rejected_message"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Medium"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardBackgroundColor="@color/color_danger_background"
+                app:strokeColor="@color/color_warning"
+                android:layout_margin="12dp"
+                app:cardCornerRadius="8dp">
+                
+                <ImageButton
+                    android:id="@+id/btn_close_note"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_close"
+                    android:background="@android:color/transparent"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="10dp"/>
+                
+                <TextView
+                    android:id="@+id/tv_rejected_message"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="@string/election_data_cannot_be_changed_anymore"
+                    app:layout_constraintBottom_toTopOf="@id/btn_submit"
+                    android:textAppearance="@style/TextAppearance.Bold"
+                    android:textColor="@android:color/white"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginEnd="25dp"
+                    />
+            </com.google.android.material.card.MaterialCardView>
+
+            <ImageButton
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:id="@+id/btn_show_note"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="27dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_warning"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/mcv_rejected_message" />
+
             <TextView
                 android:id="@+id/tv_tps_name"
+                style="@style/TextAppearance.Bold"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
-                style="@style/TextAppearance.Bold"
-                android:layout_marginTop="25dp"
                 android:layout_marginStart="27dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toStartOf="@+id/imageButton"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/mcv_rejected_message"
                 tools:text="TPS 1" />
 
             <LinearLayout
@@ -248,7 +305,8 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         android:id="@+id/mcv_total_invalid_vote"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        app:layout_constraintWidth_default="wrap"
                         android:layout_height="wrap_content"
                         android:minHeight="50dp"
                         app:cardCornerRadius="5dp"
@@ -258,14 +316,16 @@
                         app:strokeWidth="1dp"
                         android:layout_marginStart="10dp"
                         android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginEnd="10dp"
                         app:layout_constraintEnd_toEndOf="parent">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:weightSum="5">
+                            android:weightSum="5"
+                            >
 
                             <TextView
                                 style="@style/TextAppearance.Bold"
@@ -276,8 +336,10 @@
                                 app:layout_constraintEnd_toStartOf="@+id/btn_toggle"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
-                                android:text="@string/total_party_vote"
-                                android:layout_weight="1"/>
+                                android:text="@string/total_party_invalid_vote"
+                                android:layout_gravity="center"
+                                android:layout_weight="1"
+                                />
 
                             <View
                                 android:id="@+id/divider2"
@@ -314,6 +376,33 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
         
     </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:id="@+id/mcv_verified_message"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/cb_approve_terms"
+        android:textAppearance="@style/TextAppearance.Medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cardBackgroundColor="@android:color/white"
+        app:strokeColor="@color/color_warning"
+        app:cardCornerRadius="0dp">
+        <TextView
+            android:id="@+id/tv_verified_message"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/election_data_cannot_be_changed_anymore"
+            app:layout_constraintBottom_toTopOf="@id/btn_submit"
+            android:textAppearance="@style/TextAppearance.Medium"
+            android:layout_margin="16dp"
+            android:background="@android:color/white"
+            />
+    </com.google.android.material.card.MaterialCardView>
     
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/cb_approve_terms"

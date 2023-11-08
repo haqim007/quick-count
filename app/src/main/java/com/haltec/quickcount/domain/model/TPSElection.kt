@@ -43,16 +43,8 @@ data class TPSElection(
     val tpsId: Int,
     val village: String,
     val longitude: String,
-    val statusVote: String
+    val statusVote: ElectionStatus
 ){
-    val statusVoteNote: String
-        get() = when(statusVote){
-            ElectionStatus.SUBMITTED.valueText -> ElectionStatus.SUBMITTED.text
-            ElectionStatus.VERIFIED.valueText -> ElectionStatus.VERIFIED.text
-            ElectionStatus.REJECTED.valueText -> ElectionStatus.REJECTED.text
-            ElectionStatus.PENDING.valueText -> ElectionStatus.PENDING.text
-            else -> ElectionStatus.PENDING.text
-        }
     
     fun toTPS() = TPS(
         id = tpsId,
@@ -65,12 +57,13 @@ data class TPSElection(
         city = city,
         latitude = latitude,
         longitude = longitude,
-        approved = if (statusVote == ElectionStatus.VERIFIED.valueText) "1" else "0",
-        submitted = if (statusVote == ElectionStatus.SUBMITTED.valueText) "1" else "0",
-        pending = if (statusVote == ElectionStatus.PENDING.valueText) "1" else "0",
+        approved = null,
+        submitted = null,
+        pending = null,
         dpt = dpt,
         createdBy = createdBy,
-        createdAt = createdAt
+        createdAt = createdAt,
+        rejected = null
     )
     
     fun toElection() = Election(

@@ -14,7 +14,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,6 +25,15 @@ class VoteViewModel @Inject constructor(
 ) : BaseViewModel<VoteUiState>() {
     override val _state = MutableStateFlow(VoteUiState())
     
+    init {
+        state.map { it.voteData }.distinctUntilChanged()
+            .launchCollectLatest {
+                if (!state.value.hasInitState && it is Resource.Success){
+                    setInitState()
+                }
+            }
+    }
+    
     fun setTpsElection(tps: TPS, election: Election){
         _state.update { state ->
             state.copy(
@@ -33,10 +41,42 @@ class VoteViewModel @Inject constructor(
                 election = election
             )
         }
-        getCandidates()
+        fetchCandidates()
     }
     
-    fun getCandidates(){
+    private fun setInitState(){
+        var partiesVote = state.value.partiesVote
+        var newCandidatesVote = state.value.candidatesVote
+        state.value.voteData.data?.partyLists?.forEach { partyListsItem ->
+            partiesVote = updatePartiesVoteState(partiesVote, partyListsItem.id, partyListsItem.totalPartyVote)
+
+            newCandidatesVote = partyListsItem.candidateList.flatMap { candidateItem ->
+                updateCandidatesVoteState(newCandidatesVote, candidateItem.id, candidateItem.totalCandidateVote)
+           }
+        }
+   
+        _state.update { state ->
+            state.copy(
+                invalidVote = state.voteData.data?.invalidVote ?: 0,
+                partiesVote = partiesVote,
+                candidatesVote = newCandidatesVote,
+                hasInitState = true
+            )
+        }
+
+    }
+
+    private fun updateCandidatesVoteState(currentCandidatesVote:  List<Pair<Int, Int>>, candidateId: Int, vote: Int) =
+        currentCandidatesVote.filter { pair ->
+            pair.first != candidateId
+        } + (candidateId to vote)
+
+    private fun updatePartiesVoteState(currentPartiesVote: List<Pair<Int, Int>>, partyId: Int, vote: Int) =
+        currentPartiesVote.filter { pair ->
+            pair.first != partyId
+        } + (partyId to vote)
+
+    fun fetchCandidates(){
         if (state.value.tps != null && state.value.election != null){
             repository.getCandidateList(
                 state.value.tps!!,
@@ -53,15 +93,17 @@ class VoteViewModel @Inject constructor(
     fun setCandidateVote(partyId: Int, candidateId: Int, vote: Int){
         updateCandidateVote?.cancel()
         updateCandidateVote = viewModelScope.launch {
-            val newCandidatesVote = state.value.candidatesVote.filter{ pair ->
-                pair.first != candidateId
-            } + (candidateId to vote)
+//            val newCandidatesVote = state.value.candidatesVote.filter{ pair ->
+//                pair.first != candidateId
+//            } + (candidateId to vote)
+            val newCandidatesVote = updateCandidatesVoteState(state.value.candidatesVote, candidateId, vote)
             val newPartyListItem = updateCandidateVote(partyId, candidateId, vote)
             val newVoteData = state.value.voteData.data?.copy(
                 partyLists = newPartyListItem,
             )
             _state.update { state ->
                 state.copy(
+                    hasInputData =  true,
                     candidatesVote = newCandidatesVote,
                     voteData = Resource.Success(newVoteData!!)
                 )
@@ -107,15 +149,17 @@ class VoteViewModel @Inject constructor(
     fun setPartyVote(partyId: Int, vote: Int){
         updatePartyVote?.cancel()
         updatePartyVote = viewModelScope.launch {
-            val newPartiesVote = state.value.partiesVote.filter{ pair ->
-                pair.first != partyId
-            } + (partyId to vote)
+//            val newPartiesVote = state.value.partiesVote.filter{ pair ->
+//                pair.first != partyId
+//            } + (partyId to vote)
+            val newPartiesVote = updatePartiesVoteState(state.value.partiesVote, partyId, vote)
             val newPartyListItem = updatePartyVote(partyId, vote)
             val newVoteData = state.value.voteData.data?.copy(
                 partyLists = newPartyListItem
             )
             _state.update { state ->
                 state.copy(
+                    hasInputData =  true,
                     partiesVote = newPartiesVote,
                     voteData = Resource.Success(newVoteData!!)
                 )
@@ -146,6 +190,13 @@ class VoteViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Update party vote in [VoteData.PartyListsItem]
+     *
+     * @param partyId
+     * @param vote
+     * @return
+     */
     private fun updatePartyVote(
         partyId: Int,
         vote: Int
@@ -228,6 +279,7 @@ class VoteViewModel @Inject constructor(
 }
 
 data class VoteUiState(
+    val hasInitState: Boolean = false,
     val voteData: Resource<VoteData> = Resource.Idle(),
     // first Int is ID, second Int is total vote
     val candidatesVote: List<Pair<Int, Int>> = listOf(),
@@ -237,5 +289,6 @@ data class VoteUiState(
     val termsIsApproved: Boolean = false,
     val tps: TPS? = null,
     val election: Election? = null,
-    val submitResult: Resource<BasicMessage> = Resource.Idle()
+    val submitResult: Resource<BasicMessage> = Resource.Idle(),
+    val hasInputData: Boolean = false
 )

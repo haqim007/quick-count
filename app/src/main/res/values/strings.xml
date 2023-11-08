@@ -97,4 +97,6 @@
     <string name="rejected">Ditolak</string>
     <string name="election_">Data %s</string>
     <string name="election_data_cannot_be_changed_anymore">Data sudah tidak dapat diubah kembali. Silahkan hubungi administrator jika ada perubahan</string>
+    <string name="total_party_invalid_vote">Jumlah Suara Tidak Sah</string>
+    <string name="data_rejected_">Data Ditolak: %s</string>
 </resources>

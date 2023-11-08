@@ -18,12 +18,11 @@ class TPSListAdapter(
         return TPSListViewHolder.create(parent)
     }
 
-    override fun onBindViewHolder(holder: TPSListAdapter.TPSListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TPSListViewHolder, position: Int) {
         holder.bind(getItem(position), callback)
     }
     
     class TPSListViewHolder(private val binding: ItemTpsBinding): RecyclerView.ViewHolder(binding.root){
-        
         
         fun bind(tps: TPS, callback: TPSListCallback){
             
@@ -35,13 +34,16 @@ class TPSListAdapter(
                     capitalizeWords(tps.subdistrict)
                 )
                 tvDataSent.text = itemView.context.getString(
-                    R.string.data_sent_, tps.submitted
+                    R.string.data_sent_, tps.submitted.toString()
                 )
                 tvDataUnverified.text = itemView.context.getString(
-                    R.string.data_not_verified_, tps.pending
+                    R.string.data_not_verified_, tps.pending.toString()
                 )
                 tvDataVerified.text = itemView.context.getString(
-                    R.string.data_verified_, tps.approved
+                    R.string.data_verified_, tps.approved.toString()
+                )
+                tvDataRejected.text = itemView.context.getString(
+                    R.string.data_rejected_, tps.rejected.toString()
                 )
                 btnOpenTps.setOnClickListener { 
                     callback.onClick(tps)

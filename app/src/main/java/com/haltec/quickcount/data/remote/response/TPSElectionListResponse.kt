@@ -3,6 +3,7 @@ package com.haltec.quickcount.data.remote.response
 import com.google.gson.annotations.SerializedName
 import com.haltec.quickcount.data.util.capitalizeWords
 import com.haltec.quickcount.data.util.stringToStringDateID
+import com.haltec.quickcount.domain.model.ElectionStatus
 import com.haltec.quickcount.domain.model.TPSElection
 
 data class TPSElectionListResponse(
@@ -79,7 +80,13 @@ data class TPSElectionListResponse(
 				longitude = longitude,
 				latitude = latitude,
 				createdAt = stringToStringDateID(createdAt),
-				statusVote = status,
+				statusVote = when(status){
+					ElectionStatus.SUBMITTED.valueText -> ElectionStatus.SUBMITTED
+					ElectionStatus.VERIFIED.valueText -> ElectionStatus.VERIFIED
+					ElectionStatus.REJECTED.valueText -> ElectionStatus.REJECTED
+					ElectionStatus.PENDING.valueText -> ElectionStatus.PENDING
+					else -> ElectionStatus.PENDING
+				},
 				createdBy = capitalizeWords(createdBy),
 				address = address,
 				dpt = dpt

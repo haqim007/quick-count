@@ -48,6 +48,9 @@ data class TPSResponse(
 	@field:SerializedName("submited")
 	val submited: String,
 
+	@field:SerializedName("rejected")
+	val rejected: String,
+
 	@field:SerializedName("village")
 	val village: String,
 
@@ -59,17 +62,18 @@ data class TPSResponse(
 		address, 
 		city, 
 		latitude, 
-		pending, 
+		pending.toIntOrNull() ?: 0, 
 		dpt, 
 		createdAt, 
 		createdBy, 
-		approved,
+		approved.toIntOrNull() ?: 0,
 		capitalizeWords(subdistrict),
 		capitalizeWords(province), 
 		capitalizeWords(name), 
 		id, 
-		submited,
+		submited.toIntOrNull() ?: 0,
 		capitalizeWords(village), 
-		longitude
+		longitude,
+		rejected.toIntOrNull() ?: 0
 	)
 }

@@ -5,6 +5,7 @@ import com.haltec.quickcount.data.util.capitalizeWords
 import com.haltec.quickcount.data.util.stringToDate
 import com.haltec.quickcount.data.util.stringToStringDateID
 import com.haltec.quickcount.domain.model.Election
+import com.haltec.quickcount.domain.model.ElectionStatus
 
 data class ElectionListResponse(
 
@@ -53,7 +54,12 @@ data class ElectionListResponse(
 			createdAt = stringToStringDateID(it.createdAt),
 			updatedBy =  it.updatedBy,
 			updatedAt = stringToStringDateID(it.updatedAt),
-			statusVote = it.statusVote,
+			statusVote = when(it.statusVote){
+				ElectionStatus.SUBMITTED.valueNumber -> ElectionStatus.SUBMITTED
+				ElectionStatus.VERIFIED.valueNumber -> ElectionStatus.VERIFIED
+				ElectionStatus.REJECTED.valueNumber -> ElectionStatus.REJECTED
+				else -> ElectionStatus.PENDING
+			},
 			active = it.active
 		)
 	} ?: listOf()

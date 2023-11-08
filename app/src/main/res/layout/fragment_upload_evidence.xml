@@ -219,6 +219,34 @@
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.card.MaterialCardView
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:id="@+id/mcv_verified_message"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/election_data_cannot_be_changed_anymore"
+            app:layout_constraintBottom_toTopOf="@id/btn_upload"
+            android:textAppearance="@style/TextAppearance.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:cardBackgroundColor="@android:color/white"
+            app:strokeColor="@color/color_warning"
+            app:cardCornerRadius="0dp">
+            <TextView
+                android:id="@+id/tv_verified_message"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/election_data_cannot_be_changed_anymore"
+                app:layout_constraintBottom_toTopOf="@id/btn_submit"
+                android:textAppearance="@style/TextAppearance.Medium"
+                android:layout_margin="16dp"
+                android:background="@android:color/white"
+                />
+        </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_upload"
             android:layout_width="0dp"

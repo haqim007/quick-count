@@ -35,16 +35,16 @@ class TPSElectionListAdapter(
             binding.apply {
                 tvTpsName.text = data.tpsName
                 tvElectionName.text = data.electionName
-                tvElectionInfo.text = if (data.statusVote == ""){
+                tvElectionInfo.text = if (data.statusVote == ElectionStatus.PENDING){
                     itemView.context.getString(R.string.input_data_before_date_time, data.createdAt)
                 }else{
                     itemView.context.getString(R.string.sent_at_date_time, data.createdAt)
                 }
-                val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, data.statusVoteNote))
+                val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, data.statusVote.text))
                 val statusColor: Int
                 val borderColor: Int
                 when(data.statusVote) {
-                    ElectionStatus.SUBMITTED.valueText -> {
+                    ElectionStatus.SUBMITTED -> {
                         statusColor = ContextCompat.getColor(
                             itemView.context,
                             R.color.color_status_election_submitted
@@ -55,7 +55,7 @@ class TPSElectionListAdapter(
                         )
                     }
 
-                    ElectionStatus.VERIFIED.valueText -> {
+                    ElectionStatus.VERIFIED -> {
                         statusColor = ContextCompat.getColor(
                             itemView.context,
                             R.color.color_status_election_verified

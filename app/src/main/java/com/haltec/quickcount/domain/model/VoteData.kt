@@ -1,5 +1,19 @@
 package com.haltec.quickcount.domain.model
 
+/**
+ * Vote data
+ *
+ * @property tpsId
+ * @property province
+ * @property subdistrict
+ * @property partyLists
+ * @property village
+ * @property city
+ * @property tpsName
+ * @property validVote total valid vote
+ * @property invalidVote total invalid vote
+ * @constructor Create empty Vote data
+ */
 data class VoteData(
     val tpsId: Int,
     val province: String,
@@ -8,8 +22,21 @@ data class VoteData(
     val village: String,
     val city: String,
     val tpsName: String,
-
+    val validVote: Int,
+    val invalidVote: Int,
+    val note: String?,
 ){
+    /**
+     * Party lists item
+     *
+     * @property candidateList
+     * @property partyName
+     * @property id
+     * @property isExpanded
+     * @property totalPartyVote
+     * @property totalVote totalPartiVote + sum of totalCandidateVote of [Candidate]
+     * @constructor Create empty Party lists item
+     */
     data class PartyListsItem(
         val candidateList: List<Candidate>,
         val partyName: String,
@@ -19,6 +46,15 @@ data class VoteData(
         val totalVote: Int = 0,
     )
 
+    /**
+     * Candidate
+     *
+     * @property orderNumber
+     * @property candidateName
+     * @property id
+     * @property totalCandidateVote
+     * @constructor Create empty Candidate
+     */
     data class Candidate(
         val orderNumber: Int,
         val candidateName: String,
