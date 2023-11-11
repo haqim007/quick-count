@@ -46,7 +46,6 @@ class VoteAdapter(
         ){
             binding.apply {
                 tvTotalPartyVote.text = formatNumberWithSeparator(data.totalPartyVote)
-
                 
                 tvPartyTitle.text = itemView.context.getString(R.string.data_perolehan_partai_s, data.partyName)
                 tvTotalVote.text = data.totalVote.toString()
@@ -80,6 +79,8 @@ class VoteAdapter(
                         callback.onEdit(data)
                     }
                 }
+                
+                mcvTotalPartyVote.isVisible = data.includePartyVote
                 
             }
         }

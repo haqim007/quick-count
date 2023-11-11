@@ -3,7 +3,9 @@ package com.haltec.quickcount.ui
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import com.haltec.quickcount.hideKeyboard
 import kotlinx.coroutines.Job
@@ -17,6 +19,16 @@ abstract class BaseFragment() : Fragment(){
         viewLifecycleOwner.lifecycleScope.launch {
             this@launchCollectLatest.distinctUntilChanged().collectLatest {
                 callback(it)
+            }
+        }
+    }
+
+    fun <T> Flow<T>.launchOnResumeCollectLatest(callback: suspend (value: T) -> Unit) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED){
+                this@launchOnResumeCollectLatest.distinctUntilChanged().collectLatest {
+                    callback(it)
+                }
             }
         }
     }

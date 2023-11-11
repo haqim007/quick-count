@@ -25,6 +25,9 @@ data class CandidateListResponse(
 		@field:SerializedName("subdistrict")
 		val subdistrict: String,
 
+		@field:SerializedName("is_partai")
+		val isPartai: Int,
+		
 		@field:SerializedName("partai_lists")
 		val partaiLists: List<PartyListsItemResponse>,
 
@@ -56,7 +59,8 @@ data class CandidateListResponse(
 			village = data.village,
 			validVote = data.amount,
 			invalidVote = data.invalidVote,
-			note = data.note
+			note = data.note,
+			isParty = data.isPartai == 1
 		)
 	}
 }

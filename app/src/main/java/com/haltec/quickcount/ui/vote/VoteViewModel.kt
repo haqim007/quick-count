@@ -231,13 +231,19 @@ class VoteViewModel @Inject constructor(
             )
         }
     }
-    
+
+    private var invalidVoteJob: Job? = null
     fun setInvalidVote(totalInvalidVote: Int){
-        _state.update { state ->
-            state.copy(
-                invalidVote = totalInvalidVote
-            )
+        invalidVoteJob?.cancel()
+        invalidVoteJob = viewModelScope.launch {
+            _state.update { state ->
+                state.copy(
+                    invalidVote = totalInvalidVote
+                )
+            }
+            delay(3000)
         }
+        
     }
     
     fun setTermIsApproved(checked: Boolean = true){
@@ -254,8 +260,9 @@ class VoteViewModel @Inject constructor(
                 tps = tps!!,
                 election = election!!,
                 candidates = candidatesVote,
-                parties = partiesVote,
+                parties = if (voteData.data?.isParty == true) partiesVote else null ,
                 invalidVote = invalidVote,
+                isParty = voteData.data?.isParty == true
             ).launchCollectLatest { 
                 _state.update { state -> state.copy(submitResult = it) }
             }
@@ -265,6 +272,8 @@ class VoteViewModel @Inject constructor(
     fun clear(){
         _state.update { state -> 
             state.copy(
+                hasInitState = false,
+                hasInputData = false,
                 voteData = Resource.Idle(),
                 candidatesVote = listOf(),
                 partiesVote = listOf(),

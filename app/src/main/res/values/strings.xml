@@ -77,7 +77,7 @@
     <string name="total_vote">Jumlah Suara</string>
     <string name="total_vote_">Jumlah Suara: %s</string>
     <string name="total_vote_total">Total Suara</string>
-    <string name="total_party_vote">Jumlah Suara Partai</string>
+    <string name="total_party_vote">Suara Partai</string>
     <string name="hasil_suara_tidak_sah">Hasil Suara Tidak Sah</string>
     <string name="data_perolehan_partai_s">Data Perolehan Partai %s</string>
     <string name="candidate_order_number_">Nomor Urut %d</string>

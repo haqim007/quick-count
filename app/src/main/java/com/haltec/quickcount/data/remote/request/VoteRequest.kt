@@ -6,7 +6,7 @@ import com.haltec.quickcount.domain.model.VoteData
 data class VoteRequest(
 	@SerializedName("tps_id")
 	val tpsId: Int,
-	val partai: List<PartyItem>,
+	val partai: List<PartyItem>?,
 	@SerializedName("valid_vote")
 	val validVote: Int,
 	val amount: Int,
@@ -14,7 +14,9 @@ data class VoteRequest(
 	@SerializedName("selection_type_id")
 	val selectionTypeId: Int,
 	@SerializedName("invalid_vote")
-	val invalidVote: Int
+	val invalidVote: Int,
+	@SerializedName("is_partai")
+	val isPartai: Int
 ){
 	data class PartyItem(
 		val amount: Int,

@@ -12,6 +12,8 @@ package com.haltec.quickcount.domain.model
  * @property tpsName
  * @property validVote total valid vote
  * @property invalidVote total invalid vote
+ * @property isParty Include party vote, when true it means, there will not be input for party vote. only candidate vote
+ *
  * @constructor Create empty Vote data
  */
 data class VoteData(
@@ -25,6 +27,7 @@ data class VoteData(
     val validVote: Int,
     val invalidVote: Int,
     val note: String?,
+    val isParty: Boolean,
 ){
     /**
      * Party lists item
@@ -44,7 +47,14 @@ data class VoteData(
         val isExpanded: Boolean = false,
         val totalPartyVote: Int = 0,
         val totalVote: Int = 0,
-    )
+    ){
+        /**
+         * Include party vote, when true it means, there will not be input for party vote. 
+         * only candidate vote
+         */
+        val includePartyVote: Boolean
+            get() = id != 0
+    }
 
     /**
      * Candidate

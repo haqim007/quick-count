@@ -28,12 +28,12 @@ enum class ElectionStatus (val text: String, val valueText: String, val valueNum
      *
      * @constructor Create empty Verified
      */
-    VERIFIED("Sudah Terverifikasi", "approved", "1"),
+    VERIFIED("Sudah Terverifikasi", "approve", "1"),
 
     /**
      * Rejected
      *
      * @constructor Create empty Rejected
      */
-    REJECTED("Ditolak", "rejected", "-1")
+    REJECTED("Ditolak", "reject", "-1")
 }

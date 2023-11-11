@@ -58,7 +58,8 @@ class VoteRepository @Inject constructor(
         election: Election,
         invalidVote: Int,
         candidates: List<Pair<Int, Int>>,
-        parties: List<Pair<Int, Int>>
+        parties: List<Pair<Int, Int>>?,
+        isParty: Boolean
     ): Flow<Resource<BasicMessage>> {
         return object : AuthorizedNetworkBoundResource<BasicMessage, BasicResponse>(
             userPreference
@@ -67,7 +68,7 @@ class VoteRepository @Inject constructor(
                 val totalCandidatesVotes = candidates.sumOf {
                     it.second
                 }
-                val totalPartiesVotes = parties.sumOf { it.second }
+                val totalPartiesVotes = parties?.sumOf { it.second } ?: 0
                 val validVotes = totalCandidatesVotes + totalPartiesVotes
                 return remoteDataSource.vote(
                     VoteRequest(
@@ -79,9 +80,10 @@ class VoteRepository @Inject constructor(
                         candidate = candidates.map { 
                             VoteRequest.CandidateItem(it.first, it.second)
                         },
-                        partai = parties.map {
+                        partai = parties?.map {
                             VoteRequest.PartyItem(partaiId = it.first, amount = it.second)
-                        }
+                        },
+                        isPartai = if (isParty) 1 else 0
                     )
                 )
             }

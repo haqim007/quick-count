@@ -15,6 +15,7 @@ import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
+import com.haltec.quickcount.data.util.formatNumberWithSeparator
 import com.haltec.quickcount.databinding.FragmentVoteBinding
 import com.haltec.quickcount.domain.model.BasicMessage
 import com.haltec.quickcount.domain.model.ElectionStatus
@@ -69,10 +70,14 @@ class VoteFragment : BaseFragment() {
             }
             tvTpsName.text = args.tps.name
             tvElectionName.text = args.election.title
+
+            mcvTotalInvalidVoteView.isVisible = !isEditable
+            mcvTotalInvalidVote.isVisible = isEditable
             
-            viewModel.state.map { it.invalidVote }.launchCollectLatest {
+            viewModel.state.map { it.invalidVote }.launchOnResumeCollectLatest {
                 if (it.toString() != etTotalInvalidVote.text.toString()) {
                     etTotalInvalidVote.setText(it.toString())
+                    tvTotalInvalidVote.text = formatNumberWithSeparator(it)
                 }
             }
             
@@ -98,7 +103,7 @@ class VoteFragment : BaseFragment() {
             }
             
             var invalidVoteExpanded = true
-            btnToggleInvalidVote.setOnClickListener {
+            clInvalidVoteHeader.setOnClickListener {
                 if (invalidVoteExpanded){
                     btnToggleInvalidVote.setImageDrawable(
                         ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_bottom)
@@ -116,9 +121,6 @@ class VoteFragment : BaseFragment() {
 
             observeSubmitResult()
             
-            //
-            cbApproveTerms.isVisible = isEditable
-            btnSubmit.isVisible = isEditable
             mcvVerifiedMessage.isVisible = !isEditable
         }
         
@@ -210,8 +212,9 @@ class VoteFragment : BaseFragment() {
 
     private fun FragmentVoteBinding.bindVoteData(
         adapter: VoteAdapter,
-        electionStatus: ElectionStatus
+        electionStatus: ElectionStatus,
     ) {
+        val isEditable = electionStatus != ElectionStatus.VERIFIED
         viewModel.state.apply {
             map { it.voteData }.launchCollectLatest { voteData ->
                 voteData.handle(
@@ -223,8 +226,8 @@ class VoteFragment : BaseFragment() {
                             svContent.isVisible = dataNotEmpty
                             
                             layoutLoader.lavAnimation.isVisible = dataEmpty
-                            cbApproveTerms.isVisible = dataNotEmpty
-                            btnSubmit.isVisible = dataNotEmpty
+                            cbApproveTerms.isVisible = dataNotEmpty && isEditable
+                            btnSubmit.isVisible = dataNotEmpty && isEditable
                             mcvInvalidVote.isVisible = dataNotEmpty
                             tvTpsName.isVisible = dataNotEmpty
                             llAreaTitle.isVisible = dataNotEmpty
@@ -287,6 +290,9 @@ class VoteFragment : BaseFragment() {
                             tvTpsName.isVisible = false
                             llAreaTitle.isVisible = false
                             llAreaValue.isVisible = false
+                            cbApproveTerms.isVisible = false
+                            btnSubmit.isVisible = false
+                            mcvVerifiedMessage.isVisible = false
                         }
                     }
                 )

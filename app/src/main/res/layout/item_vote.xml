@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginTop="15dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -82,7 +82,8 @@
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constrainedHeight="true"
                 android:fillViewport="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -94,17 +95,19 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_candidate"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constrainedHeight="true"
                         android:layout_marginBottom="10dp"
                         android:descendantFocusability="beforeDescendants"
                         android:nestedScrollingEnabled="true"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                        app:layout_constraintBottom_toTopOf="@id/mcv_total_party_vote"
+                        app:layout_constraintBottom_toTopOf="@id/mcv_total_vote"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        tools:itemCount="1"
+                        app:layout_constraintVertical_bias="0.0"
+                        tools:itemCount="3"
                         tools:listitem="@layout/item_candidate_view" />
 
                     <com.google.android.material.card.MaterialCardView
@@ -135,6 +138,7 @@
                                 android:layout_marginHorizontal="8dp"
                                 android:layout_marginTop="7dp"
                                 android:layout_weight="1"
+                                android:layout_gravity="center"
                                 android:text="@string/total_party_vote"
                                 app:layout_constraintEnd_toStartOf="@+id/btn_toggle"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -167,18 +171,18 @@
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/mcv_total_vote"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
                         android:layout_marginEnd="10dp"
                         android:minHeight="50dp"
                         app:cardBackgroundColor="@color/gray"
                         app:cardCornerRadius="5dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/mcv_total_party_vote"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/mcv_total_party_vote"
-                        app:layout_constraintTop_toTopOf="@+id/mcv_total_party_vote"
                         app:strokeColor="@color/black_55_alpha"
-                        app:strokeWidth="1dp">
+                        app:strokeWidth="1dp"
+                        android:layout_marginBottom="16dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -198,6 +202,7 @@
                                 app:layout_constraintEnd_toStartOf="@+id/btn_toggle"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
+                            
 
                             <View
                                 android:layout_width="match_parent"

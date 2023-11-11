@@ -12,6 +12,7 @@ interface IVoteRepository {
     fun vote(
         tps: TPS, election: Election, invalidVote: Int,
         candidates: List<Pair<Int, Int>>,
-        parties: List<Pair<Int, Int>>,
+        parties: List<Pair<Int, Int>>?,
+        isParty: Boolean
     ): Flow<Resource<BasicMessage>>
 }

@@ -1,21 +1,19 @@
 package com.haltec.quickcount.ui.voteform
 
 import android.app.Dialog
-import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.FragmentVoteFormDialogBinding
 import com.haltec.quickcount.domain.model.VoteData
 import com.haltec.quickcount.ui.vote.CandidateAdapter
@@ -67,6 +65,7 @@ class VoteFormDialogFragment : BottomSheetDialogFragment() {
         binding.bottomSheetVoteForm.layoutParams = layoutParams
         behavior.apply {
             state = BottomSheetBehavior.STATE_EXPANDED
+            skipCollapsed = true
         }
     }
 
@@ -123,9 +122,28 @@ class VoteFormDialogFragment : BottomSheetDialogFragment() {
                         tvTotalVote.text = it.toString()
                     }
                 }
+
+                setupVoteInputLayout(data.includePartyVote)
             }
         }
 
+    }
+
+    private fun FragmentVoteFormDialogBinding.setupVoteInputLayout(isIncludePartyVote: Boolean) {
+        mcvTotalPartyVote.isVisible = isIncludePartyVote
+        // Set initial weights
+        val totalPartyVoteWeight = if (mcvTotalPartyVote.visibility == View.VISIBLE) 1f else 0f
+        val totalVoteWeight = if (mcvTotalPartyVote.visibility == View.VISIBLE) 1f else 2f
+        val paramsTotalPartyVote = mcvTotalPartyVote.layoutParams as LinearLayout.LayoutParams
+        paramsTotalPartyVote.weight = totalPartyVoteWeight
+        mcvTotalPartyVote.layoutParams = paramsTotalPartyVote
+
+        val paramsTotalVote = mcvTotalVote.layoutParams as LinearLayout.LayoutParams
+        paramsTotalVote.weight = totalVoteWeight
+        mcvTotalVote.layoutParams = paramsTotalVote
+
+        // Request layout to apply the changes
+        llVote.requestLayout()
     }
 
 
