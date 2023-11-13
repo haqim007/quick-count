@@ -63,7 +63,6 @@ class VoteViewModel @Inject constructor(
                 hasInitState = true
             )
         }
-
     }
 
     private fun updateCandidatesVoteState(currentCandidatesVote:  List<Pair<Int, Int>>, candidateId: Int, vote: Int) =
@@ -82,6 +81,33 @@ class VoteViewModel @Inject constructor(
                 state.value.tps!!,
                 state.value.election!!
             ).launchCollectLatest {
+                //dummy
+                // use this variable to test list with many candidates
+//                val dummyVoteData: Resource<VoteData> = if (it is Resource.Success && it.data != null){
+//                    val dummy = it.data.partyLists.map { partyListsItem ->
+//                        // dummy
+//                        val dummy = mutableListOf<VoteData.Candidate>()
+//                        for (i in 99..105){
+//                            dummy.add(partyListsItem.candidateList[0].copy(
+//                                id = i
+//                            ))
+//                        }
+//                        //dummy
+//                        partyListsItem.copy(
+//                            candidateList = partyListsItem.candidateList + dummy
+//                        )
+//                    }
+//                    
+//                    Resource.Success(
+//                        it.data.copy(
+//                            partyLists = dummy
+//                        )
+//                    )
+//                }else{
+//                    it
+//                }
+                //dummy
+                
                 _state.update { state -> 
                     state.copy(voteData = it) 
                 }
@@ -93,9 +119,6 @@ class VoteViewModel @Inject constructor(
     fun setCandidateVote(partyId: Int, candidateId: Int, vote: Int){
         updateCandidateVote?.cancel()
         updateCandidateVote = viewModelScope.launch {
-//            val newCandidatesVote = state.value.candidatesVote.filter{ pair ->
-//                pair.first != candidateId
-//            } + (candidateId to vote)
             val newCandidatesVote = updateCandidatesVoteState(state.value.candidatesVote, candidateId, vote)
             val newPartyListItem = updateCandidateVote(partyId, candidateId, vote)
             val newVoteData = state.value.voteData.data?.copy(
@@ -149,9 +172,6 @@ class VoteViewModel @Inject constructor(
     fun setPartyVote(partyId: Int, vote: Int){
         updatePartyVote?.cancel()
         updatePartyVote = viewModelScope.launch {
-//            val newPartiesVote = state.value.partiesVote.filter{ pair ->
-//                pair.first != partyId
-//            } + (partyId to vote)
             val newPartiesVote = updatePartiesVoteState(state.value.partiesVote, partyId, vote)
             val newPartyListItem = updatePartyVote(partyId, vote)
             val newVoteData = state.value.voteData.data?.copy(

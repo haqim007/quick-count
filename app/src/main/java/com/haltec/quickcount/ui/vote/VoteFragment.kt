@@ -10,6 +10,8 @@ import androidx.core.widget.addTextChangedListener
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
@@ -51,6 +53,13 @@ class VoteFragment : BaseFragment() {
         
         binding.apply {
             
+            srlFormVote.apply { 
+                setOnRefreshListener { 
+                    viewModel.fetchCandidates()
+                    isRefreshing = false
+                }
+            }
+            
             btnBack.setOnClickListener { 
                 if (viewModel.state.value.hasInputData){
                     voteDialog
@@ -86,8 +95,12 @@ class VoteFragment : BaseFragment() {
                     viewModel.setInvalidVote(it.toString().toIntOrNull() ?: 0)
                 }
             }
-
-            setupVoteAdapter(isEditable, args.election.statusVote)
+            
+            bindCandidateList(
+                candidatePartyAdapter = setupVoteAdapter(isEditable),
+                candidateNonPartyAdapter = setupCandidateAdapter(isEditable),
+                args.election.statusVote
+            )
             
             cbApproveTerms.setOnCheckedChangeListener { _, isChecked -> 
                 viewModel.setTermIsApproved(isChecked)
@@ -166,11 +179,27 @@ class VoteFragment : BaseFragment() {
             })
         }
     }
+    
+    private fun FragmentVoteBinding.setupCandidateAdapter(
+        isEditable: Boolean
+    ): ListAdapter<VoteData.Candidate, out RecyclerView.ViewHolder> {
+        val adapter = if (isEditable){
+            CandidateAdapter(object: CandidateAdapter.Callback{
+                override fun onCandidateVoteChange(candidateId: Int, vote: Int) {
+                    viewModel.setCandidateVote(0, candidateId, vote)
+                }
+            })
+        }else{
+            CandidateViewAdapter()
+        }
+        
+        return adapter
+        
+    }
 
-    private fun FragmentVoteBinding.setupVoteAdapter(
+    private fun setupVoteAdapter(
         isEditable: Boolean,
-        electionStatus: ElectionStatus
-    ) {
+    ): VoteAdapter {
         val adapter = VoteAdapter(isEditable, object: VoteAdapter.Callback{
             
             override fun toggleView(partyId: Int) {
@@ -205,13 +234,12 @@ class VoteFragment : BaseFragment() {
             }
         })
         
-        rvVote.adapter = adapter
-        rvVote.itemAnimator = null
-        bindVoteData(adapter, electionStatus)
+        return adapter
     }
 
-    private fun FragmentVoteBinding.bindVoteData(
-        adapter: VoteAdapter,
+    private fun FragmentVoteBinding.bindCandidateList(
+        candidatePartyAdapter: VoteAdapter,
+        candidateNonPartyAdapter: ListAdapter<VoteData.Candidate, out RecyclerView.ViewHolder>,
         electionStatus: ElectionStatus,
     ) {
         val isEditable = electionStatus != ElectionStatus.VERIFIED
@@ -244,7 +272,15 @@ class VoteFragment : BaseFragment() {
                                 tvVillageName.text = data!!.village
                                 tvSubdistrictName.text = data.subdistrict
                                 // show data in list
-                                adapter.submitList(data.partyLists)
+                                if (data.isParty){
+                                    rvVote.adapter = candidatePartyAdapter
+                                    rvVote.itemAnimator = null
+                                    candidatePartyAdapter.submitList(data.partyLists)
+                                }else {
+                                    rvVote.adapter = candidateNonPartyAdapter
+                                    rvVote.itemAnimator = null
+                                    candidateNonPartyAdapter.submitList(data.partyLists.flatMap { it.candidateList })
+                                }
                                 
                                 // show note
                                 if (electionStatus == ElectionStatus.REJECTED){

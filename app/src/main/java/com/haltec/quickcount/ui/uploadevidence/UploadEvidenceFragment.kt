@@ -43,11 +43,8 @@ class UploadEvidenceFragment : BaseFragment() {
     private lateinit var binding: FragmentUploadEvidenceBinding
     private val viewModel: UploadEvidenceViewModel by hiltNavGraphViewModels(R.id.authorized_nav_graph)
     private val mainViewModel: MainViewModel by activityViewModels()
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    
     private var isBackCamera: Boolean = true
-
     private val uploadEvidenceDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
     }
@@ -88,6 +85,7 @@ class UploadEvidenceFragment : BaseFragment() {
             
             btnBack.setOnClickListener { 
                 findNavController().navigateUp()
+                viewModel.clearState()
             }
             
             tvElectionName.text = election.title

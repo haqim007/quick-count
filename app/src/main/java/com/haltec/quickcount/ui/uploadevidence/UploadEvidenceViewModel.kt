@@ -127,6 +127,19 @@ class UploadEvidenceViewModel @Inject constructor(
             }
         }
     }
+    
+    fun clearState(){
+        _state.update { state ->
+            state.copy(
+                tps = null,
+                election = null,
+                formState = hashMapOf(),
+                allowToSubmit = false,
+                type = null,
+                submitResult = Resource.Idle()
+            )
+        }
+    }
 }
 
 typealias Type = String
