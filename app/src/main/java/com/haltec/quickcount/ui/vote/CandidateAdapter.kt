@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.ItemCandidateBinding
 import com.haltec.quickcount.domain.model.VoteData
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 class CandidateAdapter(
     private val callback: Callback
@@ -21,7 +23,7 @@ class CandidateAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.setIsRecyclable(false)
+//        holder.setIsRecyclable(false)
         holder.onBind(getItem(position), callback)
     }
 
@@ -38,21 +40,29 @@ class CandidateAdapter(
                 tvOrderNumber.text = itemView.context.getString(R.string.candidate_order_number_, data.orderNumber)
                 tvCandidateName.text = data.candidateName
                 etCandidateVote.setText(data.totalCandidateVote.toString())
+                var vote = data.totalCandidateVote
                 btnIncrease.setOnClickListener {
-                    val newVotes = (data.totalCandidateVote + 1)
-                    etCandidateVote.setText(newVotes.toString())
+                    etCandidateVote.setText((++vote).toString())
+                    etCandidateVote.clearFocus()
+                    btnDecrese.clearFocus()
                 }
                 btnDecrese.setOnClickListener {
-                    val newVotes = (data.totalCandidateVote - 1)
-                    etCandidateVote.setText(newVotes.toString())
+                    if (vote > 0){
+                        etCandidateVote.setText((--vote).toString())
+                    }
+                    etCandidateVote.clearFocus()
+                    btnIncrease.clearFocus()
                 }
                 etCandidateVote.addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                     override fun afterTextChanged(s: Editable?) {
                         if (data.totalCandidateVote.toString() != s.toString()) {
-                            callback.onCandidateVoteChange(data.id, s.toString().toIntOrNull() ?: 0)
-                            etCandidateVote.setSelection(s.toString().length)
+                            callback.onCandidateVoteChange(
+                                data.partyId, 
+                                data.id, 
+                                s.toString().toIntOrNull() ?: 0
+                            )
                         }
                     }
                 })
@@ -69,7 +79,7 @@ class CandidateAdapter(
     }
 
     interface Callback{
-        fun onCandidateVoteChange(candidateId: Int, vote: Int)
+        fun onCandidateVoteChange(partyId:Int, candidateId: Int, vote: Int)
     }
 
 

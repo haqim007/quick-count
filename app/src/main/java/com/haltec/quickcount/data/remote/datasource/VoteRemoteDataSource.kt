@@ -3,10 +3,8 @@ package com.haltec.quickcount.data.remote.datasource
 import com.haltec.quickcount.data.mechanism.getResult
 import com.haltec.quickcount.data.remote.request.VoteRequest
 import com.haltec.quickcount.data.remote.service.VoteService
-import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
-@ViewModelScoped
 class VoteRemoteDataSource @Inject constructor(
     private val service: VoteService
 ) {

@@ -93,6 +93,9 @@ dependencies {
     implementation(libs.androidx.swiperefreshlayout)
     debugImplementation(libs.chucker)
     releaseImplementation(libs.chucker.noop)
+    implementation(libs.work.runtime)
+    implementation(libs.hilt.work)
+    ksp(libs.hilt.compiler)
 }
 
 inline fun <reified ValueT> com.android.build.api.dsl.VariantDimension.buildConfigField(

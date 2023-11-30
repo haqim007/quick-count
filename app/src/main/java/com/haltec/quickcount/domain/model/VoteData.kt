@@ -68,6 +68,7 @@ data class VoteData(
     data class Candidate(
         val orderNumber: Int,
         val candidateName: String,
+        val partyId: Int,
         val id: Int,
         val totalCandidateVote: Int = 0,
     )

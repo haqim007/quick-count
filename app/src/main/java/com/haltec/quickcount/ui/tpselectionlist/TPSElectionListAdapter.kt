@@ -6,25 +6,26 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.ItemTpsElectionBinding
-import com.haltec.quickcount.domain.model.ElectionStatus
+import com.haltec.quickcount.domain.model.SubmitVoteStatus
 import com.haltec.quickcount.domain.model.TPSElection
 
 
 class TPSElectionListAdapter(
     private val callback: TPSElectionListCallback
-): ListAdapter<TPSElection, TPSElectionListAdapter.TPSElectionListViewHolder>(ItemDIffCallback()) {
+): PagingDataAdapter<TPSElection, TPSElectionListAdapter.TPSElectionListViewHolder>(ItemDIffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TPSElectionListViewHolder {
         return TPSElectionListViewHolder.create(parent)
     }
 
     override fun onBindViewHolder(holder: TPSElectionListViewHolder, position: Int) {
-        holder.bind(getItem(position), callback)
+        getItem(position)?.let { holder.bind(it, callback) }
     }
 
     class TPSElectionListViewHolder(private val binding: ItemTpsElectionBinding): RecyclerView.ViewHolder(binding.root){
@@ -35,7 +36,7 @@ class TPSElectionListAdapter(
             binding.apply {
                 tvTpsName.text = data.tpsName
                 tvElectionName.text = data.electionName
-                tvElectionInfo.text = if (data.statusVote == ElectionStatus.PENDING){
+                tvElectionInfo.text = if (data.statusVote == SubmitVoteStatus.PENDING){
                     itemView.context.getString(R.string.input_data_before_date_time, data.createdAt)
                 }else{
                     itemView.context.getString(R.string.sent_at_date_time, data.createdAt)
@@ -44,7 +45,7 @@ class TPSElectionListAdapter(
                 val statusColor: Int
                 val borderColor: Int
                 when(data.statusVote) {
-                    ElectionStatus.SUBMITTED -> {
+                    SubmitVoteStatus.SUBMITTED -> {
                         statusColor = ContextCompat.getColor(
                             itemView.context,
                             R.color.color_status_election_submitted
@@ -55,7 +56,7 @@ class TPSElectionListAdapter(
                         )
                     }
 
-                    ElectionStatus.VERIFIED -> {
+                    SubmitVoteStatus.VERIFIED -> {
                         statusColor = ContextCompat.getColor(
                             itemView.context,
                             R.color.color_status_election_verified

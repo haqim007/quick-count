@@ -1,7 +1,7 @@
 package com.haltec.quickcount.data.remote.response
 
 import com.google.gson.annotations.SerializedName
-import com.haltec.quickcount.data.util.stringToStringDateID
+import com.haltec.quickcount.util.stringToStringDateID
 import com.haltec.quickcount.domain.model.VoteEvidence
 
 data class UploadEvidenceResponse(

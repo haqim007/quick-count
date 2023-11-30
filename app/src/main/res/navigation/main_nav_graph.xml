@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_nav_graph"
-    app:startDestination="@id/unauthorized_nav_graph">
+    app:startDestination="@id/splashscreenFragment">
 
     <navigation android:id="@+id/authorized_nav_graph"
         app:startDestination="@id/TPSListFragment">
@@ -106,8 +106,8 @@
                 android:id="@+id/action_loginFragment_to_locationPermissionFragment"
                 app:destination="@id/locationPermissionFragment" />
             <action
-                android:id="@+id/action_loginFragment_to_TPSListFragment"
-                app:destination="@id/authorized_nav_graph"
+                android:id="@+id/action_loginFragment_to_SplashscreenFragment"
+                app:destination="@id/splashscreenFragment"
                 app:popUpTo="@id/loginFragment"
                 app:popUpToInclusive="true"/>
         </fragment>
@@ -124,5 +124,23 @@
         </fragment>
     </navigation>
     
+    <fragment
+        android:id="@+id/splashscreenFragment"
+        android:name="com.haltec.quickcount.ui.splashscreen.SplashscreenFragment"
+        android:label="fragment_splashscreen"
+        tools:layout="@layout/fragment_splashscreen" >
+        <action
+            android:id="@+id/action_splashscreenFragment_to_TPSListFragment"
+            app:destination="@id/authorized_nav_graph"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"/>
+
+        <action
+            android:id="@+id/action_splashscreenFragment_to_login"
+            app:destination="@id/unauthorized_nav_graph"
+            app:popUpTo="@id/splashscreenFragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
+
 
 </navigation>

@@ -19,6 +19,7 @@ import com.haltec.quickcount.domain.model.VoteData
 import com.haltec.quickcount.ui.vote.CandidateAdapter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
@@ -94,7 +95,7 @@ class VoteFormDialogFragment : BottomSheetDialogFragment() {
                 tvPartyTitle.text = getString(com.haltec.quickcount.R.string.data_perolehan_partai_s, data.partyName)
                 etTotalPartyVote.setText(data.totalPartyVote.toString())
                 val childAdapter = CandidateAdapter(object : CandidateAdapter.Callback{
-                    override fun onCandidateVoteChange(candidateId: Int, vote: Int) {
+                    override fun onCandidateVoteChange(partyId: Int, candidateId: Int, vote: Int) {
                         callback.onCandidateVoteChange(data.id, candidateId, vote)
                     }
                 })
@@ -102,9 +103,7 @@ class VoteFormDialogFragment : BottomSheetDialogFragment() {
                 rvCandidate.itemAnimator = null
                 
                 viewLifecycleOwner.lifecycleScope.launch {
-                    callback.getCandidateList(data.id).collectLatest {
-                        childAdapter.submitList(it)
-                    }
+                    childAdapter.submitList(callback.getCandidateList(data.id).first())
                 }
                 
                 etTotalPartyVote.addTextChangedListener { 

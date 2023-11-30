@@ -1,13 +1,9 @@
 package com.haltec.quickcount.data.mechanism
 
 import com.haltec.quickcount.data.preference.UserPreference
-import com.haltec.quickcount.data.util.DATE_TIME_FORMAT
-import com.haltec.quickcount.data.util.stringToTimestamp
-import com.haltec.quickcount.domain.model.UserInfo
-import kotlinx.coroutines.delay
+import com.haltec.quickcount.data.remote.base.checkToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
@@ -17,7 +13,7 @@ import kotlinx.coroutines.flow.map
 * RequestType: Data type that used to catch network response a.k.a inserted data type
 * ResultType: Data type that expected as return data a.k.a output data type
 * */
-abstract class NetworkBoundResource<ResultType, RequestType> {
+abstract class NetworkBoundResource<ResultType, ResponseType> {
 
     private val result: Flow<Resource<ResultType>> = flow{
         emit(Resource.Loading())
@@ -27,7 +23,7 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
                 val apiResponse = requestFromRemoteRunner()
                 if(apiResponse.isSuccess){
                     apiResponse.getOrNull()?.let { res ->
-                        onFetchSuccess(res)
+                        onSuccess(res)
                         emitAll(
                             loadResult(res).map {
                                 Resource.Success(it)
@@ -36,22 +32,34 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
                     }
 
                 }else{
-                    onFetchFailed(apiResponse.exceptionOrNull() as CustomThrowable)
-                    emit(
-                        Resource.Error(
-                            message = apiResponse
-                                .exceptionOrNull()
-                                ?.localizedMessage ?: "Failed to fetch data",
-                            data = currentLocalData
+                    val mException = apiResponse.exceptionOrNull() as? CustomThrowable
+                    
+                    if (mException != null){
+                        onFailed(mException)
+                        emit(
+                            Resource.Error(
+                                message = mException.message ?: "Failed to fetch data",
+                                data = currentLocalData,
+                                code = mException.code
+                            )
                         )
-                    )
+                    }else{
+                        val exceptionFallback = apiResponse.exceptionOrNull()
+                        emit(
+                            Resource.Error(
+                                message = exceptionFallback?.message ?: "Failed to fetch data",
+                                data = currentLocalData
+                            )
+                        )
+                    }
+                    
                 }
             }else{
                 emit( Resource.Error(message = "Request is not allowed") )
             }
             
         }catch (e: Exception){
-            onFetchFailed()
+            onFailed()
             emit(
                 Resource.Error(
                     message = e.localizedMessage ?: "Failed to request"
@@ -65,11 +73,11 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
      *
      * @return
      */
-    protected open suspend fun requestFromRemoteRunner(): Result<RequestType>{
+    protected open suspend fun requestFromRemoteRunner(): Result<ResponseType>{
         return requestFromRemote()
     }
 
-    protected abstract suspend fun requestFromRemote(): Result<RequestType>
+    protected abstract suspend fun requestFromRemote(): Result<ResponseType>
 
     /**
      * Load from network to be returned and consumed. Convert data from network to model here
@@ -77,7 +85,7 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
      * @param data
      * @return
      */
-    protected abstract fun loadResult(data: RequestType): Flow<ResultType>
+    protected abstract fun loadResult(data: ResponseType): Flow<ResultType>
 
     /**
      * Load current data from local storage
@@ -85,9 +93,9 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
      */
     protected open suspend fun loadCurrentLocalData(): ResultType? = null
 
-    protected open suspend fun onFetchSuccess(data: RequestType) {}
+    protected open suspend fun onSuccess(data: ResponseType) {}
 
-    protected open suspend fun onFetchFailed(exceptionOrNull: CustomThrowable? = null) {}
+    protected open suspend fun onFailed(exceptionOrNull: CustomThrowable? = null) {}
     
     /*
     * 
@@ -101,41 +109,15 @@ abstract class NetworkBoundResource<ResultType, RequestType> {
 
 }
 
-abstract class AuthorizedNetworkBoundResource<ResultType, RequestType>(
+abstract class AuthorizedNetworkBoundResource<ResultType, ResponseType>(
     private val userPreference: UserPreference
-): NetworkBoundResource<ResultType, RequestType>(){
+): NetworkBoundResource<ResultType, ResponseType>(){
 
-    final override suspend fun requestFromRemoteRunner(): Result<RequestType> {
-        var apiResponse: Result<RequestType>? = null
-        
-        // Repeat three times in case request failed because of http code 401.
-        // Because from the network API when the token expired, 
-        // it will response refreshed token instead of just (error) message
-        run repeatBlock@{
-            repeat(3){
-                apiResponse = requestFromRemote()
-                if (apiResponse?.isSuccess == false){
-                    val exception = apiResponse?.exceptionOrNull() as CustomThrowable
-                    if (exception.code == 401 && exception.data?.data != null){
-                        userPreference.updateToken(
-                            exception.data.data.token,
-                            stringToTimestamp(exception.data.data.exp, DATE_TIME_FORMAT) ?: 0
-                        )
-                        delay(3000)
-                    }else{
-                        return@repeatBlock
-                    }
-                }else{
-                    return@repeatBlock
-                }
-            }
-        }
-        
-        
-        return apiResponse!!
+    final override suspend fun requestFromRemoteRunner(): Result<ResponseType> {
+        return checkToken(userPreference, requestFromRemote = { requestFromRemote() })
     }
 
-    override suspend fun onFetchFailed(exceptionOrNull: CustomThrowable?) {
+    override suspend fun onFailed(exceptionOrNull: CustomThrowable?) {
         if(exceptionOrNull?.code == 401){
             userPreference.resetUserInfo()
         }

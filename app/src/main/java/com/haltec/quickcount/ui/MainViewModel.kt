@@ -3,6 +3,7 @@ package com.haltec.quickcount.ui
 import androidx.lifecycle.viewModelScope
 import com.haltec.quickcount.domain.model.SessionValidity
 import com.haltec.quickcount.domain.repository.IAuthRepository
+import com.haltec.quickcount.domain.repository.IConnectivityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val loginRepository: IAuthRepository
+    private val loginRepository: IAuthRepository,
+    private val connectivityRepository: IConnectivityRepository
 ): BaseViewModel<MainUiState>() {
     override val _state = MutableStateFlow(MainUiState())
     
@@ -71,6 +73,12 @@ class MainViewModel @Inject constructor(
     
     fun showCameraPermissionDialog(show: Boolean = true){
         _state.update { state -> state.copy(showCameraPermissionDialog = show) }
+    }
+    
+    fun setOnline(isOnline: Boolean){
+        viewModelScope.launch {
+            connectivityRepository.setOnline(isOnline)
+        }
     }
     
 }

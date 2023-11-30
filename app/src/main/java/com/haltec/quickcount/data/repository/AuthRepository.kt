@@ -1,5 +1,6 @@
 package com.haltec.quickcount.data.repository
 
+import com.haltec.quickcount.data.local.room.AppDatabase
 import dagger.hilt.android.scopes.ViewModelScoped
 import com.haltec.quickcount.data.mechanism.NetworkBoundResource
 import com.haltec.quickcount.data.mechanism.Resource
@@ -8,7 +9,6 @@ import com.haltec.quickcount.data.preference.UserPreference
 import com.haltec.quickcount.data.remote.datasource.LoginRemoteDataSource
 import com.haltec.quickcount.data.remote.request.LoginRequest
 import com.haltec.quickcount.data.remote.response.LoginResponse
-import com.haltec.quickcount.data.util.currentTimestamp
 import com.haltec.quickcount.di.DispatcherIO
 import com.haltec.quickcount.domain.model.Login
 import com.haltec.quickcount.domain.model.SessionValidity
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ViewModelScoped
@@ -26,6 +26,7 @@ class AuthRepository @Inject constructor(
     private val devicePreference: DevicePreference,
     private val userPreference: UserPreference,
     private val remoteDataSource: LoginRemoteDataSource,
+    private val database: AppDatabase,
     @DispatcherIO
     private val dispatcher: CoroutineDispatcher
 ) : IAuthRepository {
@@ -52,7 +53,7 @@ class AuthRepository @Inject constructor(
                 )
             }
 
-            override suspend fun onFetchSuccess(data: LoginResponse) {
+            override suspend fun onSuccess(data: LoginResponse) {
                 userPreference.storeUserInfo(userInfo = data.toUserInfo())
             }
 
@@ -65,6 +66,12 @@ class AuthRepository @Inject constructor(
     }
 
     override suspend fun logout() {
-        userPreference.resetUserInfo(true)
+        
+        withContext(dispatcher){
+            userPreference.resetUserInfo(true)
+            devicePreference.reset()
+            database.clearAllTables()
+        }
+        
     }
 }

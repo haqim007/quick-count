@@ -36,7 +36,7 @@
 
     <TextView
         android:id="@+id/tv_order_number"
-        style="@style/TextAppearance.Bold.Small"
+        style="@style/TextAppearance.Bold.Medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
@@ -59,7 +59,7 @@
 
     <TextView
         android:id="@+id/tv_candidate_vote"
-        style="@style/TextAppearance.Bold.Small"
+        style="@style/TextAppearance.Bold.Medium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"

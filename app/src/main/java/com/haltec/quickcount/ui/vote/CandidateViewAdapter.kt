@@ -1,19 +1,14 @@
 package com.haltec.quickcount.ui.vote
 
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
-import com.haltec.quickcount.data.util.formatNumberWithSeparator
-import com.haltec.quickcount.databinding.ItemCandidateBinding
+import com.haltec.quickcount.util.formatNumberWithSeparator
 import com.haltec.quickcount.databinding.ItemCandidateViewBinding
 import com.haltec.quickcount.domain.model.VoteData
-import java.util.Locale
 
 
 class CandidateViewAdapter: ListAdapter<VoteData.Candidate, CandidateViewAdapter.ViewHolder>(ItemDiffCallback()) {

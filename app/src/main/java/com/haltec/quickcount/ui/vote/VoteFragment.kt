@@ -8,26 +8,31 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.haltec.quickcount.R
+import com.haltec.quickcount.data.mechanism.CustomThrowable.Companion.UNKNOWN_HOST_EXCEPTION
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
-import com.haltec.quickcount.data.util.formatNumberWithSeparator
+import com.haltec.quickcount.util.formatNumberWithSeparator
 import com.haltec.quickcount.databinding.FragmentVoteBinding
 import com.haltec.quickcount.domain.model.BasicMessage
-import com.haltec.quickcount.domain.model.ElectionStatus
+import com.haltec.quickcount.domain.model.SubmitVoteStatus
 import com.haltec.quickcount.domain.model.VoteData
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.voteform.VoteFormDialogCallback
 import com.haltec.quickcount.ui.voteform.VoteFormDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class VoteFragment : BaseFragment() {
@@ -49,7 +54,7 @@ class VoteFragment : BaseFragment() {
         
         val args: VoteFragmentArgs by navArgs()
         viewModel.setTpsElection(args.tps, args.election)
-        val isEditable = args.election.statusVote != ElectionStatus.VERIFIED
+        val isEditable = args.election.statusVote != SubmitVoteStatus.VERIFIED
         
         binding.apply {
             
@@ -66,15 +71,13 @@ class VoteFragment : BaseFragment() {
                         .setTitle(R.string.are_you_done)
                         .setMessage(R.string.you_need_to_reinput)
                         .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                            viewModel.clear()
-                            findNavController().navigateUp()
+                            navigateUp()
                         }
                         .setNegativeButton(R.string.no, null)
                         .setCancelable(false)
                         .show()
                 }else{
-                    viewModel.clear()
-                    findNavController().navigateUp()
+                    navigateUp()
                 }
             }
             tvTpsName.text = args.tps.name
@@ -90,9 +93,20 @@ class VoteFragment : BaseFragment() {
                 }
             }
             
+            var invalidVoteJob: Job? = null
             etTotalInvalidVote.addTextChangedListener {
-                if (it.toString() != viewModel.state.value.invalidVote.toString()){
+                invalidVoteJob?.cancel()
+                if (it.toString() != viewModel.state.value.invalidVote.toString() && it.toString().isNotBlank()){
                     viewModel.setInvalidVote(it.toString().toIntOrNull() ?: 0)
+                }
+                // if invalid vote is blank for 1500ms, it will automatically updated with 0
+                if (it.toString().isBlank()){
+                    invalidVoteJob = viewLifecycleOwner.lifecycleScope.launch { 
+                        delay(1500)
+                        etTotalInvalidVote.setText("0")
+                        // set cursor to back
+                        etTotalInvalidVote.setSelection(1)
+                    }
                 }
             }
             
@@ -151,19 +165,30 @@ class VoteFragment : BaseFragment() {
                         )
                         .setIcon(R.drawable.ic_success)
                         .setPositiveButton(getString(R.string.ok)){ _, _ ->
-                            viewModel.clear()
-                            findNavController().navigateUp()
+                            navigateUp()
                         }
                         .setCancelable(false)
                         .show()
                 }
 
-                override fun onError(message: String?, data: BasicMessage?) {
+                override fun onError(message: String?, data: BasicMessage?, code: Int?) {
+                    val title: Int
+                    val mMessage: String?
+                    if (code == UNKNOWN_HOST_EXCEPTION){
+                        title = R.string.no_internet_connection
+                        mMessage = getString(R.string.will_be_sent_once_internet_available)
+                    }else{
+                        title = R.string.error_occured
+                        mMessage = message
+                    }
+                    
                     voteDialog
-                        .setTitle(R.string.error_occured)
-                        .setMessage(message)
+                        .setTitle(title)
+                        .setMessage(mMessage)
                         .setIcon(R.drawable.ic_warning)
-                        .setPositiveButton(getString(R.string.ok), null)
+                        .setPositiveButton(getString(R.string.ok)){_, _ ->
+                            navigateUp()
+                        }
                         .show()
                 }
 
@@ -179,14 +204,20 @@ class VoteFragment : BaseFragment() {
             })
         }
     }
-    
-    private fun FragmentVoteBinding.setupCandidateAdapter(
+
+    private fun navigateUp() {
+        viewModel.clear()
+        findNavController().navigateUp()
+    }
+
+    private fun setupCandidateAdapter(
         isEditable: Boolean
     ): ListAdapter<VoteData.Candidate, out RecyclerView.ViewHolder> {
+        
         val adapter = if (isEditable){
             CandidateAdapter(object: CandidateAdapter.Callback{
-                override fun onCandidateVoteChange(candidateId: Int, vote: Int) {
-                    viewModel.setCandidateVote(0, candidateId, vote)
+                override fun onCandidateVoteChange(partyId: Int, candidateId: Int, vote: Int) {
+                    viewModel.setCandidateVote(partyId, candidateId, vote)
                 }
             })
         }else{
@@ -240,9 +271,9 @@ class VoteFragment : BaseFragment() {
     private fun FragmentVoteBinding.bindCandidateList(
         candidatePartyAdapter: VoteAdapter,
         candidateNonPartyAdapter: ListAdapter<VoteData.Candidate, out RecyclerView.ViewHolder>,
-        electionStatus: ElectionStatus,
+        submitVoteStatus: SubmitVoteStatus,
     ) {
-        val isEditable = electionStatus != ElectionStatus.VERIFIED
+        val isEditable = submitVoteStatus != SubmitVoteStatus.VERIFIED
         viewModel.state.apply {
             map { it.voteData }.launchCollectLatest { voteData ->
                 voteData.handle(
@@ -271,6 +302,7 @@ class VoteFragment : BaseFragment() {
 
                                 tvVillageName.text = data!!.village
                                 tvSubdistrictName.text = data.subdistrict
+                                etTotalInvalidVote.setText(data.invalidVote.toString())
                                 // show data in list
                                 if (data.isParty){
                                     rvVote.adapter = candidatePartyAdapter
@@ -283,7 +315,7 @@ class VoteFragment : BaseFragment() {
                                 }
                                 
                                 // show note
-                                if (electionStatus == ElectionStatus.REJECTED){
+                                if (submitVoteStatus == SubmitVoteStatus.REJECTED){
                                     if (!data.note.isNullOrBlank()){
                                         tvRejectedMessage.text = data.note
                                         mcvRejectedMessage.isVisible = true
@@ -301,15 +333,19 @@ class VoteFragment : BaseFragment() {
                             }
                         }
 
-                        override fun onError(message: String?, data: VoteData?) {
-                            // loader
-                            layoutLoader.lavAnimation.setAnimation(R.raw.error_box)
-                            layoutLoader.lavAnimation.playAnimation()
-                            layoutLoader.lavAnimation.isVisible = true
-                            layoutLoader.tvErrorMessage.text =
-                                message ?: getString(R.string.error_occured)
-                            layoutLoader.btnTryAgain.isVisible = true
-                            layoutLoader.tvErrorMessage.isVisible = true
+                        override fun onError(message: String?, data: VoteData?, code: Int?) {
+                            data?.let { 
+                                onSuccess(data)
+                            } ?: run {
+                                // loader
+                                layoutLoader.lavAnimation.setAnimation(R.raw.error_box)
+                                layoutLoader.lavAnimation.playAnimation()
+                                layoutLoader.lavAnimation.isVisible = true
+                                layoutLoader.tvErrorMessage.text =
+                                    message ?: getString(R.string.error_occured)
+                                layoutLoader.btnTryAgain.isVisible = true
+                                layoutLoader.tvErrorMessage.isVisible = true
+                            }
                         }
 
                         override fun onLoading() {

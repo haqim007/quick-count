@@ -27,12 +27,11 @@
 
         <TextView
             android:id="@+id/tv_tps_location"
-            style="@style/TextAppearance.Bold"
+            style="@style/TextAppearance.Bold.Medium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="8dp"
-            android:textSize="10sp"
             app:layout_constraintEnd_toStartOf="@+id/btn_open_tps"
             app:layout_constraintStart_toStartOf="@+id/tv_tps_name"
             app:layout_constraintTop_toBottomOf="@id/tv_tps_name"
@@ -40,6 +39,7 @@
             tools:text="Kel. Jugosari Kec. Candipuro" />
 
         <com.google.android.material.button.MaterialButton
+            android:visibility="gone"
             android:id="@+id/btn_open_tps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,12 +57,11 @@
 
         <TextView
             android:id="@+id/tv_data_sent"
-            style="@style/TextAppearance.Bold.ExtraSmall"
+            style="@style/TextAppearance.Bold.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:alpha="0.5"
-            android:textSize="8sp"
             app:layout_constraintEnd_toEndOf="@+id/tv_tps_location"
             app:layout_constraintStart_toStartOf="@+id/tv_tps_location"
             app:layout_constraintTop_toBottomOf="@id/tv_tps_location"
@@ -71,12 +70,11 @@
 
         <TextView
             android:id="@+id/tv_data_verified"
-            style="@style/TextAppearance.Bold.ExtraSmall"
+            style="@style/TextAppearance.Bold.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:alpha="0.5"
-            android:textSize="8sp"
             app:layout_constraintEnd_toEndOf="@+id/tv_tps_location"
             app:layout_constraintStart_toStartOf="@+id/tv_tps_location"
             app:layout_constraintTop_toBottomOf="@id/tv_data_sent"
@@ -85,7 +83,7 @@
 
         <TextView
             android:id="@+id/tv_data_unverified"
-            style="@style/TextAppearance.Bold.ExtraSmall"
+            style="@style/TextAppearance.Bold.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -98,7 +96,7 @@
 
         <TextView
             android:id="@+id/tv_data_rejected"
-            style="@style/TextAppearance.Bold.ExtraSmall"
+            style="@style/TextAppearance.Bold.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -108,6 +106,19 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_data_unverified"
             tools:ignore="SmallSp"
             tools:text="Data Ditolak : 1  Formulir" />
+
+        <TextView
+            android:id="@+id/tv_data_wait_to_be_sent"
+            style="@style/TextAppearance.Bold.Small"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:alpha="0.5"
+            app:layout_constraintEnd_toEndOf="@+id/tv_tps_location"
+            app:layout_constraintStart_toStartOf="@+id/tv_tps_location"
+            app:layout_constraintTop_toBottomOf="@+id/tv_data_rejected"
+            tools:ignore="SmallSp"
+            tools:text="Data Menunggu Terkirim : 1  Formulir" />
         
         
     </androidx.constraintlayout.widget.ConstraintLayout>

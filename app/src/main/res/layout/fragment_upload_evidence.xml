@@ -57,9 +57,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="8dp"
-                    android:fontFamily="@font/bold_700"
+                    android:textAppearance="@style/TextAppearance.Bold"
                     android:textColor="@android:color/white"
-                    android:textSize="16sp"
                     android:layout_marginTop="21dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/btn_back"
@@ -72,9 +71,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
                     android:layout_marginEnd="3dp"
-                    android:fontFamily="@font/medium_500"
+                    android:textAppearance="@style/TextAppearance.Small"
                     android:textColor="@android:color/white"
-                    android:textSize="8sp"
                     app:layout_constraintEnd_toEndOf="@+id/tv_upload_evidence_title"
                     app:layout_constraintStart_toStartOf="@+id/tv_upload_evidence_title"
                     app:layout_constraintTop_toBottomOf="@+id/tv_upload_evidence_title"
@@ -103,26 +101,54 @@
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_pleno"
+                    android:id="@+id/chip_photo_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/plano"
+                    android:text="@string/photo_1"
                     style="@style/CustomChip"
                     android:checked="true"/>
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_form_c1"
+                    android:id="@+id/chip_photo_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/formulir_c1"
+                    android:text="@string/photo_2"
                     style="@style/CustomChip" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_lainnya"
+                    android:id="@+id/chip_photo_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/others"
+                    android:text="@string/photo_3"
                     style="@style/CustomChip" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_photo_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/photo_4"
+                    style="@style/CustomChip"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_photo_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/photo_5"
+                    style="@style/CustomChip"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_photo_6"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/photo_6"
+                    style="@style/CustomChip"/>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_photo_7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/photo_7"
+                    style="@style/CustomChip"/>
 
             </com.google.android.material.chip.ChipGroup>
 
@@ -131,9 +157,11 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/mcv_take_photo"
             android:layout_width="0dp"
-            android:layout_height="305dp"
+            android:layout_height="wrap_content"
+            android:minHeight="305dp"
             android:layout_marginTop="24dp"
             app:cardCornerRadius="16dp"
+            app:cardBackgroundColor="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="@+id/hsv_chips"
             app:layout_constraintStart_toStartOf="@+id/hsv_chips"
             app:layout_constraintTop_toBottomOf="@+id/hsv_chips">
@@ -160,7 +188,7 @@
 
                 <TextView
                     android:id="@+id/tv_take_photo"
-                    style="@style/TextAppearance.Bold.Small"
+                    style="@style/TextAppearance.Bold.Medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -296,7 +324,8 @@
             android:id="@+id/iv_expanded_photo_result"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/dummy_selfi"
+            tools:src="@drawable/dummy_selfi"
+            android:src="@drawable/broken_image"
             android:scaleType="fitCenter"
             android:contentDescription="@string/zoom_touch_close" />
     </LinearLayout>

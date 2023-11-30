@@ -2,17 +2,17 @@ package com.haltec.quickcount.ui.tpslist
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
-import com.haltec.quickcount.data.util.capitalizeWords
+import com.haltec.quickcount.util.capitalizeWords
 import com.haltec.quickcount.databinding.ItemTpsBinding
 import com.haltec.quickcount.domain.model.TPS
 
 class TPSListAdapter(
     private val callback: TPSListCallback
-): ListAdapter<TPS, TPSListAdapter.TPSListViewHolder>(ItemDIffCallback()) {
+): PagingDataAdapter<TPS, TPSListAdapter.TPSListViewHolder>(ItemDIffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TPSListViewHolder {
         return TPSListViewHolder.create(parent)
@@ -24,29 +24,34 @@ class TPSListAdapter(
     
     class TPSListViewHolder(private val binding: ItemTpsBinding): RecyclerView.ViewHolder(binding.root){
         
-        fun bind(tps: TPS, callback: TPSListCallback){
+        fun bind(tps: TPS?, callback: TPSListCallback){
             
-            binding.apply {
-                tvTpsName.text = capitalizeWords(tps.name)
-                tvTpsLocation.text = itemView.context.getString(
-                    R.string.tps_location_,
-                    capitalizeWords(tps.village),
-                    capitalizeWords(tps.subdistrict)
-                )
-                tvDataSent.text = itemView.context.getString(
-                    R.string.data_sent_, tps.submitted.toString()
-                )
-                tvDataUnverified.text = itemView.context.getString(
-                    R.string.data_not_verified_, tps.pending.toString()
-                )
-                tvDataVerified.text = itemView.context.getString(
-                    R.string.data_verified_, tps.approved.toString()
-                )
-                tvDataRejected.text = itemView.context.getString(
-                    R.string.data_rejected_, tps.rejected.toString()
-                )
-                btnOpenTps.setOnClickListener { 
-                    callback.onClick(tps)
+            tps?.let {
+                binding.apply {
+                    tvTpsName.text = capitalizeWords(tps.name)
+                    tvTpsLocation.text = itemView.context.getString(
+                        R.string.tps_location_,
+                        capitalizeWords(tps.village),
+                        capitalizeWords(tps.subdistrict)
+                    )
+                    tvDataSent.text = itemView.context.getString(
+                        R.string.data_sent_, tps.submitted.toString()
+                    )
+                    tvDataUnverified.text = itemView.context.getString(
+                        R.string.data_not_verified_, tps.pending.toString()
+                    )
+                    tvDataVerified.text = itemView.context.getString(
+                        R.string.data_verified_, tps.approved.toString()
+                    )
+                    tvDataRejected.text = itemView.context.getString(
+                        R.string.data_rejected_, tps.rejected.toString()
+                    )
+                    tvDataWaitToBeSent.text = itemView.context.getString(
+                        R.string.data_wait_to_be_sent_, tps.waitToBeSent.toString()
+                    )
+                    root.setOnClickListener {
+                        callback.onClick(tps)
+                    }
                 }
             }
             

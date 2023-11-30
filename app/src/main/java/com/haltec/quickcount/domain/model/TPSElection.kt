@@ -4,28 +4,21 @@ enum class ElectionFilter{
     BELUM_DIKIRIM,
     BELUM_TERVERIFIKASI,
     SUDAH_TERVERIFIKASI,
+    MENUNGGU_TERKIRIM,
     DITOLAK,
     SEMUA
 }
 
 val ElectionFilter.text
     get() = when(this){
-        ElectionFilter.BELUM_DIKIRIM -> ElectionStatus.PENDING.text
-        ElectionFilter.BELUM_TERVERIFIKASI -> ElectionStatus.SUBMITTED.text
-        ElectionFilter.SUDAH_TERVERIFIKASI -> ElectionStatus.VERIFIED.text
-        ElectionFilter.DITOLAK -> ElectionStatus.REJECTED.text
+        ElectionFilter.BELUM_DIKIRIM -> SubmitVoteStatus.PENDING.text
+        ElectionFilter.BELUM_TERVERIFIKASI -> SubmitVoteStatus.SUBMITTED.text
+        ElectionFilter.MENUNGGU_TERKIRIM -> SubmitVoteStatus.IN_QUEUE.text
+        ElectionFilter.SUDAH_TERVERIFIKASI -> SubmitVoteStatus.VERIFIED.text
+        ElectionFilter.DITOLAK -> SubmitVoteStatus.REJECTED.text
         else -> "Semua"
     }
 
-fun stringToFilter(value: String): String {
-    return when (value) {
-        ElectionStatus.PENDING.text -> ElectionStatus.PENDING.valueText
-        ElectionStatus.SUBMITTED.text -> ElectionStatus.SUBMITTED.valueText
-        ElectionStatus.VERIFIED.text -> ElectionStatus.VERIFIED.valueText
-        ElectionStatus.REJECTED.text -> ElectionStatus.REJECTED.valueText
-        else -> ""
-    }
-}
 
 data class TPSElection(
     val villageCode: String,
@@ -43,7 +36,7 @@ data class TPSElection(
     val tpsId: Int,
     val village: String,
     val longitude: String,
-    val statusVote: ElectionStatus
+    val statusVote: SubmitVoteStatus
 ){
     
     fun toTPS() = TPS(

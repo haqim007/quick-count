@@ -1,8 +1,12 @@
 package com.haltec.quickcount.data.remote.response
 
+import android.content.Context
 import com.google.gson.annotations.SerializedName
-import com.haltec.quickcount.data.util.stringToStringDateID
+import com.haltec.quickcount.data.local.entity.table.UploadedEvidenceEntity
+import com.haltec.quickcount.util.stringToStringDateID
 import com.haltec.quickcount.domain.model.VoteEvidence
+import com.haltec.quickcount.util.downloadImageToCacheDir
+import com.haltec.quickcount.util.lowerAllWords
 
 data class CurrentEvidenceResponse(
 
@@ -59,7 +63,36 @@ data class CurrentEvidenceResponse(
 			this.id,
 			this.longitude
 		)
+		
+		suspend fun toUploadedEvidenceEntity(context: Context) = UploadedEvidenceEntity(
+			id = id,
+			tpsId = tpsId,
+			electionId = selectionTypeId,
+			description = description,
+			type = type,
+			fileUrl = file,
+			file = downloadImageToCacheDir(context, file, "${lowerAllWords(type)}_${tpsId}_${selectionTypeId}"),
+			latitude = latitude,
+			longitude = longitude,
+			uploadedAt = uploadedAt
+		)
+
+		fun toUploadedEvidenceEntity() = UploadedEvidenceEntity(
+			id = id,
+			tpsId = tpsId,
+			electionId = selectionTypeId,
+			description = description,
+			type = type,
+			fileUrl = file,
+			file = null,
+			latitude = latitude,
+			longitude = longitude,
+			uploadedAt = uploadedAt
+		)
+		
 	}
 	
 	fun toModel() = this.data?.map { it.toModel() } ?: emptyList()
+	fun toUploadedEntities() = this.data?.map { it.toUploadedEvidenceEntity() } ?: emptyList()
+	suspend fun toUploadedEntities(context: Context) = this.data?.map { it.toUploadedEvidenceEntity(context) } ?: emptyList()
 }

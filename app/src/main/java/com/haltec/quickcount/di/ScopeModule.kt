@@ -10,7 +10,7 @@ import kotlinx.coroutines.SupervisorJob
 import javax.inject.Qualifier
 
 @Qualifier
-@Retention(AnnotationRetention.BINARY)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class ApplicationScope
 
 @Module

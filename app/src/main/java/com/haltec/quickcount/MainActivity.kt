@@ -6,7 +6,6 @@ import android.Manifest.permission.CAMERA
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -15,6 +14,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,10 +26,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import com.haltec.quickcount.databinding.ActivityMainBinding
 import com.haltec.quickcount.ui.MainViewModel
+import com.haltec.quickcount.util.ConnectivityObserver
+import com.haltec.quickcount.util.IConnectivityObserver
+import com.haltec.quickcount.util.NotificationChannelEnum
+import com.haltec.quickcount.util.NotificationUtil
+import com.haltec.quickcount.worker.WorkerRunner
+import com.haltec.quickcount.worker.WorkerRunner.SUBMIT_WORKER_TAG
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -51,6 +61,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private val viewModel: MainViewModel by viewModels()
     
+    private val connectivityObserver: IConnectivityObserver by lazy { 
+        ConnectivityObserver()
+    }
+    private var latestConnectivityState : IConnectivityObserver.Status? = null
+    private lateinit var snackbarConnectivityStatus: Snackbar
+    private var neverShowConnectivityDialogAgain: Boolean = false
+    
     private val locationTrackerDialog by lazy {
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.fitur_lokasi_nonaktif))
@@ -69,7 +86,24 @@ class MainActivity : AppCompatActivity() {
             .setMessage(getString(R.string.please_relogin_to_continue))
             .setPositiveButton(getString(R.string.ok)) { _, _ ->
                 navController.navigate(R.id.action_logout)
+                
+                // clean all workers
+                WorkManager.getInstance(applicationContext).cancelAllWork()
             }
+            .setCancelable(false)
+            .create()
+    }
+
+    private val connectivityObserverDialog by lazy {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.no_internet_connection))
+            .setMessage(getString(R.string.data_is_cache))
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
+                snackbarConnectivityStatus.show() // to maintain snackbar existence
+            }
+            .setNeutralButton(getString(R.string.close)) { _, _ ->
+                neverShowConnectivityDialogAgain = true
+            } // will close the snackbar
             .setCancelable(false)
             .create()
     }
@@ -122,6 +156,7 @@ class MainActivity : AppCompatActivity() {
 
         navHostSetup()
 
+        // setup to show permission location access dialog
         lifecycleScope.launch {
             viewModel.state.map { it.showLocationPermissionDialog }.collectLatest {
                 if(it){
@@ -130,6 +165,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         
+        // setup show camera permission dialog
         lifecycleScope.launch { 
             viewModel.state.map { it.showCameraPermissionDialog }.collectLatest { 
                 if(it){
@@ -139,6 +175,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         
+        // observe request to logout
         lifecycleScope.launch { 
             viewModel.state.map { it.requestToLogout }
                 .distinctUntilChanged()
@@ -149,6 +186,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // setup permission dialog for notification
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
             lifecycleScope.launch { 
                 repeatOnLifecycle(Lifecycle.State.STARTED){
@@ -158,14 +196,100 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        
+        // observe connectivity of network
+        lifecycleScope.launch { 
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                observeConnectivityChange()
+            }
+        }
+
+        setupNotificationChannel()
+
+//        WorkerRunner.runSubmitVoteWorker(this@MainActivity)
+        WorkManager.getInstance(this).getWorkInfosByTagLiveData(SUBMIT_WORKER_TAG)
+            .observe(this) { workInfo ->
+                workInfo.forEach {
+                    Log.d("worker", it.toString())
+                }
+            }
     }
+    
+    private fun observeConnectivityChange(){
+        val connectivityFlow = connectivityObserver.observer(this@MainActivity).distinctUntilChanged()
+        lifecycleScope.launch {
+            connectivityFlow.collectIndexed { index, status -> 
+                latestConnectivityState = status
+                
+                // run worker on initial network state
+                when(status){
+                    IConnectivityObserver.Status.Available -> {
+                        WorkerRunner.runSubmitVoteWorker(this@MainActivity)
+                        viewModel.setOnline(true)
+                    }
+                    IConnectivityObserver.Status.Lost, IConnectivityObserver.Status.Unavailable -> {
+                        WorkerRunner.stopSubmitVoteWorker(this@MainActivity)
+                        viewModel.setOnline(false)
+                    }
+                    else -> {}
+                }
+                
+                if (!(index == 0 && status == IConnectivityObserver.Status.Available)){
+                    if(this@MainActivity::snackbarConnectivityStatus.isInitialized && 
+                        snackbarConnectivityStatus.isShown
+                    ){
+                        snackbarConnectivityStatus.dismiss()
+                    }
+                    
+                    if (connectivityObserverDialog.isShowing) connectivityObserverDialog.dismiss()
+                    
+                    when(status){
+                        IConnectivityObserver.Status.Available -> {
+                            snackbarConnectivityStatus = Snackbar.make(
+                                binding.root,
+                                getString(R.string.internet_connection_is_back),
+                                Snackbar.LENGTH_SHORT)
+                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
+                                .setTextColor(getColor(android.R.color.white))
+                                .setBackgroundTint(getColor(R.color.color_success))
+
+                            snackbarConnectivityStatus.show()
+                            neverShowConnectivityDialogAgain = false
+                        }
+                        else -> {
+                            snackbarConnectivityStatus = Snackbar.make(
+                                binding.root,
+                                getString(R.string.no_internet_connection),
+                                Snackbar.LENGTH_INDEFINITE
+                            )
+                                .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
+                                .setTextColor(getColor(R.color.white))
+                                .setBackgroundTint(getColor(R.color.color_danger))
+                                .setAction(getString(R.string.dismiss)){}
+                                .setActionTextColor(getColor(R.color.white))
+                                .setAction(R.string.info){
+                                    connectivityObserverDialog.show()
+                                }
+
+                            if (!neverShowConnectivityDialogAgain){
+                                snackbarConnectivityStatus.show()
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
 
     private fun observeSessionValidity() {
         lifecycleScope.launch {
             viewModel.state.map { it.sessionValid }.collect {
                 if(navHostFragment.navController.currentDestination?.id !in listOf(
                         R.id.loginFragment,
-                        R.id.locationPermissionFragment
+                        R.id.locationPermissionFragment,
+                        R.id.splashscreenFragment
                     )
                 ){
                     if (it?.isValid == false && !it.hasLogout) {
@@ -278,5 +402,29 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(R.string.close, onClose)
             .show()
+    }
+    
+    private fun setupNotificationChannel(){
+        // Initialize notification
+        enumValues<NotificationChannelEnum>().forEach {
+            NotificationUtil.createChannel(
+                this,
+                it.channelID,
+                it.channelName,
+                it.importance
+            )
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        WorkerRunner.stopSyncWorker(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (viewModel.state.value.sessionValid?.isValid == true){
+            WorkerRunner.runSyncWorker(this)   
+        }
     }
 }

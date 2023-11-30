@@ -9,8 +9,9 @@ import kotlinx.coroutines.flow.onEach
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
+import javax.inject.Singleton
 
-@ViewModelScoped
+@Singleton
 class TokenInterceptor @Inject constructor(
     private val userPreference: UserPreference,
     @ApplicationScope

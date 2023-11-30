@@ -20,7 +20,7 @@
 
         <TextView
             android:id="@+id/tv_election_name"
-            style="@style/TextAppearance.Bold.Small"
+            style="@style/TextAppearance.Bold.Medium"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
@@ -31,7 +31,7 @@
 
         <TextView
             android:id="@+id/tv_election_info"
-            style="@style/TextAppearance.Bold.ExtraSmall"
+            style="@style/TextAppearance.Bold.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -44,7 +44,7 @@
 
         <TextView
             android:id="@+id/tv_election_status"
-            style="@style/TextAppearance.Bold.ExtraSmall"
+            style="@style/TextAppearance.Bold.Small"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
@@ -56,6 +56,7 @@
             tools:text="Status : Sudah Terverifikasi" />
 
         <com.google.android.material.button.MaterialButton
+            android:visibility="gone"
             android:id="@+id/btn_open_election"
             android:layout_width="wrap_content"
             android:layout_height="30dp"

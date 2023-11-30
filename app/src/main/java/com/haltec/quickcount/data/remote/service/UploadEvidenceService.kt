@@ -30,8 +30,8 @@ interface UploadEvidenceService {
         file: MultipartBody.Part
     ): UploadEvidenceResponse
     
-    @GET("attachment-file/{tpsId}/{electionId)")
-    suspend fun get(
+    @GET("attachment-file/{tpsId}/{electionId}")
+    suspend fun getData(
         @Path("tpsId")
         tpsId: Int,
         @Path("electionId")

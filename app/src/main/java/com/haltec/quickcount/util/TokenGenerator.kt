@@ -1,5 +1,6 @@
-package com.haltec.quickcount.data.util
+package com.haltec.quickcount.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
@@ -21,6 +22,7 @@ fun hashString(type: String, input: String): String {
     return bytes.fold("") { str, it -> str + "%02x".format(it) }
 }
 
+@SuppressLint("HardwareIds")
 fun generateDeviceToken(context: Context): String{
     val salt = UUID.randomUUID().toString()
     val token = if(BuildConfig.DEBUG) "1234567890" else generateToken(salt)

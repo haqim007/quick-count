@@ -47,6 +47,8 @@
             <ImageView
                 android:id="@+id/btn_back"
                 android:layout_width="wrap_content"
+                android:minHeight="36dp"
+                android:minWidth="36dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_arrow_circle_left"
                 android:layout_marginStart="26dp"
@@ -60,14 +62,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
-                android:fontFamily="@font/bold_700"
+                android:text="@string/detail_semua_formulir"
+                android:textAppearance="@style/TextAppearance.Bold"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:layout_marginTop="22dp"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_back"
                 app:layout_constraintEnd_toStartOf="@+id/btn_logout"
                 app:layout_constraintStart_toEndOf="@id/btn_back"
-                app:layout_constraintTop_toTopOf="parent"
-                android:text="@string/detail_semua_formulir"/>
+                app:layout_constraintTop_toTopOf="@+id/btn_back" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -107,6 +108,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/not_sent_yet"
+                style="@style/CustomChip" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_filter_wait_to_sent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/wait_to_be_sent"
                 style="@style/CustomChip" />
 
             <com.google.android.material.chip.Chip
@@ -165,7 +173,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/til_filter_dropdown"
                 layout="@layout/layout_loader_and_error"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent" />
             
         </FrameLayout>
 

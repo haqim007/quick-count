@@ -60,13 +60,13 @@
     <string name="success_taking_picture">Berhasil mengambil foto</string>
     <string name="edit_photo">Edit foto</string>
     <string name="upload_photo">Upload foto</string>
-    <string name="please_choose_type_name">Mohon pilih tipe Pleno, Formulir C1 atau Lainnya</string>
+    <string name="please_choose_type_name">Tipe belum dipilih</string>
     <string name="failed_to_start_camera">Gagal membuka kamera</string>
     <string name="zoom_touch_close">Pencet untuk zoom foto</string>
     <string name="back_to_prev_page">Kembali ke laman sebelumnya</string>
     <string name="close_photo_expand">Tutup expand foto</string>
     <string name="upload_succeed">Upload Berhasil</string>
-    <string name="upload_succeed_message">Silahkan lanjutkan upload foto dokumen %s. Anda bisa mengganti foto selama data hasil inputan belum terverifikasi</string>
+    <string name="upload_succeed_message">Foto bukti berhasil di-upload</string>
     <string name="current_location_is_not_detected">Lokasi saat ini tidak terdeteksi pada perangkat Anda. Silahkan nyalakan GPS dan berjalan beberapa meter untuk mengkalibrasi GPS kemudian coba kembali</string>
     <string name="village_title">Kelurahan</string>
     <string name="colon">:</string>
@@ -99,4 +99,21 @@
     <string name="election_data_cannot_be_changed_anymore">Data sudah tidak dapat diubah kembali. Silahkan hubungi administrator jika ada perubahan</string>
     <string name="total_party_invalid_vote">Jumlah Suara Tidak Sah</string>
     <string name="data_rejected_">Data Ditolak: %s</string>
+    <string name="internet_connection_is_back">Koneksi Internet Kembali</string>
+    <string name="no_internet_connection">Tidak ada koneksi internet!</string>
+    <string name="dismiss">Tutup</string>
+    <string name="data_is_cache">Data yang tampil adalah data terakhir sebelum koneksi internet terputus dan dapat berubah ketika koneksi internet kembali</string>
+    <string name="info">Info</string>
+    <string name="will_be_sent_once_internet_available">Akan dikirim setelah koneksi internet kembali</string>
+    <string name="download_in_progress">Download in progress</string>
+    <string name="wait_to_be_sent">Menunggu Dikirim</string>
+    <string name="please_do_not_close_app_during_sync">Mohon untuk tidak menutup aplikasi selama proses sinkronisasi</string>
+    <string name="photo_1">Foto 1</string>
+    <string name="photo_2">Foto 2</string>
+    <string name="photo_3">Foto 3</string>
+    <string name="photo_4">Foto 4</string>
+    <string name="photo_5">Foto 5</string>
+    <string name="photo_6">Foto 6</string>
+    <string name="photo_7">Foto 7</string>
+    <string name="data_wait_to_be_sent_">Data Menunggu Terkirim : %s</string>
 </resources>

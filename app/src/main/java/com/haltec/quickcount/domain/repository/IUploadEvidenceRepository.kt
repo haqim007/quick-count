@@ -1,6 +1,7 @@
 package com.haltec.quickcount.domain.repository
 
 import com.haltec.quickcount.data.mechanism.Resource
+import com.haltec.quickcount.data.remote.request.UploadEvidenceRequest
 import com.haltec.quickcount.domain.model.Election
 import com.haltec.quickcount.domain.model.TPS
 import com.haltec.quickcount.domain.model.VoteEvidence
@@ -15,5 +16,7 @@ interface IUploadEvidenceRepository {
         image: File
     ): Flow<Resource<VoteEvidence>>
 
-    fun getCurrent(tps: TPS, election: Election): Flow<Resource<List<VoteEvidence>>>
+    fun getPrevData(tps: TPS, election: Election): Flow<Resource<List<VoteEvidence>>>
+    suspend fun getTempUploadEvidence(): List<UploadEvidenceRequest>
+    fun upload(request: UploadEvidenceRequest): Flow<Resource<VoteEvidence>>
 }

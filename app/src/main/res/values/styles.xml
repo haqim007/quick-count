@@ -13,7 +13,7 @@
         <item name="android:textSize">16sp</item>
     </style>
 
-    <style name="TextAppearance.Bold.Small" parent="TextAppearance.Bold">
+    <style name="TextAppearance.Bold.Medium" parent="TextAppearance.Bold">
         <item name="android:textSize">14sp</item>
     </style>
 
@@ -22,14 +22,18 @@
         <item name="android:textSize">26sp</item>
     </style>
 
-    <style name="TextAppearance.Bold.ExtraSmall" parent="TextAppearance.AppCompat">
-        <item name="android:fontFamily">@font/bold_700</item>
-        <item name="android:textSize">8sp</item>
+    <style name="TextAppearance.Bold.Small" parent="TextAppearance.Bold">
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="TextAppearance.Medium" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">@font/medium_500</item>
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.Small" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/medium_500</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="ShapeAppearance_bottom_corners" parent="">

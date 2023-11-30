@@ -5,10 +5,10 @@ constraintlayout = "2.1.4"
 junit = "4.13.2"
 androidxTestExtJunit = "1.1.5"
 espressoCore = "3.5.1"
-navigationFragmentKtx = "2.7.4"
-navigationUiKtx = "2.7.4"
+navigationFragmentKtx = "2.7.5"
+navigationUiKtx = "2.7.5"
 lifecycleViewmodelKtx = "2.6.2"
-activityKtx = "1.8.0"
+activityKtx = "1.8.1"
 retrofit = "2.9.0"
 converterGson = "2.9.0"
 okhttp = "5.0.0-alpha.11"
@@ -17,6 +17,8 @@ pagingRuntimeKtx = "3.2.1"
 glide = "4.15.0"
 hilt = "2.47"
 hiltNavigationFragment = "1.0.0"
+hiltWorker = "1.0.0"
+hiltCompiler = "1.0.0"
 roomKtx = "2.6.0"
 roomCompiler = "2.6.0"
 dataStore = "1.0.0"
@@ -26,17 +28,19 @@ touchImageView = "3.6"
 maps = "18.2.0"
 location = "21.0.1"
 swiperefreshlayout = "1.1.0"
-firebaseBom = "32.4.0"
+firebaseBom = "32.6.0"
 chucker = "3.5.2"
+work-runtime = "2.8.1"
 # Plugin versions
 jetbrainsKotlinAndroid = "1.9.10"
-androidGradlePlugin = "8.1.1"
+androidGradlePlugin = "8.1.4"
 kspPlugin = "1.9.10-1.0.13"
 safeArgsKotlinPlugin = "2.7.3"
 legacy-support-v4 = "1.0.0"
 lifecycle-livedata-ktx = "2.6.2"
 google-services = "4.4.0"
 recyclerview = "1.3.2"
+
 
 [libraries]
 androidx-ktx = {group = "androidx.core", name="core-ktx", version.ref="ktx"}
@@ -55,9 +59,12 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 logging-interceptor = { group = "com.squareup.okhttp3", name ="logging-interceptor", version.ref ="loggingInterceptor"}
 paging-runtime-ktx ={group ="androidx.paging", name ="paging-runtime-ktx", version.ref ="pagingRuntimeKtx"}
 glide ={group ="com.github.bumptech.glide", name ="glide", version.ref ="glide"}
+glide-compiler ={group ="com.github.bumptech.glide", name ="compiler", version.ref ="glide"}
 hilt-android = {group ="com.google.dagger", name ="hilt-android", version.ref ="hilt"}
+hilt-compiler = {group="androidx.hilt", name="hilt-compiler", version.ref="hiltCompiler"}
 hilt-android-compiler = {group ="com.google.dagger", name ="hilt-android-compiler", version.ref ="hilt"}
 hilt-navigation-fragment = {group = "androidx.hilt", name = "hilt-navigation-fragment", version.ref = "hiltNavigationFragment"}
+hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWorker"}
 room-ktx ={group ="androidx.room", name ="room-ktx", version.ref ="roomKtx"}
 room-compiler ={group ="androidx.room", name ="room-compiler", version.ref ="roomCompiler"}
 room-paging ={group ="androidx.room", name ="room-paging", version.ref ="roomCompiler"}
@@ -76,6 +83,7 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 chucker = { group = "com.github.chuckerteam.chucker", name = "library", version.ref = "chucker"}
 chucker-noop = { group = "com.github.chuckerteam.chucker", name = "library-no-op", version.ref = "chucker"}
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
+work-runtime = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work-runtime"}
 
 
 [plugins]

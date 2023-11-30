@@ -34,6 +34,8 @@
             <ImageView
                 android:id="@+id/btn_back"
                 android:layout_width="wrap_content"
+                android:minHeight="36dp"
+                android:minWidth="36dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_arrow_circle_left"
                 android:layout_marginStart="26dp"
@@ -62,9 +64,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="3dp"
                 android:layout_marginEnd="3dp"
-                android:fontFamily="@font/medium_500"
+                android:textAppearance="@style/TextAppearance.Small"
                 android:textColor="@android:color/white"
-                android:textSize="8sp"
                 app:layout_constraintEnd_toEndOf="@+id/tv_form_title"
                 app:layout_constraintStart_toStartOf="@+id/tv_form_title"
                 app:layout_constraintTop_toBottomOf="@+id/tv_form_title"
@@ -175,7 +176,7 @@
 
                     <TextView
                         android:id="@+id/tv_village_name_title"
-                        style="@style/TextAppearance.Bold.Small"
+                        style="@style/TextAppearance.Bold.Medium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/village_title"
@@ -185,7 +186,7 @@
 
                     <TextView
                         android:id="@+id/tv_subdistrict_name_title"
-                        style="@style/TextAppearance.Bold.Small"
+                        style="@style/TextAppearance.Bold.Medium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/subdistrict_title"
@@ -207,7 +208,7 @@
 
                     <TextView
                         android:id="@+id/tv_village_name"
-                        style="@style/TextAppearance.Bold.Small"
+                        style="@style/TextAppearance.Bold.Medium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
@@ -217,7 +218,7 @@
 
                     <TextView
                         android:id="@+id/tv_subdistrict_name"
-                        style="@style/TextAppearance.Bold.Small"
+                        style="@style/TextAppearance.Bold.Medium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
@@ -238,7 +239,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/ll_area_title"
-                    android:nestedScrollingEnabled="true"
                     tools:itemCount="1"
                     tools:listitem="@layout/item_vote"
                     app:layout_constraintVertical_bias="0.0"
@@ -430,6 +430,7 @@
                                         android:inputType="number"
                                         android:gravity="center"
                                         tools:text="1000"
+                                        style="@style/TextAppearance.Bold.Medium"
                                         />
 
                                 </com.google.android.material.textfield.TextInputLayout>

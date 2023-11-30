@@ -1,9 +1,9 @@
 package com.haltec.quickcount.data.remote.response
 
 import com.google.gson.annotations.SerializedName
-import com.haltec.quickcount.data.util.DATE_TIME_FORMAT
-import com.haltec.quickcount.data.util.capitalizeWords
-import com.haltec.quickcount.data.util.stringToTimestamp
+import com.haltec.quickcount.util.DATE_TIME_FORMAT
+import com.haltec.quickcount.util.capitalizeWords
+import com.haltec.quickcount.util.stringToTimestamp
 import com.haltec.quickcount.domain.model.Login
 import com.haltec.quickcount.domain.model.UserInfo
 

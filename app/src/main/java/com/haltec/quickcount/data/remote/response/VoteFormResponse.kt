@@ -1,12 +1,15 @@
 package com.haltec.quickcount.data.remote.response
 
 import com.google.gson.annotations.SerializedName
+import com.haltec.quickcount.data.local.entity.table.CandidateEntity
+import com.haltec.quickcount.data.local.entity.table.PartyEntity
+import com.haltec.quickcount.data.local.entity.table.VoteFormEntity
 import com.haltec.quickcount.domain.model.VoteData
 
-data class CandidateListResponse(
+data class VoteFormResponse(
 
 	@field:SerializedName("data")
-	val data: CandidateListDataResponse,
+	val data: VoteFormData,
 
 	@field:SerializedName("message")
 	val message: String,
@@ -14,10 +17,13 @@ data class CandidateListResponse(
 	@field:SerializedName("version")
 	val version: String
 ){
-	data class CandidateListDataResponse(
+	data class VoteFormData(
 
 		@field:SerializedName("tps_id")
 		val tpsId: Int,
+
+		@field:SerializedName("selection_type_id")
+		val selectionTypeId: Int,
 
 		@field:SerializedName("province")
 		val province: String,
@@ -29,7 +35,7 @@ data class CandidateListResponse(
 		val isPartai: Int,
 		
 		@field:SerializedName("partai_lists")
-		val partaiLists: List<PartyListsItemResponse>,
+		val partaiLists: List<PartyListsItemResponse>?,
 
 		@field:SerializedName("village")
 		val village: String,
@@ -53,7 +59,7 @@ data class CandidateListResponse(
 			tpsId = data.tpsId,
 			tpsName = data.tpsName,
 			city = city,
-			partyLists = data.partaiLists.map { it.toModel() },
+			partyLists = data.partaiLists?.map { it.toModel() } ?: emptyList(),
 			province = data.province,
 			subdistrict = data.subdistrict,
 			village = data.village,
@@ -63,9 +69,43 @@ data class CandidateListResponse(
 			isParty = data.isPartai == 1
 		)
 	}
+	
+	fun toEntity(): VoteFormEntity{
+		this.data.apply {
+			return VoteFormEntity(
+				tpsId = tpsId,
+				tpsName = tpsName,
+				electionId = selectionTypeId,
+				province = province,
+				subdistrict = subdistrict,
+				isPartai = isPartai,
+				village = village,
+				amount = amount,
+				invalidVote = invalidVote,
+				note = note,
+				
+				partaiList = partaiLists?.map { 
+					PartyEntity(
+						partaiName = it.partaiName,
+						id = it.id,
+						amount = it.amount,
+						candidateList = it.candidateList.map { candidate ->
+							CandidateEntity(
+								noUrut = candidate.noUrut, 
+								name = candidate.name, 
+								id = candidate.id, amount)
+						}
+					)
+				} ?: emptyList()
+			)
+		}
+	}
 }
 
 data class PartyListsItemResponse(
+
+	@field:SerializedName("last_partai_updated")
+	val lastPartaiUpdated: String,
 
 	@field:SerializedName("candidate_list")
 	val candidateList: List<CandidateListItemResponse>,
@@ -80,7 +120,7 @@ data class PartyListsItemResponse(
 	val amount: Int
 ){
 	fun toModel() = VoteData.PartyListsItem(
-		candidateList = this.candidateList.map { it.toModel() },
+		candidateList = this.candidateList.map { it.toModel(this.id) },
 		partyName = partaiName,
 		id,
 		totalPartyVote = amount,
@@ -102,10 +142,11 @@ data class CandidateListItemResponse(
 	@field:SerializedName("amount")
 	val amount: Int
 ){
-	fun toModel() = VoteData.Candidate(
+	fun toModel(partyId: Int) = VoteData.Candidate(
 		orderNumber = noUrut,
 		candidateName = name,
 		id = id,
-		totalCandidateVote = amount
+		totalCandidateVote = amount,
+		partyId = partyId
 	)
 }

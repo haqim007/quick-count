@@ -13,11 +13,12 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.haltec.quickcount.R
-import com.haltec.quickcount.data.util.createFile
+import com.haltec.quickcount.util.createFile
 import com.haltec.quickcount.databinding.ActivityCameraBinding
 import com.haltec.quickcount.ui.uploadevidence.UploadEvidenceFragment.Companion.CAMERA_RESULT
-import com.haltec.quickcount.ui.uploadevidence.UploadEvidenceFragment.Companion.TYPE_NAME
+import com.haltec.quickcount.ui.uploadevidence.UploadEvidenceFragment.Companion.FILE_NAME_EXTRA
 import androidx.camera.core.Preview
+import com.haltec.quickcount.util.createCacheFile
 
 class CameraActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCameraBinding
@@ -27,11 +28,11 @@ class CameraActivity : AppCompatActivity() {
         
         binding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val typeName: String? = intent.getStringExtra(TYPE_NAME)
+        val fileName: String? = intent.getStringExtra(FILE_NAME_EXTRA)
         
         binding.captureImage.setOnClickListener {
-            if (typeName != null) {
-                takePhoto(typeName)
+            if (fileName != null) {
+                takePhoto(fileName)
             } else {
                 Toast.makeText(
                     this@CameraActivity,
@@ -59,7 +60,7 @@ class CameraActivity : AppCompatActivity() {
         binding.switchCamera.isClickable = false
         
         val imageCapture = imageCapture ?: return
-        val photoFile = createFile(typeName, application)
+        val photoFile = createCacheFile(applicationContext, typeName)
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
         imageCapture.takePicture(
             outputOptions,

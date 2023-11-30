@@ -4,22 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.haltec.quickcount.R
-import com.haltec.quickcount.data.mechanism.Resource
-import com.haltec.quickcount.data.mechanism.ResourceHandler
-import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.databinding.FragmentTpsListBinding
 import com.haltec.quickcount.domain.model.TPS
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
+import com.haltec.quickcount.ui.util.handleLoadStates
+import com.haltec.quickcount.util.NotificationChannelEnum
+import com.haltec.quickcount.util.NotificationUtil
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class TPSListFragment : BaseFragment() {
@@ -46,10 +46,6 @@ class TPSListFragment : BaseFragment() {
                     TPSListFragmentDirections.actionTPSListFragmentToTPSElectionListFragment()
                 )
             }
-            
-            srlTpsList.setOnRefreshListener { 
-                viewModel.getTPSList()
-            }
         }
         
         return binding.root
@@ -72,49 +68,29 @@ class TPSListFragment : BaseFragment() {
             }
         )
         rvTps.adapter = adapter
-        viewModel.state.map { it.data }.launchCollectLatest {
-            it.handle(
-                object : ResourceHandler<List<TPS>> {
-                    override fun onSuccess(data: List<TPS>?) {
-                        adapter.submitList(data)
-                        if (data.isNullOrEmpty()) {
-                            layoutLoader.lavAnimation.setAnimation(R.raw.empty_box)
-                            layoutLoader.lavAnimation.playAnimation()
-                            layoutLoader.tvErrorMessage.text = getString(R.string.data_is_empty)
-                        }
-                        layoutLoader.lavAnimation.isVisible = data.isNullOrEmpty()
-                        rvTps.isVisible = data?.isNotEmpty() == true
-                    }
-
-                    override fun onError(message: String?, data: List<TPS>?) {
-                        layoutLoader.lavAnimation.setAnimation(R.raw.error_box)
-                        layoutLoader.lavAnimation.playAnimation()
-                        layoutLoader.lavAnimation.isVisible = true
-                        rvTps.isVisible = false
-                        layoutLoader.tvErrorMessage.text = message ?: getString(R.string.error_occured)
-                    }
-
-                    override fun onLoading() {
-                        layoutLoader.lavAnimation.setAnimation(R.raw.loading)
-                        layoutLoader.lavAnimation.playAnimation()
-                        layoutLoader.lavAnimation.isVisible = true
-                        rvTps.isVisible = false
-                    }
-
-                    override fun onAll(resource: Resource<List<TPS>>) {
-                        cgMenu.isVisible = resource !is Resource.Error
-                        tvTpsListTitle.isInvisible = resource is Resource.Error
-                        layoutLoader.tvErrorMessage.isVisible = resource is Resource.Error
-                        layoutLoader.btnTryAgain.isVisible = resource is Resource.Error
-
-                        srlTpsList.isRefreshing = resource is Resource.Loading
-                    }
-                }
-            )
+        viewModel.pagingFlow.launchCollect { 
+            adapter.submitData(it)
         }
 
+        adapter.loadStateFlow.launchCollect {
+            handleLoadStates(
+                it,
+                layoutLoader,
+                rvTps,
+                adapter,
+                getString(R.string.data_is_empty),
+                getString(R.string.error_occured)
+            )
+        }
+        
+
         layoutLoader.btnTryAgain.setOnClickListener { 
-            viewModel.getTPSList()
+            adapter.retry()
+        }
+
+        srlTpsList.setOnRefreshListener {
+            adapter.refresh()
+            srlTpsList.isRefreshing = false
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.haltec.quickcount.data.util
+package com.haltec.quickcount.util
 
 import java.text.DecimalFormat
 import java.text.NumberFormat

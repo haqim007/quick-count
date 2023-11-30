@@ -46,11 +46,11 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mcv_profile_image"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_marginStart="26dp"
-                android:layout_marginTop="15dp"
                 app:cardCornerRadius="100dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -72,9 +72,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
-                android:fontFamily="@font/bold_700"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
+                android:textAppearance="@style/TextAppearance.Bold"
                 android:maxLines="1"
                 app:layout_constraintBottom_toBottomOf="@+id/mcv_profile_image"
                 app:layout_constraintEnd_toStartOf="@+id/btn_logout"

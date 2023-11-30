@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.haltec.quickcount.data.util.currentTimestamp
+import com.haltec.quickcount.util.currentTimestamp
 import com.haltec.quickcount.di.UserPreference
 import com.haltec.quickcount.domain.model.SessionValidity
 import com.haltec.quickcount.domain.model.UserInfo

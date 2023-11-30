@@ -6,18 +6,18 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.ItemElectionBinding
 import com.haltec.quickcount.domain.model.Election
-import com.haltec.quickcount.domain.model.ElectionStatus
+import com.haltec.quickcount.domain.model.SubmitVoteStatus
 
 
 class ElectionListAdapter(
     private val callback: ElectionListCallback
-): ListAdapter<Election, ElectionListAdapter.ElectionListViewHolder>(ItemDIffCallback()) {
+): PagingDataAdapter<Election, ElectionListAdapter.ElectionListViewHolder>(ItemDIffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ElectionListViewHolder {
         return ElectionListViewHolder.create(parent)
@@ -30,63 +30,64 @@ class ElectionListAdapter(
     class ElectionListViewHolder(private val binding: ItemElectionBinding): RecyclerView.ViewHolder(binding.root){
 
 
-        fun bind(election: Election, callback: ElectionListCallback){
+        fun bind(election: Election?, callback: ElectionListCallback){
+            election?.let {
+                binding.apply {
+                    tvElectionName.text = election.title
+                    tvElectionInfo.text = if (election.statusVote == SubmitVoteStatus.PENDING){
+                        itemView.context.getString(R.string.input_data_before_date_time, election.createdAt)
+                    }else{
+                        itemView.context.getString(R.string.sent_at_date_time, election.updatedAt)
+                    }
+                    val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, election.statusVote.text))
+                    val statusColor: Int
+                    val borderColor: Int
+                    when(election.statusVote) {
+                        SubmitVoteStatus.SUBMITTED -> {
+                            statusColor = ContextCompat.getColor(
+                                itemView.context,
+                                R.color.color_status_election_submitted
+                            )
+                            borderColor = ContextCompat.getColor(
+                                itemView.context,
+                                R.color.color_border_election_submitted
+                            )
+                        }
 
-            binding.apply {
-                tvElectionName.text = election.title
-                tvElectionInfo.text = if (election.statusVote == ElectionStatus.PENDING){
-                    itemView.context.getString(R.string.input_data_before_date_time, election.createdAt)
-                }else{
-                    itemView.context.getString(R.string.sent_at_date_time, election.updatedAt)
-                }
-                val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, election.statusVote.text))
-                val statusColor: Int
-                val borderColor: Int
-                when(election.statusVote) {
-                    ElectionStatus.SUBMITTED -> {
-                        statusColor = ContextCompat.getColor(
-                            itemView.context,
-                            R.color.color_status_election_submitted
-                        )
-                        borderColor = ContextCompat.getColor(
-                            itemView.context,
-                            R.color.color_border_election_submitted
-                        )
+                        SubmitVoteStatus.VERIFIED -> {
+                            statusColor = ContextCompat.getColor(
+                                itemView.context,
+                                R.color.color_status_election_verified
+                            )
+                            borderColor = ContextCompat.getColor(
+                                itemView.context,
+                                R.color.color_border_election_verified
+                            )
+                        }
+
+                        else -> {
+                            statusColor = ContextCompat.getColor(
+                                itemView.context,
+                                R.color.color_status_election_not_sent
+                            )
+                            borderColor = ContextCompat.getColor(
+                                itemView.context,
+                                R.color.color_border_election_not_sent
+                            )
+                        }
+                    }
+                    statusSpannable.setSpan(ForegroundColorSpan(
+                        statusColor
+                    ), 8, statusSpannable.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    tvElectionStatus.text = statusSpannable
+
+                    mcvElectionItem.strokeColor = borderColor
+
+                    root.setOnClickListener {
+                        callback.onClick(election)
                     }
 
-                    ElectionStatus.VERIFIED -> {
-                        statusColor = ContextCompat.getColor(
-                            itemView.context,
-                            R.color.color_status_election_verified
-                        )
-                        borderColor = ContextCompat.getColor(
-                            itemView.context,
-                            R.color.color_border_election_verified
-                        )
-                    }
-
-                    else -> {
-                        statusColor = ContextCompat.getColor(
-                            itemView.context,
-                            R.color.color_status_election_not_sent
-                        )
-                        borderColor = ContextCompat.getColor(
-                            itemView.context,
-                            R.color.color_border_election_not_sent
-                        )
-                    }
                 }
-                statusSpannable.setSpan(ForegroundColorSpan(
-                    statusColor
-                ), 8, statusSpannable.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                tvElectionStatus.text = statusSpannable
-                
-                mcvElectionItem.strokeColor = borderColor
-                
-                btnOpenElection.setOnClickListener { 
-                    callback.onClick(election)
-                }
-                
             }
 
         }

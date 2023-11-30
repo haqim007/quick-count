@@ -1,7 +1,8 @@
 package com.haltec.quickcount.data.remote.response
 
 import com.google.gson.annotations.SerializedName
-import com.haltec.quickcount.data.util.capitalizeWords
+import com.haltec.quickcount.data.local.entity.table.TPSEntity
+import com.haltec.quickcount.util.capitalizeWords
 import com.haltec.quickcount.domain.model.TPS
 
 data class TPSResponse(
@@ -46,7 +47,7 @@ data class TPSResponse(
 	val id: Int,
 
 	@field:SerializedName("submited")
-	val submited: String,
+	val submitted: String,
 
 	@field:SerializedName("rejected")
 	val rejected: String,
@@ -55,8 +56,28 @@ data class TPSResponse(
 	val village: String,
 
 	@field:SerializedName("longitude")
-	val longitude: String
+	val longitude: String,
 ){
+	
+	fun toEntity() = TPSEntity(
+		villageCode, 
+		address, 
+		city, 
+		latitude, 
+		pending, 
+		dpt, 
+		createdAt, 
+		createdBy, 
+		approved, 
+		subdistrict, 
+		province, 
+		name, 
+		id, 
+		submitted, 
+		rejected, 
+		village, 
+		longitude
+	)
 	fun toModel() = TPS(
 		villageCode, 
 		address, 
@@ -71,7 +92,7 @@ data class TPSResponse(
 		capitalizeWords(province), 
 		capitalizeWords(name), 
 		id, 
-		submited.toIntOrNull() ?: 0,
+		submitted.toIntOrNull() ?: 0,
 		capitalizeWords(village), 
 		longitude,
 		rejected.toIntOrNull() ?: 0

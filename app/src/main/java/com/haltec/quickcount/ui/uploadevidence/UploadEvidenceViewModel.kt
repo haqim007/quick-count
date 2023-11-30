@@ -2,6 +2,8 @@ package com.haltec.quickcount.ui.uploadevidence
 
 import androidx.lifecycle.viewModelScope
 import com.haltec.quickcount.data.mechanism.Resource
+import com.haltec.quickcount.data.mechanism.ResourceHandler
+import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.domain.model.Election
 import com.haltec.quickcount.domain.model.TPS
 import com.haltec.quickcount.domain.model.VoteEvidence
@@ -33,21 +35,47 @@ class UploadEvidenceViewModel @Inject constructor(
     
     fun fetchPrevData(){
         if (state.value.tps != null && state.value.election != null){
-            repository.getCurrent(state.value.tps!!, state.value.election!!).launchCollectLatest {
-                it.data?.forEach {voteEvidence ->
-                    _state.update { state ->
-                        val copyFormState = state.formState
-                        copyFormState[voteEvidence.type] =
-                            FormInputState(imageUrl = voteEvidence.file, description = voteEvidence.description)
-                        state.copy(
-                            formState = copyFormState
-                        )
+            clearState()
+            repository.getPrevData(state.value.tps!!, state.value.election!!).launchCollectLatest {
+                it.handle(object : ResourceHandler<List<VoteEvidence>>{
+                    override fun onSuccess(data: List<VoteEvidence>?) {
+                        setFormState(it.data ?: emptyList())
                     }
-                }
+
+                    override fun onLoading() {
+                        _state.update { state ->
+                            state.copy(
+                                hasLoadPrevData = false
+                            )
+                        }
+                    }
+
+                    override fun onError(message: String?, data: List<VoteEvidence>?, code: Int?) {
+                        setFormState(it.data ?: emptyList())
+                    }
+                })
             }
         }
     }
-    
+
+    private fun setFormState(data: List<VoteEvidence>) {
+        val copyFormState = state.value.formState
+        data.forEach { voteEvidence ->
+            copyFormState[voteEvidence.type] =
+                FormInputState(
+                    image = voteEvidence.file,
+                    imageUrl = voteEvidence.fileUrl,
+                    description = voteEvidence.description
+                )
+        }
+        _state.update { state ->
+            state.copy(
+                hasLoadPrevData = true,
+                formState = copyFormState
+            )
+        }
+    }
+
     fun setImage(file: File){
         _state.update { state ->
             state.type?.let {type ->
@@ -121,8 +149,7 @@ class UploadEvidenceViewModel @Inject constructor(
                     election != null &&
                     !type.isNullOrEmpty() &&
                     formState.size > 0 &&
-                    formState[type]?.image != null &&
-                    !formState[type]?.description.isNullOrEmpty()
+                    formState[type]?.image != null
                 )
             }
         }
@@ -131,6 +158,7 @@ class UploadEvidenceViewModel @Inject constructor(
     fun clearState(){
         _state.update { state ->
             state.copy(
+                hasLoadPrevData = false,
                 tps = null,
                 election = null,
                 formState = hashMapOf(),
@@ -145,6 +173,7 @@ class UploadEvidenceViewModel @Inject constructor(
 typealias Type = String
 
 data class UploadEvidenceUiState(
+    val hasLoadPrevData: Boolean = false,
     val tps: TPS? = null,
     val election: Election? = null,
     val formState: HashMap<Type, FormInputState?> = hashMapOf(),

@@ -7,18 +7,28 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.paging.CombinedLoadStates
+import androidx.paging.LoadState
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.databinding.FragmentElectionListBinding
+import com.haltec.quickcount.databinding.LayoutLoaderAndErrorBinding
 import com.haltec.quickcount.domain.model.Election
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
+import com.haltec.quickcount.ui.util.handleLoadStates
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ElectionListFragment : BaseFragment() {
@@ -50,7 +60,8 @@ class ElectionListFragment : BaseFragment() {
             observeElectionList(adapter)
 
             srlElectionList.setOnRefreshListener {
-                viewModel.getElectionlist()
+                adapter.refresh()
+                srlElectionList.isRefreshing = false
             }
         }
         
@@ -74,47 +85,26 @@ class ElectionListFragment : BaseFragment() {
     }
 
     private fun FragmentElectionListBinding.observeElectionList(adapter: ElectionListAdapter) {
-        viewModel.state.map { it.data }.launchCollect {
-            
-            it.handle(
-                object : ResourceHandler<List<Election>> {
-                    override fun onSuccess(data: List<Election>?) {
-                        adapter.submitList(data)
-                        if (data.isNullOrEmpty()) {
-                            layoutLoader.lavAnimation.setAnimation(R.raw.empty_box)
-                            layoutLoader.lavAnimation.playAnimation()
-                            layoutLoader.tvErrorMessage.text = getString(R.string.data_is_empty)
-                        }
-                        layoutLoader.lavAnimation.isVisible = data.isNullOrEmpty()
-                        rvElections.isVisible = data?.isNotEmpty() == true
-                    }
 
-                    override fun onError(message: String?, data: List<Election>?) {
-                        layoutLoader.lavAnimation.setAnimation(R.raw.error_box)
-                        layoutLoader.lavAnimation.playAnimation()
-                        layoutLoader.lavAnimation.isVisible = true
-                        rvElections.isVisible = false
-                        layoutLoader.tvErrorMessage.text =
-                            message ?: getString(R.string.error_occured)
-                    }
-
-                    override fun onLoading() {
-                        layoutLoader.lavAnimation.setAnimation(R.raw.loading)
-                        layoutLoader.lavAnimation.playAnimation()
-                        layoutLoader.lavAnimation.isVisible = true
-                        rvElections.isVisible = false
-                    }
-
-                    override fun onAll(resource: Resource<List<Election>>) {
-                        tvElectionListTitle.isVisible = resource !is Resource.Error
-                        layoutLoader.btnTryAgain.isVisible = resource is Resource.Error
-                        layoutLoader.tvErrorMessage.isVisible = resource is Resource.Error
-
-                        srlElectionList.isRefreshing = resource is Resource.Loading
-                    }
+        viewLifecycleOwner.lifecycleScope.launch { 
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                viewModel.pagingFlow.launchCollect {
+                    adapter.submitData(it)
                 }
+            }
+        }
+
+        adapter.loadStateFlow.launchCollect {
+            handleLoadStates(
+                it, 
+                layoutLoader, 
+                rvElections, 
+                adapter, 
+                getString(R.string.data_is_empty), 
+                getString(R.string.error_occured)
             )
         }
     }
 
 }
+

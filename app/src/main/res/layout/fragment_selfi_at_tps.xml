@@ -56,9 +56,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
-                android:fontFamily="@font/bold_700"
+                android:textAppearance="@style/TextAppearance.Bold"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"
                 android:layout_marginTop="21dp"
                 app:layout_constraintEnd_toStartOf="@+id/iv_task"
                 app:layout_constraintStart_toEndOf="@id/btn_back"
@@ -72,7 +71,7 @@
 
     <TextView
         android:id="@+id/tv_selfi_info"
-        style="@style/TextAppearance.Bold.Small"
+        style="@style/TextAppearance.Bold.Medium"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="27dp"
@@ -113,7 +112,7 @@
 
             <TextView
                 android:id="@+id/tv_take_photo"
-                style="@style/TextAppearance.Bold.Small"
+                style="@style/TextAppearance.Bold.Medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

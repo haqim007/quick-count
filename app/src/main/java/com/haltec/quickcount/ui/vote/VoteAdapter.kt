@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.RecycledViewPool
 import com.haltec.quickcount.R
-import com.haltec.quickcount.data.util.formatNumberWithSeparator
+import com.haltec.quickcount.util.formatNumberWithSeparator
 import com.haltec.quickcount.databinding.ItemVoteBinding
 import com.haltec.quickcount.domain.model.VoteData
 

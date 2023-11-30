@@ -43,5 +43,6 @@ data class TPS(
     val submitted: Int?,
     val village: String,
     val longitude: String,
-    val rejected: Int?
+    val rejected: Int?,
+    val waitToBeSent: Int = 0
 ): Parcelable

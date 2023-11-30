@@ -1,7 +1,6 @@
 package com.haltec.quickcount.ui.login
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,7 @@ import com.haltec.quickcount.R
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
-import com.haltec.quickcount.data.util.generateDeviceToken
+import com.haltec.quickcount.util.generateDeviceToken
 import com.haltec.quickcount.databinding.FragmentLoginBinding
 import com.haltec.quickcount.domain.model.Login
 import com.haltec.quickcount.ui.BaseFragment
@@ -61,11 +60,11 @@ class LoginFragment : BaseFragment() {
                 
                 override fun onSuccess(data: Login?) {
                     findNavController().navigate(
-                        LoginFragmentDirections.actionLoginFragmentToTPSListFragment()
+                        LoginFragmentDirections.actionLoginFragmentToSplashscreenFragment()
                     )
                 }
 
-                override fun onError(message: String?, data: Login?) {
+                override fun onError(message: String?, data: Login?, code: Int?) {
                     var title = ""
                     var content = ""
                     message?.let {
@@ -152,7 +151,7 @@ class LoginFragment : BaseFragment() {
                     findNavController().currentDestination?.id == R.id.loginFragment
                 ){
                     findNavController().navigate(
-                        LoginFragmentDirections.actionLoginFragmentToTPSListFragment()
+                        LoginFragmentDirections.actionLoginFragmentToSplashscreenFragment()
                     )
                 }
             }

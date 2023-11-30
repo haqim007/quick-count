@@ -1,10 +1,8 @@
 package com.haltec.quickcount.data.remote.service
 
-import com.haltec.quickcount.data.remote.request.LoginRequest
 import com.haltec.quickcount.data.remote.request.VoteRequest
 import com.haltec.quickcount.data.remote.response.BasicResponse
-import com.haltec.quickcount.data.remote.response.CandidateListResponse
-import com.haltec.quickcount.data.remote.response.LoginResponse
+import com.haltec.quickcount.data.remote.response.VoteFormResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -18,7 +16,7 @@ interface VoteService {
         tpsId: Int,
         @Path("electionId")
         electionId: Int
-    ): CandidateListResponse
+    ): VoteFormResponse
 
     @POST("vote")
     suspend fun vote(
