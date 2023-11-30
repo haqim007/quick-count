@@ -37,12 +37,6 @@ class TPSElectionListViewModel @Inject constructor(
     val pagingFlow: Flow<PagingData<TPSElection>> = _pagingFlow.asStateFlow()
     
     init {
-//        viewModelScope.launch {
-//            setFilter()
-//            state.map { it.filter }.distinctUntilChanged().collectLatest {
-//                _pagingFlow = repository.getTPSElections(it).cachedIn(viewModelScope)
-//            }
-//        }
         setFilter()
         viewModelScope.launch {
             state.map { it.filter }

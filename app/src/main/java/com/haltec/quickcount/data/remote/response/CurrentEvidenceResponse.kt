@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName
 import com.haltec.quickcount.data.local.entity.table.UploadedEvidenceEntity
 import com.haltec.quickcount.util.stringToStringDateID
 import com.haltec.quickcount.domain.model.VoteEvidence
+import com.haltec.quickcount.domain.model.valueToEvidenceTypeText
 import com.haltec.quickcount.util.downloadImageToCacheDir
 import com.haltec.quickcount.util.lowerAllWords
 
@@ -52,7 +53,7 @@ data class CurrentEvidenceResponse(
 			this.latitude,
 			this.description,
 			"",
-			this.type,
+			valueToEvidenceTypeText(type),
 			"",
 			this.tpsId,
 			this.file,
@@ -69,7 +70,7 @@ data class CurrentEvidenceResponse(
 			tpsId = tpsId,
 			electionId = selectionTypeId,
 			description = description,
-			type = type,
+			type = valueToEvidenceTypeText(type),
 			fileUrl = file,
 			file = downloadImageToCacheDir(context, file, "${lowerAllWords(type)}_${tpsId}_${selectionTypeId}"),
 			latitude = latitude,
@@ -82,7 +83,7 @@ data class CurrentEvidenceResponse(
 			tpsId = tpsId,
 			electionId = selectionTypeId,
 			description = description,
-			type = type,
+			type = valueToEvidenceTypeText(type),
 			fileUrl = file,
 			file = null,
 			latitude = latitude,

@@ -24,3 +24,17 @@ fun stringToEvidenceType(text: String) : EvidenceTypes{
         else -> EvidenceTypes.OTHER
     }
 }
+
+fun valueToEvidenceTypeText(value: String) : String{
+    return when(value){
+        EvidenceTypes.PHOTO_1.value -> EvidenceTypes.PHOTO_1.text
+        EvidenceTypes.PHOTO_2.value -> EvidenceTypes.PHOTO_2.text
+        EvidenceTypes.PHOTO_3.value -> EvidenceTypes.PHOTO_3.text
+        EvidenceTypes.PHOTO_4.value -> EvidenceTypes.PHOTO_4.text
+        EvidenceTypes.PHOTO_5.value -> EvidenceTypes.PHOTO_5.text
+        EvidenceTypes.PHOTO_6.value -> EvidenceTypes.PHOTO_6.text
+        EvidenceTypes.PHOTO_7.value -> EvidenceTypes.PHOTO_7.text
+        else -> EvidenceTypes.OTHER.text
+    }
+}
+

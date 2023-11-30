@@ -35,7 +35,6 @@ class UploadEvidenceViewModel @Inject constructor(
     
     fun fetchPrevData(){
         if (state.value.tps != null && state.value.election != null){
-            clearState()
             repository.getPrevData(state.value.tps!!, state.value.election!!).launchCollectLatest {
                 it.handle(object : ResourceHandler<List<VoteEvidence>>{
                     override fun onSuccess(data: List<VoteEvidence>?) {

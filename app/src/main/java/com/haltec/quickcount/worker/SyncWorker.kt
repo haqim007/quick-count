@@ -28,6 +28,7 @@ class SyncWorker @AssistedInject constructor (
 
     override suspend fun doWork(): Result {
         try {
+            
             devicePreference.setSyncInProgress(true)
             
             Log.d("SyncWorker", "Running!")
@@ -37,7 +38,7 @@ class SyncWorker @AssistedInject constructor (
                     .get()
             }
             
-            // if submitworker is running, SyncWorker have to wait
+            // if submit worker is running, SyncWorker have to wait
             if (submitWorker.any { it.state == WorkInfo.State.RUNNING }){
                 return Result.retry()
             }
@@ -51,9 +52,9 @@ class SyncWorker @AssistedInject constructor (
             }
 
             devicePreference.setSyncInProgress(false)
-            devicePreference.setHasSync(true)
             return if (!isError){
                 Log.d("SyncWorker", "Succeed!")
+                devicePreference.setHasSync(true)
                 Result.success()
             }else{
                 retryOrFailure()
@@ -62,13 +63,15 @@ class SyncWorker @AssistedInject constructor (
         }catch (e: Exception){
             Log.d("SyncWorker", "Failed! ${e.message ?: (e.localizedMessage ?: "")}")
             devicePreference.setSyncInProgress(false)
+            devicePreference.setHasSync(true)
             return Result.failure()
         }
         
     }
 
-    private fun retryOrFailure(): Result {
+    private suspend fun retryOrFailure(): Result {
         return if (runAttemptCount > MAX_RETRIES) {
+            devicePreference.setHasSync(true)
             Log.d("SyncWorker", "Failed! Maximum retries reached")
             Result.failure()
         } else {

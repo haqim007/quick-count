@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.haltec.quickcount.di.DevicePreference
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,9 +34,12 @@ class DevicePreference @Inject constructor(
         }
     }
 
+    // only for first time sync a.k.a when hasSync false. after that, makes no effect
     suspend fun setSyncInProgress(inProgress: Boolean){
-        dataStore.edit {preferences ->
-            preferences[SYNC_IN_PROGRESS] = inProgress
+        if (!getSyncStatus().first().hasSync){
+            dataStore.edit {preferences ->
+                preferences[SYNC_IN_PROGRESS] = inProgress
+            }
         }
     }
 
