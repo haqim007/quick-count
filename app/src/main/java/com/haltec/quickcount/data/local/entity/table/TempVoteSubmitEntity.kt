@@ -2,9 +2,6 @@ package com.haltec.quickcount.data.local.entity.table
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.TypeConverters
-import com.haltec.quickcount.data.local.entity.typeConverter.TempVoteCandidateListConverter
-import com.haltec.quickcount.data.local.entity.typeConverter.TempVotePartyListConverter
 import com.haltec.quickcount.data.remote.request.VoteRequest
 
 const val TEMP_VOTE_SUBMIT_ENTITY = "temp_vote_submit_entity"
