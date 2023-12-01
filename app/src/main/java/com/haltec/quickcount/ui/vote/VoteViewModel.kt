@@ -105,10 +105,13 @@ class VoteViewModel @Inject constructor(
         partyId: Int,
         candidateId: Int, 
         vote: Int
-    ) =
-        currentCandidatesVote.filter { candidateVoteState ->
-            candidateVoteState.candidateId != candidateId && candidateVoteState.partyId != partyId
-        } + CandidateVoteState(partyId, candidateId, vote)
+    ) : List<CandidateVoteState> {
+        val excludeCandidate = currentCandidatesVote.filter { candidateVoteState ->
+            candidateVoteState.candidateId != candidateId 
+        }
+        return excludeCandidate + CandidateVoteState(partyId, candidateId, vote)
+    }
+        
 
     private fun updatePartiesVoteState(currentPartiesVote: List<Pair<Int, Int>>, partyId: Int, vote: Int) =
         currentPartiesVote.filter { pair ->

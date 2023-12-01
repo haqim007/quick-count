@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -51,7 +52,13 @@ class VoteFragment : BaseFragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentVoteBinding.inflate(inflater, container, false)
-        
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            viewModel.clear()
+            findNavController().popBackStack()
+        }
+
+
         val args: VoteFragmentArgs by navArgs()
         viewModel.setTpsElection(args.tps, args.election)
         val isEditable = args.election.statusVote != SubmitVoteStatus.VERIFIED
@@ -376,6 +383,5 @@ class VoteFragment : BaseFragment() {
             viewModel.fetchCandidates()
         }
     }
-
 
 }
