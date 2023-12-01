@@ -14,19 +14,6 @@ const val UPLOADED_EVIDENCE_TABLE = "uploaded_evidence"
 
 @Entity(
     tableName = UPLOADED_EVIDENCE_TABLE,
-    foreignKeys = [
-        ForeignKey(
-            entity = ElectionEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["election_id"],
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
-    indices = [
-        Index(value = ["type", "tps_id", "election_id"], unique = true),
-        Index(value = ["election_id"])
-    ]
 )
 data class UploadedEvidenceEntity(
     @PrimaryKey()

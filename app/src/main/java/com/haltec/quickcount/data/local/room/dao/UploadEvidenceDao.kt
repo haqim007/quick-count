@@ -106,4 +106,10 @@ interface UploadEvidenceDao {
     @Query("DELETE FROM $UPLOADED_EVIDENCE_TABLE WHERE tps_id NOT IN (:tpsIds)")
     suspend fun clearAllByTps(tpsIds: List<Int>)
 
+    @Query("DELETE FROM $UPLOADED_EVIDENCE_TABLE")
+    suspend fun clearAll()
+
+    @Query("DELETE FROM $UPLOADED_EVIDENCE_TABLE WHERE tps_id NOT IN (:tpsIds) AND election_id NOT IN (:electionId)")
+     fun clearAllByTpsElections(tpsIds: List<Int>, electionId: List<Int>)
+
 }

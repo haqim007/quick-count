@@ -24,7 +24,7 @@ interface TPSElectionDao {
             subdistrict,
             province,
             village,
-            $ELECTION_TABLE.id as electionId,
+            $ELECTION_TABLE.election_id as electionId,
             $ELECTION_TABLE.title as electionName,
             status_vote as statusVote
             
@@ -52,7 +52,7 @@ interface TPSElectionDao {
             subdistrict,
             province,
             village,
-            $ELECTION_TABLE.id as electionId,
+            $ELECTION_TABLE.election_id as electionId,
             $ELECTION_TABLE.title as electionName,
             status_vote as statusVote
             

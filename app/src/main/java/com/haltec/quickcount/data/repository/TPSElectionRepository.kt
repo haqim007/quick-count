@@ -44,7 +44,7 @@ class TPSElectionRepository @Inject constructor(
                 remoteDataSource,
                 stringToSubmitVoteStatusValueText(filter)
             ) {
-                devicePreference.isOnline().first() ?: false
+                devicePreference.isOnline().first()
             },
             pagingSourceFactory = {
                 localDataSource.getPaging(stringToSubmitVoteStatusNumber(filter))

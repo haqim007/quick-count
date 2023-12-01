@@ -2,6 +2,7 @@ package com.haltec.quickcount.data.local.entity.table
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.haltec.quickcount.util.capitalizeWords
 import com.haltec.quickcount.util.stringToStringDateID
@@ -9,8 +10,15 @@ import com.haltec.quickcount.domain.model.Election
 import com.haltec.quickcount.domain.model.SubmitVoteStatus
 
 const val ELECTION_TABLE = "election"
-@Entity(tableName = ELECTION_TABLE)
+@Entity(tableName = ELECTION_TABLE,
+    indices = [
+        Index(value = ["tps_id", "election_id"], unique = true),
+        Index(value = ["id"], unique = true)
+    ]
+)
 data class ElectionEntity(
+    @PrimaryKey
+    val id: Int,
     @ColumnInfo("updated_at")
     val updatedAt: String,
     @ColumnInfo("status_vote")
@@ -20,8 +28,8 @@ data class ElectionEntity(
     val active: Int,
     @ColumnInfo("created_at")
     val createdAt: String,
-    @PrimaryKey
-    val id: Int,
+    @ColumnInfo("election_id")
+    val electionId: Int,
     val title: String,
     @ColumnInfo("created_by")
     val createdBy: String,
@@ -30,7 +38,7 @@ data class ElectionEntity(
 ){
     
     fun toModel() = Election(
-        id = this.id,
+        id = this.electionId,
         title = capitalizeWords(this.title),
         createdBy =  this.createdBy,
         createdAt = stringToStringDateID(this.createdAt),

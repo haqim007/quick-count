@@ -37,6 +37,8 @@ class ElectionListFragment : BaseFragment() {
     private val viewModel: ElectionListViewModel by hiltNavGraphViewModels(R.id.authorized_nav_graph)
     private val mainViewModel: MainViewModel by activityViewModels()
     
+    private lateinit var adapter: ElectionListAdapter
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -56,7 +58,7 @@ class ElectionListFragment : BaseFragment() {
             }
             tvTpsName.text = tps.name
             tvTpsLocation.text = getString(R.string.tps_location_, tps.village, tps.subdistrict)
-            val adapter = setupAdapter()
+            adapter = setupAdapter()
             observeElectionList(adapter)
 
             srlElectionList.setOnRefreshListener {
@@ -104,6 +106,11 @@ class ElectionListFragment : BaseFragment() {
                 getString(R.string.error_occured)
             )
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        adapter.refresh()
     }
 
 }

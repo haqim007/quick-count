@@ -58,10 +58,13 @@ class CandidateAdapter(
                     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                     override fun afterTextChanged(s: Editable?) {
                         if (data.totalCandidateVote.toString() != s.toString()) {
+                            
+                            vote = s.toString().toIntOrNull() ?: 0
+                            
                             callback.onCandidateVoteChange(
                                 data.partyId, 
-                                data.id, 
-                                s.toString().toIntOrNull() ?: 0
+                                data.id,
+                                vote
                             )
                         }
                     }

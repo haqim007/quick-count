@@ -37,6 +37,16 @@ class UploadEvidenceLocalDataSource @Inject constructor(
         database.uploadEvidenceDao().replaceUploadedEvidence(uploadedEvidence)
     }
 
+    suspend fun insertUploadedEvidence(
+        uploadedEvidence: List<UploadedEvidenceEntity>,
+        tpsIds: List<Int>,
+        electionIds: List<Int>
+    ){
+        database.withTransaction {
+            database.uploadEvidenceDao().clearAllByTpsElections(tpsIds, electionIds)
+            database.uploadEvidenceDao().replaceUploadedEvidence(uploadedEvidence)
+        }
+    }
     suspend fun getUploadedEvidence(tpsId: Int, electionId: Int): List<UploadedEvidenceEntity> {
         return database.uploadEvidenceDao().getUploadedEvidence(tpsId, electionId)
     }

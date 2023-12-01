@@ -57,8 +57,18 @@ data class ElectionListResponse(
 		
 		
 	){
-		fun toEntity(tpsId: Int) = ElectionEntity(
-			updatedAt, statusVote, updatedBy, active, createdAt, id, title, createdBy, tpsId
+		
+		fun toEntity() = ElectionEntity(
+			id = "${tpsInfo.tpsId}${id}".toInt(),
+			updatedAt = updatedAt, 
+			statusVote = statusVote, 
+			updatedBy = updatedBy, 
+			active = active, 
+			createdAt = createdAt, 
+			electionId = id, 
+			title = title,
+			createdBy = createdBy,
+			tpsId = tpsInfo.tpsId
 		)
 		
 		fun toVoteFormEntity(): VoteFormEntity{
@@ -130,9 +140,13 @@ data class ElectionListResponse(
 	} ?: listOf()
 }
 
-fun List<ElectionListResponse.ElectionResponse>.toEntity(tpsId: Int) = this.map { 
-	it.toEntity(tpsId)
-}
+fun List<ElectionListResponse.ElectionResponse>.toEntity(): List<ElectionEntity> = this.map { 
+	return@map if (it.tpsInfo.tpsId != 0){
+		it.toEntity()
+	} else {
+		null
+	}
+}.filterNotNull()
 
 fun List<ElectionListResponse.ElectionResponse>.toVoteFormEntities() = this.map { 
 	it.toVoteFormEntity()
@@ -151,11 +165,11 @@ fun List<ElectionListResponse.ElectionResponse>.toCandidateEntity() = this.flatM
 suspend fun List<ElectionListResponse.ElectionResponse>.toUploadedEvidenceEntities(context: Context) = this.flatMap {
 	it.attachmentList?.map { 
 		it.toUploadedEvidenceEntity(context) 
-	} ?: emptyList()
+	}?.filter { it.tpsId != 0 } ?: emptyList()
 }
 
 fun List<ElectionListResponse.ElectionResponse>.toUploadedEvidenceEntities() = this.flatMap {
 	it.attachmentList?.map {
 		it.toUploadedEvidenceEntity()
-	} ?: emptyList()
+	}?.filter { it.tpsId != 0 } ?: emptyList()
 }

@@ -80,5 +80,8 @@ interface VoteFormDao {
     
     @Query("SELECT * FROM $TEMP_VOTE_SUBMIT_ENTITY")
     suspend fun getTempVoteData(): List<TempVoteSubmitEntity>
+  
+    @Query("DELETE FROM $VOTE_FORM_TABLE WHERE tps_id NOT IN (:tpsIds) AND election_id NOT IN (:electionIds)")
+    suspend fun clearAllByTpsElections(tpsIds: List<Int>, electionIds: List<Int>)
 
 }

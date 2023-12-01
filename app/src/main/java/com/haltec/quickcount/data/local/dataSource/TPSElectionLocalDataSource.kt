@@ -1,6 +1,5 @@
 package com.haltec.quickcount.data.local.dataSource
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.room.withTransaction
 import com.haltec.quickcount.data.local.entity.table.ELECTION_TABLE
@@ -14,15 +13,16 @@ import com.haltec.quickcount.data.local.entity.view.TPSElectionEntity
 import com.haltec.quickcount.data.local.entity.view.TPS_ELECTION_VIEW
 import com.haltec.quickcount.data.local.room.AppDatabase
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class TPSElectionLocalDataSource @Inject constructor(
     private val database: AppDatabase,
     private val tpsLocalDataSource: TPSLocalDataSource,
     private val electionLocalDataSource: ElectionLocalDataSource,
+    private val voteLocalDataSource: VoteLocalDataSource,
+    private val uploadLocalDataSource: UploadEvidenceLocalDataSource
 ) {
 
-    suspend fun insertAll(
+    suspend fun syncInsertAll(
         tps: List<TPSEntity>,
         election: List<ElectionEntity>,
         voteFrom: List<VoteFormEntity>,
@@ -50,8 +50,25 @@ class TPSElectionLocalDataSource @Inject constructor(
                 )
             }
 
-            electionLocalDataSource.insertAllAndRemoteKeys(electionRemoteKeys, election, voteFrom, uploadedEvidence, true)
+
+            database.remoteKeysDao().clearRemoteKeys(ELECTION_TABLE)
+            database.voteFormDao().clearAll()
+            database.uploadEvidenceDao().clearAll()
+            database.electionDao().clearAll()
+            database.remoteKeysDao().insertAll(electionRemoteKeys)
+            database.electionDao().insertAll(election, false)
         }
+        
+        voteLocalDataSource.insertAll(
+            voteFrom, 
+            tpsIds = tps.map { it.id },
+            electionId = election.map { it.electionId }
+        )
+        uploadLocalDataSource.insertUploadedEvidence(
+            uploadedEvidence,
+            tpsIds = tps.map { it.id },
+            electionIds = election.map { it.electionId }
+        )
     }
     
     suspend fun insertAll(
@@ -68,6 +85,7 @@ class TPSElectionLocalDataSource @Inject constructor(
                 database.remoteKeysDao().clearRemoteKeys(TPS_ELECTION_VIEW)
                 database.remoteKeysDao().clearRemoteKeys(TPS_TABLE)
                 database.remoteKeysDao().clearRemoteKeys(ELECTION_TABLE)
+                database.electionDao().clearAll()
                 database.tpsDao().clearAll()
             }
             
@@ -92,13 +110,16 @@ class TPSElectionLocalDataSource @Inject constructor(
                     nextKey = null
                 )
             }
-
-            electionLocalDataSource.insertAllAndRemoteKeys(electionRemoteKeys, election, voteFrom, uploadedEvidence, isRefresh)
+           
+            database.remoteKeysDao().insertAll(electionRemoteKeys)
+            database.electionDao().insertAll(election, true)
         }
+
+        voteLocalDataSource.insertAll(voteFrom)
+        uploadLocalDataSource.insertUploadedEvidence(uploadedEvidence)
     }
 
     fun getPaging(filter: String? = null): PagingSource<Int, TPSElectionEntity> {
-        Log.d("filter", filter.toString())
         return filter?.let { 
             database.tpsElectionDao().getPaging(it) 
         } ?: database.tpsElectionDao().getPaging()

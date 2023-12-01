@@ -61,5 +61,5 @@ data class TPSEntity(
 }
 
 fun List<TPSResponse>.toEntity(): List<TPSEntity>{
-    return this.map { it.toEntity() }
+    return this.map { it.toEntity() }.filter { it.id != 0 }
 }

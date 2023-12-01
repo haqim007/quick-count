@@ -30,7 +30,7 @@ import com.haltec.quickcount.data.local.room.dao.VoteFormDao
         TempUploadEvidenceEntity::class,
         UploadedEvidenceEntity::class
     ],
-    version = 10,
+    version = 18,
     exportSchema = false
 )
 @TypeConverters(AppTypeConverter::class)

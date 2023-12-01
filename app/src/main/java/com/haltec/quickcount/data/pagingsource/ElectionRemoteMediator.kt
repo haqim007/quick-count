@@ -5,6 +5,8 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.haltec.quickcount.data.local.dataSource.ElectionLocalDataSource
+import com.haltec.quickcount.data.local.dataSource.UploadEvidenceLocalDataSource
+import com.haltec.quickcount.data.local.dataSource.VoteLocalDataSource
 import com.haltec.quickcount.data.local.entity.table.ELECTION_TABLE
 import com.haltec.quickcount.data.local.entity.table.RemoteKeys
 import com.haltec.quickcount.data.local.entity.table.ElectionEntity
@@ -21,7 +23,10 @@ class ElectionRemoteMediator(
     private val userPreference: UserPreference,
     private val localDataSource: ElectionLocalDataSource,
     private val remoteDataSource: ElectionRemoteDataSource,
-    private val tpsId: Int
+    private val voteLocalDataSource: VoteLocalDataSource,
+    private val uploadEvidenceLocalDataSource: UploadEvidenceLocalDataSource,
+    private val tpsId: Int,
+    private val isOnline: suspend() -> Boolean = {true}
 ): RemoteMediator<Int, ElectionEntity>(){
     override suspend fun load(
         loadType: LoadType,
@@ -53,7 +58,7 @@ class ElectionRemoteMediator(
             val electionList = response.getOrThrow().data ?: listOf()
             val remoteKeys = electionList.map {
                 RemoteKeys(
-                    tableId = it.id,
+                    tableId = "${it.tpsInfo.tpsId}${it.id}".toInt(),
                     tableName = ELECTION_TABLE,
                     prevKey = prevKey,
                     nextKey = nextKey
@@ -61,18 +66,25 @@ class ElectionRemoteMediator(
             }
             
             localDataSource.insertAllAndRemoteKeys(
-                remoteKeys, 
-                electionList.toEntity(tpsId), 
-                electionList.toVoteFormEntities(),
-                electionList.toUploadedEvidenceEntities(),
+                remoteKeys,
+                electionList.toEntity(),
                 loadType == LoadType.REFRESH
             )
+
+            voteLocalDataSource.insertAll(
+                electionList.toVoteFormEntities()
+            )
+            uploadEvidenceLocalDataSource.insertUploadedEvidence(electionList.toUploadedEvidenceEntities())
             
             
             MediatorResult.Success(endOfPaginationReached)
         }
         catch (e: CustomThrowable){
-            MediatorResult.Error(e)
+            if (e.code == CustomThrowable.UNKNOWN_HOST_EXCEPTION && !isOnline()){
+                MediatorResult.Success(true)
+            }else{
+                MediatorResult.Error(e)
+            }
         }
         catch (e: Exception){
             MediatorResult.Error(e)

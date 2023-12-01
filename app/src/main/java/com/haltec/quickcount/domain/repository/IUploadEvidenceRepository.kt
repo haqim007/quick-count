@@ -10,9 +10,9 @@ import java.io.File
 
 interface IUploadEvidenceRepository {
     fun upload(
-        tps: TPS, election: Election, 
+        tps: TPS, election: Election,
         latitude: Double, longitude: Double,
-        type: String, description: String, 
+        type: String, description: String?,
         image: File
     ): Flow<Resource<VoteEvidence>>
 

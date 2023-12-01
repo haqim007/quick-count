@@ -94,6 +94,6 @@ data class CurrentEvidenceResponse(
 	}
 	
 	fun toModel() = this.data?.map { it.toModel() } ?: emptyList()
-	fun toUploadedEntities() = this.data?.map { it.toUploadedEvidenceEntity() } ?: emptyList()
-	suspend fun toUploadedEntities(context: Context) = this.data?.map { it.toUploadedEvidenceEntity(context) } ?: emptyList()
+	fun toUploadedEntities() = this.data?.map { it.toUploadedEvidenceEntity() }?.filter { it.tpsId != 0 } ?: emptyList()
+	suspend fun toUploadedEntities(context: Context) = this.data?.map { it.toUploadedEvidenceEntity(context) }?.filter { it.tpsId != 0 } ?: emptyList()
 }

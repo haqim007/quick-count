@@ -36,16 +36,20 @@ class VoteLocalDataSource @Inject constructor(
 
     suspend fun insertAll(
         voteForm: List<VoteFormEntity>,
-        isRefresh: Boolean = false
+        tpsIds: List<Int>,
+        electionId: List<Int>
     ){
         database.withTransaction {
-            if (isRefresh){
-                database.voteFormDao().clearAll()
-            }
+            database.voteFormDao().clearAllByTpsElections(tpsIds, electionId)
             database.voteFormDao().insertAll(voteForm)
         }
     }
-    
+
+    suspend fun insertAll(
+        voteForm: List<VoteFormEntity>
+    ){
+        database.voteFormDao().insertAll(voteForm)
+    }
     suspend fun removeTempVoteSubmit(tpsId: Int, electionId: Int){
         database.voteFormDao().removeTempVoteSubmit(tpsId, electionId)
         

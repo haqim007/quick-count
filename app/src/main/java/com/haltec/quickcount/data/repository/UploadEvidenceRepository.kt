@@ -45,7 +45,7 @@ class UploadEvidenceRepository @Inject constructor(
         latitude: Double,
         longitude: Double,
         type: String,
-        description: String,
+        description: String?,
         image: File,
     ): Flow<Resource<VoteEvidence>> {
         return object: AuthorizedNetworkBoundResource<VoteEvidence, UploadEvidenceResponse>(
@@ -56,7 +56,7 @@ class UploadEvidenceRepository @Inject constructor(
                     tpsId = tps.id,
                     electionId = election.id,
                     type = stringToEvidenceType(type).value,
-                    description = description,
+                    description = description ?: "",
                     latitude = latitude.toString(),
                     longitude = longitude.toString(),
                     file = image
@@ -71,7 +71,7 @@ class UploadEvidenceRepository @Inject constructor(
                             electionId = election.id,
                             longitude = longitude.toString(),
                             latitude = latitude.toString(),
-                            description = description,
+                            description = description ?: "",
                             type = type,
                             file = image,
                             fileUrl = null,
@@ -83,7 +83,7 @@ class UploadEvidenceRepository @Inject constructor(
                             electionId = election.id,
                             longitude = longitude.toString(),
                             latitude = latitude.toString(),
-                            description = description,
+                            description = description ?: "",
                             type = type,
                             file = image
                         )

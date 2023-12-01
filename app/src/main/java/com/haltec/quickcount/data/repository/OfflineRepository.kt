@@ -38,14 +38,12 @@ class OfflineRepository @Inject constructor(
             }
 
             override suspend fun onSuccess(data: OfflineResponse) {
-                val tpsEntities = data.data.map { it.toEntity() }
+                val tpsEntities = data.data.map { it.toEntity() }.filter { it.id != 0 }
                 val electionEntities = data.data.flatMap { 
-                    it.selectionTypeList.toEntity(it.id)
+                    it.selectionTypeList.toEntity()
                 }
                 val voteFormEntities = data.data.flatMap { 
                     it.selectionTypeList.toVoteFormEntities()
-                }.filter { 
-                    it.tpsId != 0
                 }
                 val uploadedEvidence = data.data.flatMap {
                     weakContext.get()
@@ -53,7 +51,7 @@ class OfflineRepository @Inject constructor(
                             it.selectionTypeList.toUploadedEvidenceEntities(nonNullContext)
                         } ?: emptyList()
                 }
-                localDataSource.insertAll(
+                localDataSource.syncInsertAll(
                     tpsEntities,
                     electionEntities,
                     voteFormEntities,

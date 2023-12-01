@@ -5,6 +5,7 @@ import com.haltec.quickcount.data.local.entity.table.CandidateEntity
 import com.haltec.quickcount.data.local.entity.table.ElectionEntity
 import com.haltec.quickcount.data.local.entity.table.PartyEntity
 import com.haltec.quickcount.data.local.entity.table.TPSEntity
+import com.haltec.quickcount.data.local.entity.table.UploadedEvidenceEntity
 import com.haltec.quickcount.data.local.entity.table.VoteFormEntity
 import com.haltec.quickcount.util.capitalizeWords
 import com.haltec.quickcount.util.stringToStringDateID
@@ -130,6 +131,7 @@ data class TPSElectionListResponse(
 		)
 		
 		fun toElectionEntity() = ElectionEntity(
+			id = "${id}$selectionTypeId".toInt(),
 			updatedBy = "",
 			updatedAt = "",
 			createdBy = "",
@@ -137,8 +139,8 @@ data class TPSElectionListResponse(
 			active = 0,
 			statusVote = status,
 			tpsId = id,
-			id = selectionTypeId,
-			title = selectionType,
+			electionId = selectionTypeId,
+			title = selectionType
 		)
 
 		fun toVoteFormEntity(): VoteFormEntity {
@@ -196,18 +198,26 @@ data class TPSElectionListResponse(
 
 fun List<TPSElectionListResponse.TPSElectionResponse>.toTPSEntities() = this.map {
 	it.toTPSEntity()
-}.distinct()
+}.filter { it.id != 0 }.distinct()
 
-fun List<TPSElectionListResponse.TPSElectionResponse>.toElectionEntities() = this.map {
-	it.toElectionEntity()
-}
+fun List<TPSElectionListResponse.TPSElectionResponse>.toElectionEntities(): List<ElectionEntity> = this.map {
+	return@map if (it.tpsInfo.tpsId != 0){
+		it.toElectionEntity()
+	}else{
+		null
+	}
+}.filterNotNull()
 
-fun List<TPSElectionListResponse.TPSElectionResponse>.toVoteFormEntities() = this.map {
-	it.toVoteFormEntity()
-}
+fun List<TPSElectionListResponse.TPSElectionResponse>.toVoteFormEntities(): List<VoteFormEntity> = this.map {
+	return@map if (it.tpsInfo.tpsId != 0){
+		it.toVoteFormEntity()
+	}else{
+		null
+	}
+}.filterNotNull()
 
-fun List<TPSElectionListResponse.TPSElectionResponse>.toUploadedEvidenceEntities() = this.flatMap {
+fun List<TPSElectionListResponse.TPSElectionResponse>.toUploadedEvidenceEntities(): List<UploadedEvidenceEntity> = this.flatMap {
 	it.attachmentList.map {
 		it.toUploadedEvidenceEntity()
 	}
-}
+}.filter { it.tpsId != 0 }

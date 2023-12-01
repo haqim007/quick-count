@@ -5,8 +5,6 @@ import androidx.room.withTransaction
 import com.haltec.quickcount.data.local.entity.table.ELECTION_TABLE
 import com.haltec.quickcount.data.local.entity.table.ElectionEntity
 import com.haltec.quickcount.data.local.entity.table.RemoteKeys
-import com.haltec.quickcount.data.local.entity.table.UploadedEvidenceEntity
-import com.haltec.quickcount.data.local.entity.table.VoteFormEntity
 import com.haltec.quickcount.data.local.room.AppDatabase
 import javax.inject.Inject
 
@@ -29,20 +27,11 @@ class ElectionLocalDataSource @Inject constructor(
         return database.electionDao().getPaging(tpsId)
     }
 
-    suspend fun getById(id: Int): ElectionEntity?{
-        return database.electionDao().getById(id)
-    }
-
-    suspend fun clearAll(){
-        database.electionDao().clearAll()
-    }
-    
     suspend fun insertAllAndRemoteKeys(
-        remoteKeys: List<RemoteKeys>, 
+        remoteKeys: List<RemoteKeys>,
         election: List<ElectionEntity>,
-        voteForm: List<VoteFormEntity>,
-        uploadedEvidence: List<UploadedEvidenceEntity>,
-        isRefresh: Boolean = false
+        isRefresh: Boolean = false,
+        isFromTPSElection: Boolean = false
     ){
         database.withTransaction { 
             if (isRefresh){
@@ -50,10 +39,7 @@ class ElectionLocalDataSource @Inject constructor(
                 database.electionDao().clearAll()
             }
             database.remoteKeysDao().insertAll(remoteKeys)
-            database.electionDao().insertAll(election)
-            val electionIds = election.map { it.id }
-            database.voteFormDao().insertAll(voteForm)
-            database.uploadEvidenceDao().insertUploadEvidence(uploadedEvidence)
+            database.electionDao().insertAll(election, isFromTPSElection)
         }
     }
 }

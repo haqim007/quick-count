@@ -10,19 +10,6 @@ import com.haltec.quickcount.domain.model.VoteData
 const val VOTE_FORM_TABLE = "vote_form"
 @Entity(
     tableName = VOTE_FORM_TABLE,
-    foreignKeys = [
-        ForeignKey(
-            entity = ElectionEntity::class,
-            parentColumns = ["id"],
-            childColumns = ["election_id"],
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        )    
-    ],
-    indices = [
-        Index(value = ["tps_id", "election_id"], unique = true),
-        Index(value = ["election_id"])
-    ]
 )
 data class VoteFormEntity(
     @PrimaryKey(autoGenerate = true)

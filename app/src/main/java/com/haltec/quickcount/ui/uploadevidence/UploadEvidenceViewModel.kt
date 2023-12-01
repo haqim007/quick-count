@@ -130,7 +130,7 @@ class UploadEvidenceViewModel @Inject constructor(
                         latitude,
                         longitude,
                         type!!,
-                        formState[type]!!.description!!,
+                        formState[type]!!.description,
                         formState[type]!!.image!!
                     ).collectLatest { 
                         _state.update { state -> state.copy(submitResult = it) }

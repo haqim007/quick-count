@@ -47,7 +47,7 @@ class SyncWorker @AssistedInject constructor (
             offlineRepository.getAllData().collectLatest {
                 isError = it is Resource.Error
                 if (isError){
-                    Log.d("SyncWorker", it.message!!)
+                    Log.e("SyncWorker", it.message!!)
                 }
             }
 
