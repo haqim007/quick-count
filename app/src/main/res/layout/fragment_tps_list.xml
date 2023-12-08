@@ -154,7 +154,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_tps_list_title"
                 layout="@layout/layout_loader_and_error"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent" />
         </FrameLayout>
         
         

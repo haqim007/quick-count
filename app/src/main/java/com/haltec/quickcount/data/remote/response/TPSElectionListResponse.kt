@@ -88,7 +88,7 @@ data class TPSElectionListResponse(
 		val tpsInfo: VoteFormResponse.VoteFormData,
 
 		@field:SerializedName("attachment_list")
-		val attachmentList: List<CurrentEvidenceResponse.CurrentEvidenceData>
+		val attachmentList: List<CurrentEvidenceResponse.CurrentEvidenceData>?
 	){
 		fun toModel() =
 			TPSElection(
@@ -217,7 +217,7 @@ fun List<TPSElectionListResponse.TPSElectionResponse>.toVoteFormEntities(): List
 }.filterNotNull()
 
 fun List<TPSElectionListResponse.TPSElectionResponse>.toUploadedEvidenceEntities(): List<UploadedEvidenceEntity> = this.flatMap {
-	it.attachmentList.map {
+	it.attachmentList?.map {
 		it.toUploadedEvidenceEntity()
-	}
+	} ?: emptyList()
 }.filter { it.tpsId != 0 }

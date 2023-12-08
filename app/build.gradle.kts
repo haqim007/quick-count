@@ -17,8 +17,8 @@ android {
         applicationId = "com.haltec.quickcount"
         minSdk = 24
         targetSdk = 34
-        versionCode = 13
-        versionName = "1.0.0.13"
+        versionCode = 15
+        versionName = "1.0.0.15"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

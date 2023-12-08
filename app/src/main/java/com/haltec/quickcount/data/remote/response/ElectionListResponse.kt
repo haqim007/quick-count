@@ -1,6 +1,7 @@
 package com.haltec.quickcount.data.remote.response
 
 import android.content.Context
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.haltec.quickcount.data.local.entity.table.CandidateEntity
 import com.haltec.quickcount.data.local.entity.table.ElectionEntity
@@ -72,53 +73,46 @@ data class ElectionListResponse(
 		)
 		
 		fun toVoteFormEntity(): VoteFormEntity{
-			this.apply { 
-				tpsInfo.apply {
-					return VoteFormEntity(
-						tpsId = tpsId,
-						electionId = id,
-						province = province,
-						subdistrict = subdistrict,
-						isPartai = isPartai, village = village,
-						tpsName = tpsName,
-						amount = amount, invalidVote = invalidVote,
-						note = note,
+			return VoteFormEntity(
+				tpsId = tpsInfo.tpsId,
+				electionId = id,
+				province = tpsInfo.province,
+				subdistrict = tpsInfo.subdistrict,
+				isPartai = tpsInfo.isPartai, village = tpsInfo.village,
+				tpsName = tpsInfo.tpsName,
+				amount = tpsInfo.amount, invalidVote = tpsInfo.invalidVote,
+				note = tpsInfo.note,
 
-						partaiList = this@ElectionResponse.toPartyEntity()
-					)
-				}
-			}
+				partaiList = this@ElectionResponse.toPartyEntity(tpsInfo.partaiLists)
+			)
 		}
 		
-		fun toPartyEntity(): List<PartyEntity>{
-			this.apply { 
-				return tpsInfo.partaiLists?.map {
-					PartyEntity(
-						partaiName = it.partaiName,
+
+		fun toPartyEntity(partaiLists: List<PartyListsItemResponse>?): List<PartyEntity>{
+			return partaiLists?.map {
+				PartyEntity(
+					partaiName = it.partaiName,
+					id = it.id,
+					amount = it.amount,
+					candidateList = this@ElectionResponse.toCandidateEntity(partyId = it.id)
+				)
+			} ?: emptyList()
+		}
+
+		fun toCandidateEntity(partyId: Int): List<CandidateEntity>{
+			return tpsInfo.partaiLists?.filter { 
+				it.id == partyId
+			}?.flatMap {party ->
+				party.candidateList.map {
+					CandidateEntity(
+						noUrut = it.noUrut,
 						id = it.id,
 						amount = it.amount,
-						candidateList = this@ElectionResponse.toCandidateEntity()
+						name = it.name
 					)
-				} ?: emptyList()
-			}
+				}
+			} ?: emptyList()
 		}
-
-		fun toCandidateEntity(): List<CandidateEntity>{
-			this.apply {
-				return tpsInfo.partaiLists?.flatMap {party ->
-					party.candidateList.map {
-						CandidateEntity(
-							noUrut = it.noUrut,
-							id = it.id,
-							amount = it.amount,
-							name = it.name
-						)
-					}
-				} ?: emptyList()
-			}
-		}
-		
-		
 	}
 	
 	fun toModel() = this.data?.map { 
@@ -154,13 +148,6 @@ fun List<ElectionListResponse.ElectionResponse>.toVoteFormEntities() = this.map 
 	it.tpsId != 0
 }
 
-fun List<ElectionListResponse.ElectionResponse>.toPartyEntity() = this.flatMap {
-	it.toPartyEntity()
-}
-
-fun List<ElectionListResponse.ElectionResponse>.toCandidateEntity() = this.flatMap {
-	it.toCandidateEntity()
-}
 
 suspend fun List<ElectionListResponse.ElectionResponse>.toUploadedEvidenceEntities(context: Context) = this.flatMap {
 	it.attachmentList?.map { 

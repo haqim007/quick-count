@@ -126,29 +126,7 @@ class VoteViewModel @Inject constructor(
             ).launchCollectLatest {
                 //dummy
                 // use this variable to test list with many candidates
-//                val dummyVoteData: Resource<VoteData> = if (it is Resource.Success && it.data != null){
-//                    val dummy = it.data.partyLists.map { partyListsItem ->
-//                        // dummy
-//                        val dummy = mutableListOf<VoteData.Candidate>()
-//                        for (i in 99..105){
-//                            dummy.add(partyListsItem.candidateList[0].copy(
-//                                id = i
-//                            ))
-//                        }
-//                        //dummy
-//                        partyListsItem.copy(
-//                            candidateList = partyListsItem.candidateList + dummy
-//                        )
-//                    }
-//                    
-//                    Resource.Success(
-//                        it.data.copy(
-//                            partyLists = dummy
-//                        )
-//                    )
-//                }else{
-//                    it
-//                }
+                //val dataDummy = generateDummyCandidate(it, it.data)
                 //dummy
                 
                 _state.update { state -> 
@@ -157,7 +135,39 @@ class VoteViewModel @Inject constructor(
             }
         }
     }
-    
+
+    // use this to test list with many candidates
+    private fun generateDummyCandidate(
+        it: Resource<VoteData>,
+        data: VoteData,
+    ): Resource<VoteData> {
+        return if (it is Resource.Success && it.data != null) {
+            val dummy = data.partyLists.map { partyListsItem ->
+                // dummy
+                val dummy = mutableListOf<VoteData.Candidate>()
+                for (i in 99..105) {
+                    dummy.add(
+                        partyListsItem.candidateList[0].copy(
+                            id = i
+                        )
+                    )
+                }
+                //dummy
+                partyListsItem.copy(
+                    candidateList = partyListsItem.candidateList + dummy
+                )
+            }
+
+            Resource.Success(
+                data.copy(
+                    partyLists = dummy
+                )
+            )
+        } else {
+            it
+        }
+    }
+
     private var updateCandidateVote: Job? = null
     fun setCandidateVote(partyId: Int, candidateId: Int, vote: Int){
         updateCandidateVote?.cancel()

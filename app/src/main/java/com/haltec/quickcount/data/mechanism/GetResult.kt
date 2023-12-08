@@ -50,5 +50,6 @@ class CustomThrowable(val code: Int = DEFAULT_CODE, override val message: String
     companion object{
         const val DEFAULT_CODE = 999
         const val UNKNOWN_HOST_EXCEPTION = 503
+        const val NOT_FOUND = 404
     }
 }

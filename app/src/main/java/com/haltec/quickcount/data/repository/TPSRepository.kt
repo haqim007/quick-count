@@ -8,6 +8,7 @@ import androidx.paging.map
 import com.haltec.quickcount.data.local.dataSource.TPSLocalDataSource
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.pagingsource.TPSRemoteMediator
+import com.haltec.quickcount.data.preference.DevicePreference
 import com.haltec.quickcount.data.preference.UserPreference
 import com.haltec.quickcount.data.remote.datasource.TPSRemoteDataSource
 import com.haltec.quickcount.util.DEFAULT_PAGE_SIZE
@@ -27,8 +28,8 @@ class TPSRepository @Inject constructor(
     private val userPreference: UserPreference,
     @DispatcherIO
     private val dispatcher: CoroutineDispatcher,
-    private val remoteMediator: TPSRemoteMediator,
-    private val tpsLocalDataSource: TPSLocalDataSource
+    private val localDataSource: TPSLocalDataSource,
+    private val devicePreference: DevicePreference
 ): ITPSRepository {
 
     override suspend fun getUsername(): String {
@@ -41,9 +42,15 @@ class TPSRepository @Inject constructor(
             config = PagingConfig(
                 pageSize = DEFAULT_PAGE_SIZE
             ),
-            remoteMediator = remoteMediator,
+            remoteMediator = TPSRemoteMediator(
+                userPreference = userPreference,
+                tpsLocalDataSource = localDataSource,
+                tpsRemoteDataSource = remoteDataSource
+            ){
+                devicePreference.isOnline().first()
+            },
             pagingSourceFactory = {
-                tpsLocalDataSource.getPaging()
+                localDataSource.getPaging()
             }
         ).flow.map { 
             it.map { 
