@@ -1,5 +1,6 @@
 package com.haltec.quickcount.ui.vote
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.domain.model.BasicMessage
@@ -10,17 +11,23 @@ import com.haltec.quickcount.domain.repository.IVoteRepository
 import com.haltec.quickcount.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.LinkedList
 import javax.inject.Inject
+
+typealias CandidateId = Int
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -29,24 +36,27 @@ class VoteViewModel @Inject constructor(
     private val repository: IVoteRepository
 ) : BaseViewModel<VoteUiState>() {
     override val _state = MutableStateFlow(VoteUiState())
+    private var hasInitState: Boolean = false
     
     init {
-        state.map { it.voteData }.distinctUntilChanged()
-            .launchCollectLatest {
-                val isInitState = !state.value.hasInitState
-                val isSuccess = it is Resource.Success
-                val isErrorWithData = it is Resource.Error && it.data != null
+        viewModelScope.launch {
+            state.map { it.voteData }.distinctUntilChanged()
+                .collectLatest {
+                    val isInitState = !hasInitState
+                    val isSuccess = it is Resource.Success
+                    val isErrorWithData = it is Resource.Error && it.data != null
+                    Log.d(this@VoteViewModel.javaClass.name, "$isInitState $isSuccess $isErrorWithData")
+                    if (isInitState && (isSuccess || isErrorWithData)) {
+                        setInitState()
+                    }
 
-                if (isInitState && (isSuccess || isErrorWithData)) {
-                    setInitState()
                 }
-
-            }
+        }
         
         state.map { it.candidatesVote }.distinctUntilChanged()
             .debounce(3000)
             .launchCollectLatest {
-            if (state.value.hasInitState){
+            if (hasInitState){
                 onCandidatesVoteChange(it)
             }
         }
@@ -55,7 +65,6 @@ class VoteViewModel @Inject constructor(
     private fun onCandidatesVoteChange(
         candidatesVote: List<CandidateVoteState>
     ){
-
         val newPartyListItem = updateCandidateVote(candidatesVote)
         val newVoteData = state.value.voteData.data?.copy(
             partyLists = newPartyListItem,
@@ -65,8 +74,6 @@ class VoteViewModel @Inject constructor(
                 voteData = Resource.Success(newVoteData!!)
             )
         }
-
-
     }
     
     fun setTpsElection(tps: TPS, election: Election){
@@ -79,24 +86,27 @@ class VoteViewModel @Inject constructor(
         fetchCandidates()
     }
     
-    private fun setInitState(){
-        var partiesVote = state.value.partiesVote
-        var newCandidatesVote = state.value.candidatesVote
-        state.value.voteData.data?.partyLists?.forEach { partyListsItem ->
-            partiesVote = updatePartiesVoteState(partiesVote, partyListsItem.id, partyListsItem.totalPartyVote)
+    fun setInitState(){
+        viewModelScope.launch {
+            var partiesVote = state.value.partiesVote
+            val newCandidatesVote = state.value.candidatesVote
+            state.value.voteData.data?.partyLists?.forEach { partyListsItem ->
+                partiesVote = updatePartiesVoteState(partiesVote, partyListsItem.id, partyListsItem.totalPartyVote)
 
-            newCandidatesVote = partyListsItem.candidateList.flatMap { candidateItem ->
-                updateCandidatesVoteState(newCandidatesVote, partyListsItem.id, candidateItem.id, candidateItem.totalCandidateVote)
-           }
-        }
-   
-        _state.update { state ->
-            state.copy(
-                invalidVote = state.voteData.data?.invalidVote ?: 0,
-                partiesVote = partiesVote,
-                candidatesVote = newCandidatesVote,
-                hasInitState = true
-            )
+                partyListsItem.candidateList.forEach { candidateItem ->
+                    updateCandidatesVoteState(newCandidatesVote, partyListsItem.id, candidateItem.id, candidateItem.totalCandidateVote)
+                }
+            }
+
+            hasInitState = true
+            Log.d(this@VoteViewModel.javaClass.name, "hasInitState: $hasInitState")
+            _state.update { state ->
+                state.copy(
+                    invalidVote = state.voteData.data?.invalidVote ?: 0,
+                    partiesVote = partiesVote,
+                    candidatesVote = newCandidatesVote,
+                )
+            }
         }
     }
 
@@ -105,11 +115,14 @@ class VoteViewModel @Inject constructor(
         partyId: Int,
         candidateId: Int, 
         vote: Int
-    ) : List<CandidateVoteState> {
-        val excludeCandidate = currentCandidatesVote.filter { candidateVoteState ->
-            candidateVoteState.candidateId != candidateId 
-        }
-        return excludeCandidate + CandidateVoteState(partyId, candidateId, vote)
+    ): List<CandidateVoteState> {
+        
+        val currentCandidatesVoteMap = currentCandidatesVote.associateBy { it.candidateId }.toMutableMap()
+
+        currentCandidatesVoteMap[candidateId] = CandidateVoteState(partyId, candidateId, vote)
+        
+        return currentCandidatesVoteMap.values.toList()
+        
     }
         
 
@@ -169,16 +182,17 @@ class VoteViewModel @Inject constructor(
     }
 
     private var updateCandidateVote: Job? = null
+    // Pair<PartyId, CandidateId>
+    private var lastCandidateUpdate: Pair<Int, Int>? = null
     fun setCandidateVote(partyId: Int, candidateId: Int, vote: Int){
-        updateCandidateVote?.cancel()
-        val newCandidatesVote = updateCandidatesVoteState(state.value.candidatesVote, partyId, candidateId, vote)
+        val candidateVotes = state.value.candidatesVote
+        val newCandidateVotes = updateCandidatesVoteState(candidateVotes, partyId, candidateId, vote)
         _state.update { state ->
             state.copy(
                 hasInputData =  true,
-                candidatesVote = newCandidatesVote
+                candidatesVote = newCandidateVotes
             )
         }
-        
     }
 
     private fun updateCandidateVote(
@@ -236,7 +250,11 @@ class VoteViewModel @Inject constructor(
     
     fun getTotalVote(partyId: Int): Flow<Int> {
         return state
-            .map { it.voteData.data?.partyLists?.first { it.id == partyId }?.totalVote ?: 0 }
+            .map { 
+                it.voteData.data?.partyLists?.first { 
+                    it.id == partyId 
+                }?.totalVote ?: 0 
+            }
             .distinctUntilChanged()
     }
     
@@ -338,9 +356,9 @@ class VoteViewModel @Inject constructor(
     }
     
     fun clear(){
+        hasInitState = false
         _state.update { state -> 
             state.copy(
-                hasInitState = false,
                 hasInputData = false,
                 voteData = Resource.Idle(),
                 candidatesVote = listOf(),
@@ -356,7 +374,6 @@ class VoteViewModel @Inject constructor(
 }
 
 data class VoteUiState(
-    val hasInitState: Boolean = false,
     val voteData: Resource<VoteData> = Resource.Idle(),
     // contains candidates that are being inputted
     val onEditCandidates: List<VoteData.Candidate> = listOf(),

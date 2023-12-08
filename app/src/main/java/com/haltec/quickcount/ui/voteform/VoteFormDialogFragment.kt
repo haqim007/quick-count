@@ -1,6 +1,7 @@
 package com.haltec.quickcount.ui.voteform
 
 import android.app.Dialog
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
@@ -44,7 +45,7 @@ class VoteFormDialogFragment : BottomSheetDialogFragment() {
         binding.btnClose1.setOnClickListener {
             dismissNow()
         }
-
+        
         return binding.root
     }
 
@@ -79,6 +80,9 @@ class VoteFormDialogFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        detectSoftkeyboard()
+        
         callback = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable(VOTE_FORM_CALLBACK, VoteFormDialogCallback::class.java)!!
         }else{
@@ -112,10 +116,6 @@ class VoteFormDialogFragment : BottomSheetDialogFragment() {
                     }
                 }
                 
-                etTotalPartyVote.setOnFocusChangeListener { view, isFocused ->
-                    binding.viewSpacer.isVisible = isFocused
-                }
-                
                 viewLifecycleOwner.lifecycleScope.launch { 
                     callback.getTotalVote(data.id).collectLatest { 
                         tvTotalVote.text = it.toString()
@@ -123,6 +123,30 @@ class VoteFormDialogFragment : BottomSheetDialogFragment() {
                 }
 
                 setupVoteInputLayout(data.includePartyVote)
+            }
+        }
+
+    }
+    
+    private fun detectSoftkeyboard(){
+        val rootView = requireActivity().window.decorView.rootView
+        rootView.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            rootView.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = rootView.height
+
+            // rect.bottom is the position above soft keypad or device button.
+            // if keypad is shown, the rect.bottom is smaller than the screen height.
+            val keypadHeight = screenHeight - rect.bottom
+
+            if (_binding != null){
+                if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                    // Keyboard is opened
+                    binding.viewSpacer.isVisible = true
+                } else {
+                    // Keyboard is closed
+                    binding.viewSpacer.isVisible = false
+                }
             }
         }
 
