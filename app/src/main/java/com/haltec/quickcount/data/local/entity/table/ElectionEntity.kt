@@ -23,8 +23,6 @@ data class ElectionEntity(
     val updatedAt: String,
     @ColumnInfo("status_vote")
     val statusVote: String,
-    @ColumnInfo("updated_by")
-    val updatedBy: String,
     val active: Int,
     @ColumnInfo("created_at")
     val createdAt: String,
@@ -42,7 +40,6 @@ data class ElectionEntity(
         title = capitalizeWords(this.title),
         createdBy =  this.createdBy,
         createdAt = stringToStringDateID(this.createdAt),
-        updatedBy =  this.updatedBy,
         updatedAt = stringToStringDateID(this.updatedAt),
         statusVote = when(this.statusVote){
             SubmitVoteStatus.SUBMITTED.valueNumber -> SubmitVoteStatus.SUBMITTED

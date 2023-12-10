@@ -7,10 +7,11 @@ import com.haltec.quickcount.data.local.entity.table.PartyEntity
 import com.haltec.quickcount.data.local.entity.table.TPSEntity
 import com.haltec.quickcount.data.local.entity.table.UploadedEvidenceEntity
 import com.haltec.quickcount.data.local.entity.table.VoteFormEntity
-import com.haltec.quickcount.util.capitalizeWords
-import com.haltec.quickcount.util.stringToStringDateID
 import com.haltec.quickcount.domain.model.TPSElection
 import com.haltec.quickcount.domain.model.stringToSubmitVoteStatus
+import com.haltec.quickcount.domain.model.submitVoteStatusValueTextToValueNumber
+import com.haltec.quickcount.util.capitalizeWords
+import com.haltec.quickcount.util.stringToStringDateID
 
 data class TPSElectionListResponse(
 	@field:SerializedName("data")
@@ -70,7 +71,7 @@ data class TPSElectionListResponse(
 		val longitude: String,
 
 		@field:SerializedName("status")
-		val status: String,
+			val status: String,
 
 		@field:SerializedName("submited")
 		val submitted: String,
@@ -132,12 +133,11 @@ data class TPSElectionListResponse(
 		
 		fun toElectionEntity() = ElectionEntity(
 			id = "${id}$selectionTypeId".toInt(),
-			updatedBy = "",
 			updatedAt = "",
 			createdBy = "",
 			createdAt = "",
 			active = 0,
-			statusVote = status,
+			statusVote = submitVoteStatusValueTextToValueNumber(status),
 			tpsId = id,
 			electionId = selectionTypeId,
 			title = selectionType

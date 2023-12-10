@@ -71,6 +71,7 @@ class SyncWorker @AssistedInject constructor (
 
     private suspend fun retryOrFailure(): Result {
         return if (runAttemptCount > MAX_RETRIES) {
+            devicePreference.setSyncInProgress(false)
             devicePreference.setHasSync(true)
             Log.d("SyncWorker", "Failed! Maximum retries reached")
             Result.failure()
@@ -81,7 +82,8 @@ class SyncWorker @AssistedInject constructor (
     }
 
     companion object {
-        const val MAX_RETRIES = 3
+        // TODO: Find out why runAttempCount is not increasing after Result.retry()
+        const val MAX_RETRIES = -1
     }
 }
 

@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.ItemTpsElectionBinding
@@ -41,7 +40,7 @@ class TPSElectionListAdapter(
                 }else{
                     itemView.context.getString(R.string.sent_at_date_time, data.createdAt)
                 }
-                val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, data.statusVote.text))
+                val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, data.statusVote.label))
                 val statusColor: Int
                 val borderColor: Int
                 when(data.statusVote) {
@@ -85,7 +84,7 @@ class TPSElectionListAdapter(
                 
                 mcvElectionItem.strokeColor = borderColor
                 
-                btnOpenElection.setOnClickListener { 
+                root.setOnClickListener { 
                     callback.onClick(data)
                 }
                 

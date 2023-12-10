@@ -1,21 +1,14 @@
 package com.haltec.quickcount.ui.tpselectionlist
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.paging.flatMap
-import androidx.paging.map
 import com.google.android.material.chip.Chip
 import com.haltec.quickcount.R
-import com.haltec.quickcount.data.mechanism.Resource
-import com.haltec.quickcount.data.mechanism.ResourceHandler
-import com.haltec.quickcount.data.mechanism.handle
 import com.haltec.quickcount.databinding.FragmentTpsElectionListBinding
 import com.haltec.quickcount.domain.model.ElectionFilter
 import com.haltec.quickcount.domain.model.TPSElection
@@ -24,7 +17,6 @@ import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
 import com.haltec.quickcount.ui.util.handleLoadStates
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.map
 
 @AndroidEntryPoint
 class TPSElectionListFragment : BaseFragment() {
@@ -32,6 +24,10 @@ class TPSElectionListFragment : BaseFragment() {
     private lateinit var binding: FragmentTpsElectionListBinding
     private val viewModel: TPSElectionListViewModel by hiltNavGraphViewModels(R.id.authorized_nav_graph)
     private val mainViewModel: MainViewModel by activityViewModels()
+    
+    private val filterItems = ElectionFilter.entries.map {
+        it.text
+    }
     
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,16 +44,12 @@ class TPSElectionListFragment : BaseFragment() {
             }
             
             btnBack.setOnClickListener { findNavController().navigateUp() }
-
-            val items = ElectionFilter.entries.map { 
-                it.text
-            }
+            
             cgFilter.setOnCheckedStateChangeListener { _, checkedIds ->
                 val typeChip = cgFilter.findViewById<Chip>(checkedIds[0])
-                if (items.contains(typeChip.text.toString())){
+                if (filterItems.contains(typeChip.text.toString())){
                     viewModel.setFilter(typeChip.text.toString())
                 }
-                
             }
         }
         
@@ -101,6 +93,15 @@ class TPSElectionListFragment : BaseFragment() {
         srlTpsElection.setOnRefreshListener {
             adapter.refresh()
             srlTpsElection.isRefreshing = false
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val typeChip = binding.cgFilter.findViewById<Chip>(R.id.chip_filter_all)
+        if (filterItems.contains(typeChip.text.toString())){
+            viewModel.setFilter(typeChip.text.toString())
         }
     }
 

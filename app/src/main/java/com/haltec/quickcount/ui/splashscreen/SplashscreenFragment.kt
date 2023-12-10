@@ -53,7 +53,7 @@ class SplashscreenFragment : BaseFragment() {
                     }else{
                         repeatOnLifecycle(Lifecycle.State.RESUMED){
                             viewModel.state.map { it.syncStatus }.distinctUntilChanged().collectLatest {
-//                                binding.tvTitleMessage.isVisible = false
+
                                 if (it?.hasSync == false && !it.syncInProgress){
                                     WorkerRunner.stopSyncWorker(requireContext())
                                     WorkerRunner.runSyncWorker(requireContext())

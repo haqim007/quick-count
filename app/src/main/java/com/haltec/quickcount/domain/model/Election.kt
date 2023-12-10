@@ -7,7 +7,6 @@ import kotlinx.parcelize.Parcelize
 data class Election(
     val updatedAt: String,
     val statusVote: SubmitVoteStatus,
-    val updatedBy: String,
     val active: Int,
     val createdAt: String,
     val id: Int,

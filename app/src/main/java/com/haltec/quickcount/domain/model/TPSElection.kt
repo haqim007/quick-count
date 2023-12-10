@@ -11,11 +11,11 @@ enum class ElectionFilter{
 
 val ElectionFilter.text
     get() = when(this){
-        ElectionFilter.BELUM_DIKIRIM -> SubmitVoteStatus.PENDING.text
-        ElectionFilter.BELUM_TERVERIFIKASI -> SubmitVoteStatus.SUBMITTED.text
-        ElectionFilter.MENUNGGU_TERKIRIM -> SubmitVoteStatus.IN_QUEUE.text
-        ElectionFilter.SUDAH_TERVERIFIKASI -> SubmitVoteStatus.VERIFIED.text
-        ElectionFilter.DITOLAK -> SubmitVoteStatus.REJECTED.text
+        ElectionFilter.BELUM_DIKIRIM -> SubmitVoteStatus.PENDING.label
+        ElectionFilter.BELUM_TERVERIFIKASI -> SubmitVoteStatus.SUBMITTED.label
+        ElectionFilter.MENUNGGU_TERKIRIM -> SubmitVoteStatus.IN_QUEUE.label
+        ElectionFilter.SUDAH_TERVERIFIKASI -> SubmitVoteStatus.VERIFIED.label
+        ElectionFilter.DITOLAK -> SubmitVoteStatus.REJECTED.label
         else -> "Semua"
     }
 
@@ -62,7 +62,6 @@ data class TPSElection(
     fun toElection() = Election(
         updatedAt = "",
         statusVote = statusVote,
-        updatedBy = "",
         active = 1,
         createdAt = createdAt,
         id = electionId,

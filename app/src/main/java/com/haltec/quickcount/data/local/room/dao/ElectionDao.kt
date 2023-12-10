@@ -20,7 +20,6 @@ interface ElectionDao {
                 if (isFromTPSElection){
                     insert(
                         it.copy(
-                            updatedBy = prev.updatedBy,
                             updatedAt = prev.updatedAt,
                             createdBy = prev.createdBy,
                             createdAt = prev.createdAt,

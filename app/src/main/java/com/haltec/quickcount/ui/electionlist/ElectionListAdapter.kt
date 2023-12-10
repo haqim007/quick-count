@@ -39,7 +39,7 @@ class ElectionListAdapter(
                     }else{
                         itemView.context.getString(R.string.sent_at_date_time, election.updatedAt)
                     }
-                    val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, election.statusVote.text))
+                    val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, election.statusVote.label))
                     val statusColor: Int
                     val borderColor: Int
                     when(election.statusVote) {

@@ -32,9 +32,6 @@ data class ElectionListResponse(
 		@field:SerializedName("status_vote")
 		val statusVote: String,
 
-		@field:SerializedName("updated_by")
-		val updatedBy: String,
-
 		@field:SerializedName("active")
 		val active: Int,
 
@@ -63,7 +60,6 @@ data class ElectionListResponse(
 			id = "${tpsInfo.tpsId}${id}".toInt(),
 			updatedAt = updatedAt, 
 			statusVote = statusVote, 
-			updatedBy = updatedBy, 
 			active = active, 
 			createdAt = createdAt, 
 			electionId = id, 
@@ -121,7 +117,6 @@ data class ElectionListResponse(
 			title = capitalizeWords(it.title),
 			createdBy =  it.createdBy,
 			createdAt = stringToStringDateID(it.createdAt),
-			updatedBy =  it.updatedBy,
 			updatedAt = stringToStringDateID(it.updatedAt),
 			statusVote = when(it.statusVote){
 				SubmitVoteStatus.SUBMITTED.valueNumber -> SubmitVoteStatus.SUBMITTED

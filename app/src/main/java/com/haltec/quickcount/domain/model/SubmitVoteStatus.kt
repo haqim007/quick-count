@@ -3,12 +3,12 @@ package com.haltec.quickcount.domain.model
 /**
  * Election status
  *
- * @property text
+ * @property label
  * @property valueText
  * @property valueNumber
  * @constructor Create empty Election status
  */
-enum class SubmitVoteStatus (val text: String, val valueText: String, val valueNumber: String){
+enum class SubmitVoteStatus (val label: String, val valueText: String, val valueNumber: String){
     /**
      * Submitted
      *
@@ -47,22 +47,22 @@ enum class SubmitVoteStatus (val text: String, val valueText: String, val valueN
 
 fun stringToSubmitVoteStatusValueText(value: String): String {
     return when (value) {
-        SubmitVoteStatus.PENDING.text -> SubmitVoteStatus.PENDING.valueText
-        SubmitVoteStatus.IN_QUEUE.text -> SubmitVoteStatus.IN_QUEUE.valueText
-        SubmitVoteStatus.SUBMITTED.text -> SubmitVoteStatus.SUBMITTED.valueText
-        SubmitVoteStatus.VERIFIED.text -> SubmitVoteStatus.VERIFIED.valueText
-        SubmitVoteStatus.REJECTED.text -> SubmitVoteStatus.REJECTED.valueText
+        SubmitVoteStatus.PENDING.label -> SubmitVoteStatus.PENDING.valueText
+        SubmitVoteStatus.IN_QUEUE.label -> SubmitVoteStatus.IN_QUEUE.valueText
+        SubmitVoteStatus.SUBMITTED.label -> SubmitVoteStatus.SUBMITTED.valueText
+        SubmitVoteStatus.VERIFIED.label -> SubmitVoteStatus.VERIFIED.valueText
+        SubmitVoteStatus.REJECTED.label -> SubmitVoteStatus.REJECTED.valueText
         else -> ""
     }
 }
 
 fun stringToSubmitVoteStatusNumber(value: String): String? {
     return when (value) {
-        SubmitVoteStatus.PENDING.text -> SubmitVoteStatus.PENDING.valueNumber
-        SubmitVoteStatus.IN_QUEUE.text -> SubmitVoteStatus.IN_QUEUE.valueNumber
-        SubmitVoteStatus.SUBMITTED.text -> SubmitVoteStatus.SUBMITTED.valueNumber
-        SubmitVoteStatus.VERIFIED.text -> SubmitVoteStatus.VERIFIED.valueNumber
-        SubmitVoteStatus.REJECTED.text -> SubmitVoteStatus.REJECTED.valueNumber
+        SubmitVoteStatus.PENDING.label -> SubmitVoteStatus.PENDING.valueNumber
+        SubmitVoteStatus.IN_QUEUE.label -> SubmitVoteStatus.IN_QUEUE.valueNumber
+        SubmitVoteStatus.SUBMITTED.label -> SubmitVoteStatus.SUBMITTED.valueNumber
+        SubmitVoteStatus.VERIFIED.label -> SubmitVoteStatus.VERIFIED.valueNumber
+        SubmitVoteStatus.REJECTED.label -> SubmitVoteStatus.REJECTED.valueNumber
         else -> null
     }
 }
@@ -76,6 +76,17 @@ fun stringToSubmitVoteStatus(status: String): SubmitVoteStatus{
         SubmitVoteStatus.PENDING.valueText -> SubmitVoteStatus.PENDING
         SubmitVoteStatus.IN_QUEUE.valueText -> SubmitVoteStatus.IN_QUEUE
         else -> SubmitVoteStatus.PENDING
+    }
+}
+
+fun submitVoteStatusValueTextToValueNumber(status: String): String{
+    return when(status){
+        SubmitVoteStatus.SUBMITTED.valueText -> SubmitVoteStatus.SUBMITTED.valueNumber
+        SubmitVoteStatus.VERIFIED.valueText -> SubmitVoteStatus.VERIFIED.valueNumber
+        SubmitVoteStatus.REJECTED.valueText -> SubmitVoteStatus.REJECTED.valueNumber
+        SubmitVoteStatus.PENDING.valueText -> SubmitVoteStatus.PENDING.valueNumber
+        SubmitVoteStatus.IN_QUEUE.valueText -> SubmitVoteStatus.IN_QUEUE.valueNumber
+        else -> SubmitVoteStatus.PENDING.valueNumber
     }
 }
 
