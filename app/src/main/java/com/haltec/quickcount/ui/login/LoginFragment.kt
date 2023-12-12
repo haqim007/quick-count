@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -31,7 +32,7 @@ class LoginFragment : BaseFragment() {
     
     private lateinit var binding: FragmentLoginBinding
     private val mainViewModel: MainViewModel by activityViewModels()
-    private val viewModel: LoginViewModel by hiltNavGraphViewModels(R.id.unauthorized_nav_graph)
+    private val viewModel: LoginViewModel by viewModels()
 
     private val loginDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())

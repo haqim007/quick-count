@@ -7,18 +7,8 @@
 
     <navigation android:id="@+id/authorized_nav_graph"
         app:startDestination="@id/TPSListFragment">
-        <fragment
-            android:id="@+id/voteFragment"
-            android:name="com.haltec.quickcount.ui.vote.VoteFragment"
-            android:label="fragment_vote"
-            tools:layout="@layout/fragment_vote" >
-            <argument
-                android:name="tps"
-                app:argType="com.haltec.quickcount.domain.model.TPS"/>
-            <argument
-                android:name="election"
-                app:argType="com.haltec.quickcount.domain.model.Election"/>
-        </fragment>
+
+
         <fragment
             android:id="@+id/electionActionFragment"
             android:name="com.haltec.quickcount.ui.electionaction.ElectionActionFragment"
@@ -34,9 +24,10 @@
             <argument
                 android:name="election"
                 app:argType="com.haltec.quickcount.domain.model.Election"/>
+            
             <action
                 android:id="@+id/action_electionActionFragment_to_voteFragment"
-                app:destination="@id/voteFragment" />
+                app:destination="@id/vote_graph" />
         </fragment>
         <fragment
             android:id="@+id/TPSListFragment"
@@ -93,6 +84,39 @@
             app:destination="@id/unauthorized_nav_graph"
             app:popUpTo="@id/authorized_nav_graph"
             app:popUpToInclusive="true"/>
+        
+        
+        <navigation android:id="@+id/vote_graph"
+            app:startDestination="@id/voteFragment">
+            
+            <fragment
+                android:id="@+id/voteFormFragment"
+                android:name="com.haltec.quickcount.ui.voteform.VoteFormFragment"
+                android:label="fragment_vote_form"
+                tools:layout="@layout/fragment_vote_form">
+                <argument
+                    android:name="partyId"
+                    app:argType="integer" />
+            </fragment>
+            
+            <fragment
+                android:id="@+id/voteFragment"
+                android:name="com.haltec.quickcount.ui.vote.VoteFragment"
+                android:label="fragment_vote"
+                tools:layout="@layout/fragment_vote">
+                
+                <action
+                    android:id="@+id/action_voteFragment_to_voteFormFragment"
+                    app:destination="@id/voteFormFragment" />
+            </fragment>
+
+            <argument
+                android:name="tps"
+                app:argType="com.haltec.quickcount.domain.model.TPS" />
+            <argument
+                android:name="election"
+                app:argType="com.haltec.quickcount.domain.model.Election" />
+        </navigation>
     </navigation>
     
     <navigation android:id="@+id/unauthorized_nav_graph"
@@ -141,6 +165,5 @@
             app:popUpTo="@id/splashscreenFragment"
             app:popUpToInclusive="true"/>
     </fragment>
-
 
 </navigation>

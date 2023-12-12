@@ -10,13 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.ItemCandidateBinding
 import com.haltec.quickcount.domain.model.VoteData
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 
 class CandidateAdapter(
     private val callback: Callback
 ): ListAdapter<VoteData.Candidate, CandidateAdapter.ViewHolder>(ItemDiffCallback()) {
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.onCreate(parent)
@@ -24,7 +21,9 @@ class CandidateAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 //        holder.setIsRecyclable(false)
-        holder.onBind(getItem(position), callback)
+        holder.onBind(
+            position, getItem(position), callback
+        )
     }
 
     class ViewHolder(
@@ -32,6 +31,7 @@ class CandidateAdapter(
     ): RecyclerView.ViewHolder(binding.root){
 
         fun onBind(
+            position: Int,
             data: VoteData.Candidate,
             callback: Callback
         ){
@@ -41,31 +41,56 @@ class CandidateAdapter(
                 tvCandidateName.text = data.candidateName
                 etCandidateVote.setText(data.totalCandidateVote.toString())
                 var vote = data.totalCandidateVote
+                var updateValue = false // flag to allow when to submit change to prevent submit value on scroll because of recycling view
+           
                 btnIncrease.setOnClickListener {
+                    updateValue = true
                     etCandidateVote.setText((++vote).toString())
                     etCandidateVote.clearFocus()
                     btnDecrese.clearFocus()
+                    updateValue = false
                 }
                 btnDecrese.setOnClickListener {
                     if (vote > 0){
+                        updateValue = true
                         etCandidateVote.setText((--vote).toString())
                     }
                     etCandidateVote.clearFocus()
                     btnIncrease.clearFocus()
+                    updateValue = false
+                }
+                
+                etCandidateVote.setOnFocusChangeListener { v, hasFocus ->
+                    val value = etCandidateVote.text.toString().toIntOrNull()
+                    if (hasFocus){
+                        if (value == null || value == 0){
+                            etCandidateVote.setText("")
+                        }
+                        updateValue = true
+                        
+                    }else{
+                        v.clearFocus()
+                        updateValue = false
+                        if (value == null){
+                            etCandidateVote.setText("0")
+                        }
+                    }
                 }
                 etCandidateVote.addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                     override fun afterTextChanged(s: Editable?) {
-                        if (data.totalCandidateVote.toString() != s.toString()) {
+                        if (data.totalCandidateVote.toString() != s.toString() && updateValue) {
                             
                             vote = s.toString().toIntOrNull() ?: 0
                             
                             callback.onCandidateVoteChange(
+                                position,
                                 data.partyId, 
                                 data.id,
                                 vote
                             )
+                            
                         }
                     }
                 })
@@ -82,7 +107,7 @@ class CandidateAdapter(
     }
 
     interface Callback{
-        fun onCandidateVoteChange(partyId:Int, candidateId: Int, vote: Int)
+        fun onCandidateVoteChange(position: Int, partyId:Int, candidateId: Int, vote: Int)
     }
 
 

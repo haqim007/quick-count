@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 class ElectionListFragment : BaseFragment() {
     
     private lateinit var binding: FragmentElectionListBinding
-    private val viewModel: ElectionListViewModel by hiltNavGraphViewModels(R.id.authorized_nav_graph)
+    private val viewModel: ElectionListViewModel by viewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
     
     private lateinit var adapter: ElectionListAdapter

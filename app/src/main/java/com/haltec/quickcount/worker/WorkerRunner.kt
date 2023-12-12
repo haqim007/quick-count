@@ -42,30 +42,30 @@ object WorkerRunner{
     
     fun runSyncWorker(context: Context){
 
-        val syncWorkerRequest = PeriodicWorkRequestBuilder<SyncWorker>(
-            1, TimeUnit.HOURS
-        )
-            .addTag(SYNC_WORKER_TAG)
-            .setInitialDelay(3L, TimeUnit.SECONDS)
-            .setBackoffCriteria(BackoffPolicy.LINEAR, 30L, TimeUnit.SECONDS)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .setRequiresBatteryNotLow(true)
-                    .build()
-            )
-            .build()
-        
-        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "SYNC_WORKER",
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-            syncWorkerRequest
-        )
+//        val syncWorkerRequest = PeriodicWorkRequestBuilder<SyncWorker>(
+//            1, TimeUnit.HOURS
+//        )
+//            .addTag(SYNC_WORKER_TAG)
+//            .setInitialDelay(3L, TimeUnit.SECONDS)
+//            .setBackoffCriteria(BackoffPolicy.LINEAR, 30L, TimeUnit.SECONDS)
+//            .setConstraints(
+//                Constraints.Builder()
+//                    .setRequiredNetworkType(NetworkType.CONNECTED)
+//                    .setRequiresBatteryNotLow(true)
+//                    .build()
+//            )
+//            .build()
+//
+//        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+//            "SYNC_WORKER",
+//            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+//            syncWorkerRequest
+//        )
         
         
     }
 
     fun stopSyncWorker(context: Context){
-        WorkManager.getInstance(context).cancelAllWorkByTag(SYNC_WORKER_TAG)
+//        WorkManager.getInstance(context).cancelAllWorkByTag(SYNC_WORKER_TAG)
     }
 }

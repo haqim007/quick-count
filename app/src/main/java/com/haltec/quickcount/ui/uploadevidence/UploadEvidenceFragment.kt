@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -54,7 +55,7 @@ import java.io.File
 class UploadEvidenceFragment : BaseFragment() {
     
     private lateinit var binding: FragmentUploadEvidenceBinding
-    private val viewModel: UploadEvidenceViewModel by hiltNavGraphViewModels(R.id.authorized_nav_graph)
+    private val viewModel: UploadEvidenceViewModel by viewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var isBackCamera: Boolean = true

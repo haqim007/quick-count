@@ -54,19 +54,23 @@ class SplashscreenFragment : BaseFragment() {
                         repeatOnLifecycle(Lifecycle.State.RESUMED){
                             viewModel.state.map { it.syncStatus }.distinctUntilChanged().collectLatest {
 
-                                if (it?.hasSync == false && !it.syncInProgress){
-                                    WorkerRunner.stopSyncWorker(requireContext())
-                                    WorkerRunner.runSyncWorker(requireContext())
-                                }else if(it?.hasSync == false && it.syncInProgress){
-                                    binding.tvTitleMessage.isVisible = true
-                                }else if (it?.hasSync == true && !it.syncInProgress){
-                                    WorkerRunner.stopSyncWorker(requireContext())
-                                    findNavController().navigate(
-                                        SplashscreenFragmentDirections.actionSplashscreenFragmentToTPSListFragment()
-                                    )
-                                }else{
-                                    binding.tvTitleMessage.isVisible = false
-                                }
+//                                if (it?.hasSync == false && !it.syncInProgress){
+//                                    WorkerRunner.stopSyncWorker(requireContext())
+//                                    WorkerRunner.runSyncWorker(requireContext())
+//                                }else if(it?.hasSync == false && it.syncInProgress){
+//                                    binding.tvTitleMessage.isVisible = true
+//                                }else if (it?.hasSync == true && !it.syncInProgress){
+//                                    WorkerRunner.stopSyncWorker(requireContext())
+//                                    findNavController().navigate(
+//                                        SplashscreenFragmentDirections.actionSplashscreenFragmentToTPSListFragment()
+//                                    )
+//                                }else{
+//                                    binding.tvTitleMessage.isVisible = false
+//                                }
+
+                                findNavController().navigate(
+                                    SplashscreenFragmentDirections.actionSplashscreenFragmentToTPSListFragment()
+                                )
                             }
                         }
                     }

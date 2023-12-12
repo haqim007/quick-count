@@ -16,22 +16,20 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.haltec.quickcount.R
+import com.haltec.quickcount.VoteGraphArgs
 import com.haltec.quickcount.data.mechanism.CustomThrowable.Companion.UNKNOWN_HOST_EXCEPTION
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.data.mechanism.ResourceHandler
 import com.haltec.quickcount.data.mechanism.handle
-import com.haltec.quickcount.util.formatNumberWithSeparator
 import com.haltec.quickcount.databinding.FragmentVoteBinding
 import com.haltec.quickcount.domain.model.BasicMessage
 import com.haltec.quickcount.domain.model.SubmitVoteStatus
 import com.haltec.quickcount.domain.model.VoteData
 import com.haltec.quickcount.ui.BaseFragment
-import com.haltec.quickcount.ui.voteform.VoteFormDialogCallback
-import com.haltec.quickcount.ui.voteform.VoteFormDialogFragment
+import com.haltec.quickcount.util.formatNumberWithSeparator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -39,13 +37,11 @@ import kotlinx.coroutines.launch
 class VoteFragment : BaseFragment() {
     
     private lateinit var binding: FragmentVoteBinding
-    private val viewModel: VoteViewModel by hiltNavGraphViewModels(R.id.authorized_nav_graph)
+    private val viewModel: VoteViewModel by hiltNavGraphViewModels(R.id.vote_graph)
 
     private val voteDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
     }
-    
-    private lateinit var formDialog: VoteFormDialogFragment
     
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,7 +55,7 @@ class VoteFragment : BaseFragment() {
         }
 
 
-        val args: VoteFragmentArgs by navArgs()
+        val args: VoteGraphArgs by navArgs()
         viewModel.setTpsElection(args.tps, args.election)
         val isEditable = args.election.statusVote != SubmitVoteStatus.VERIFIED
         
@@ -223,7 +219,7 @@ class VoteFragment : BaseFragment() {
         
         val adapter = if (isEditable){
             CandidateAdapter(object: CandidateAdapter.Callback{
-                override fun onCandidateVoteChange(partyId: Int, candidateId: Int, vote: Int) {
+                override fun onCandidateVoteChange(position: Int, partyId: Int, candidateId: Int, vote: Int) {
                     viewModel.setCandidateVote(partyId, candidateId, vote)
                 }
             })
@@ -245,30 +241,9 @@ class VoteFragment : BaseFragment() {
             }
 
             override fun onEdit(data: VoteData.PartyListsItem) {
-                formDialog = VoteFormDialogFragment.newInstance(object : VoteFormDialogCallback(){
-                    override fun getData(): VoteData.PartyListsItem {
-                        return data
-                    }
-
-                    override fun onCandidateVoteChange(partyId: Int, candidateId: Int, vote: Int) {
-                        viewModel.setCandidateVote(partyId, candidateId, vote)
-                    }
-
-                    override fun onPartyVoteChange(partyId: Int, vote: Int) {
-                        viewModel.setPartyVote(partyId, vote)
-                    }
-
-                    override fun getTotalVote(partyId: Int): Flow<Int> {
-                        return viewModel.getTotalVote(partyId)
-                    }
-
-                    override fun getCandidateList(partyInt: Int): Flow<List<VoteData.Candidate>>{
-                        return viewModel.getCandidateListData(partyInt)
-                    }
-                })
-
-                formDialog.show(requireActivity().supportFragmentManager, VoteFormDialogFragment.TAG)
-                
+                findNavController().navigate(
+                    VoteFragmentDirections.actionVoteFragmentToVoteFormFragment(data.id)
+                )
             }
         })
         
@@ -282,7 +257,7 @@ class VoteFragment : BaseFragment() {
     ) {
         val isEditable = submitVoteStatus != SubmitVoteStatus.VERIFIED
         viewModel.state.apply {
-            map { it.voteData }.launchCollectLatest { voteData ->
+            map { it.voteData }.launchOnResumeCollectLatest { voteData ->
                 voteData.handle(
                     object : ResourceHandler<VoteData> {
                         

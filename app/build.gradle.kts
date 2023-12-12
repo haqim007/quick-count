@@ -17,8 +17,8 @@ android {
         applicationId = "com.haltec.quickcount"
         minSdk = 24
         targetSdk = 34
-        versionCode = 17
-        versionName = "1.0.0.17"
+        versionCode = 19
+        versionName = "1.0.0.19"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,14 +31,25 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            resValue("string", "app_name", "PEMILU DESK LUMAJANG - Debug")
+            
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             buildConfigField("BASE_URL", "https://quickcount-api.haltec.id:81/v1/")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("staging"){
+            initWith(getAt("debug"))
+            applicationIdSuffix = ".staging"
+            isDebuggable = false
+            resValue("string", "app_name", "PEMILU DESK LUMAJANG - Staging")
+            dependencies{
+                implementation(libs.chucker.noop)
+            }
         }
     }
     compileOptions {
