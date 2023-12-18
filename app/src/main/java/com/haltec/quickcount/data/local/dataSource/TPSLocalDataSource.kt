@@ -46,7 +46,21 @@ class TPSLocalDataSource @Inject constructor(
                 database.tpsDao().clearAll()
             }
             database.remoteKeysDao().insertAll(remoteKeys)
-            database.tpsDao().insertAll(tps)
+            val existingInQueueVoteTPSIds: MutableList<Int> = mutableListOf()
+            database.voteFormDao().getTempVoteData().forEach {
+                existingInQueueVoteTPSIds.add(it.tpsId)
+            }
+            // update total of waitToBeSent
+            val newTps = tps.map {tpsEntity ->
+                if (existingInQueueVoteTPSIds.contains(tpsEntity.id)){
+                    tpsEntity.copy(
+                        waitToBeSent = existingInQueueVoteTPSIds.count { it == tpsEntity.id }.toString()
+                    )
+                }else{
+                    tpsEntity
+                }
+            }
+            database.tpsDao().insertAll(newTps)
             val tpsIds = tps.map { it.id }
             // clean election entity to prevent foreign key constraint failed
             database.electionDao().clearAll(tpsIds)
@@ -60,4 +74,10 @@ class TPSLocalDataSource @Inject constructor(
     suspend fun decreaseTotalVoteToBeSent(tpsId: Int){
         database.tpsDao().decreaseTotalWaitToBeSentData(tpsId)
     }
+
+    suspend fun increaseTotalVoteUnverified(tpsId: Int){
+        database.tpsDao().increaseTotalVoteSubmitted(tpsId)
+    }
+    
+    suspend fun countTPS() = database.tpsDao().countAll()
 }

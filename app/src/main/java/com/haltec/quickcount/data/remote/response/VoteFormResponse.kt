@@ -51,6 +51,9 @@ data class VoteFormResponse(
 
 		@field:SerializedName("note")
 		val note: String?,
+
+		@field:SerializedName("last_vote_updated")
+		val lastVoteUpdated: String,
 	)
 	
 	fun toModel(city: String): VoteData{

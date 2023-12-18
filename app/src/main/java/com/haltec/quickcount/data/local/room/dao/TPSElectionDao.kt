@@ -26,7 +26,8 @@ interface TPSElectionDao {
             village,
             $ELECTION_TABLE.election_id as electionId,
             $ELECTION_TABLE.title as electionName,
-            status_vote as statusVote
+            status_vote as statusVote,
+            updated_at as lastVoteUpdated
             
         FROM $ELECTION_TABLE
         
@@ -54,7 +55,8 @@ interface TPSElectionDao {
             village,
             $ELECTION_TABLE.election_id as electionId,
             $ELECTION_TABLE.title as electionName,
-            status_vote as statusVote
+            status_vote as statusVote,
+            updated_at as lastVoteUpdated
             
         FROM $ELECTION_TABLE
         

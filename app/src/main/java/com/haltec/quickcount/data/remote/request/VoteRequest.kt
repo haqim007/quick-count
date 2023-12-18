@@ -16,7 +16,9 @@ data class VoteRequest(
 	@SerializedName("invalid_vote")
 	val invalidVote: Int,
 	@SerializedName("is_partai")
-	val isPartai: Int
+	val isPartai: Int,
+	val latitude: String,
+	val longitude: String,
 ){
 	data class PartyItem(
 		val amount: Int,

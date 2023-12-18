@@ -27,6 +27,7 @@ import com.haltec.quickcount.domain.model.Election
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
 import com.haltec.quickcount.ui.util.handleLoadStates
+import com.haltec.quickcount.util.capitalizeWords
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -57,7 +58,7 @@ class ElectionListFragment : BaseFragment() {
             btnLogout.setOnClickListener {
                 mainViewModel.requestToLogout()
             }
-            tvTpsName.text = tps.name
+            tvTpsName.text = getString(R.string.tps_name_, capitalizeWords(tps.name))
             tvTpsLocation.text = getString(R.string.tps_location_, tps.village, tps.subdistrict)
             adapter = setupAdapter()
             observeElectionList(adapter)

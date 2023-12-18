@@ -6,6 +6,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -34,11 +35,12 @@ class ElectionListAdapter(
             election?.let {
                 binding.apply {
                     tvElectionName.text = election.title
-                    tvElectionInfo.text = if (election.statusVote == SubmitVoteStatus.PENDING){
-                        itemView.context.getString(R.string.input_data_before_date_time, election.createdAt)
+                    tvElectionInfo.text = if (arrayOf(SubmitVoteStatus.PENDING, SubmitVoteStatus.IN_QUEUE).contains(election.statusVote)){
+                        null
                     }else{
                         itemView.context.getString(R.string.sent_at_date_time, election.updatedAt)
                     }
+                    tvElectionInfo.isVisible = tvElectionInfo.text != null
                     val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, election.statusVote.label))
                     val statusColor: Int
                     val borderColor: Int

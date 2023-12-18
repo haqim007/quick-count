@@ -11,6 +11,7 @@ import com.haltec.quickcount.util.capitalizeWords
 import com.haltec.quickcount.util.stringToStringDateID
 import com.haltec.quickcount.domain.model.Election
 import com.haltec.quickcount.domain.model.SubmitVoteStatus
+import com.haltec.quickcount.domain.model.submitVoteStatusValueTextToValueNumber
 
 data class ElectionListResponse(
 
@@ -59,7 +60,7 @@ data class ElectionListResponse(
 		fun toEntity() = ElectionEntity(
 			id = "${tpsInfo.tpsId}${id}".toInt(),
 			updatedAt = updatedAt, 
-			statusVote = statusVote, 
+			statusVote = submitVoteStatusValueTextToValueNumber(statusVote), 
 			active = active, 
 			createdAt = createdAt, 
 			electionId = id, 
@@ -111,22 +112,6 @@ data class ElectionListResponse(
 		}
 	}
 	
-	fun toModel() = this.data?.map { 
-		Election(
-			id = it.id,
-			title = capitalizeWords(it.title),
-			createdBy =  it.createdBy,
-			createdAt = stringToStringDateID(it.createdAt),
-			updatedAt = stringToStringDateID(it.updatedAt),
-			statusVote = when(it.statusVote){
-				SubmitVoteStatus.SUBMITTED.valueNumber -> SubmitVoteStatus.SUBMITTED
-				SubmitVoteStatus.VERIFIED.valueNumber -> SubmitVoteStatus.VERIFIED
-				SubmitVoteStatus.REJECTED.valueNumber -> SubmitVoteStatus.REJECTED
-				else -> SubmitVoteStatus.PENDING
-			},
-			active = it.active
-		)
-	} ?: listOf()
 }
 
 fun List<ElectionListResponse.ElectionResponse>.toEntity(): List<ElectionEntity> = this.map { 
@@ -135,7 +120,7 @@ fun List<ElectionListResponse.ElectionResponse>.toEntity(): List<ElectionEntity>
 	} else {
 		null
 	}
-}.filterNotNull()
+}.filterNotNull().distinctBy { it.id }
 
 fun List<ElectionListResponse.ElectionResponse>.toVoteFormEntities() = this.map { 
 	it.toVoteFormEntity()

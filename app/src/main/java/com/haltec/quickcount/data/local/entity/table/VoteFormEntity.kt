@@ -10,6 +10,9 @@ import com.haltec.quickcount.domain.model.VoteData
 const val VOTE_FORM_TABLE = "vote_form"
 @Entity(
     tableName = VOTE_FORM_TABLE,
+    indices = [
+        Index(value = ["tps_id", "election_id"], unique = true)
+    ]
 )
 data class VoteFormEntity(
     @PrimaryKey(autoGenerate = true)
@@ -43,7 +46,6 @@ data class VoteFormEntity(
                 id = it.id,
                 totalPartyVote = it.amount,
                 totalVote = it.amount + it.candidateList.sumOf { it.amount },
-                isExpanded = index == 0,
                 candidateList = it.candidateList.map { candidate -> 
                     VoteData.Candidate(
                         orderNumber = candidate.noUrut,

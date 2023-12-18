@@ -62,11 +62,7 @@ class VoteRepository @Inject constructor(
         }.asFlow().map { 
             if (it is Resource.Success && it.data != null){
                 val data = it.data.copy(
-                    partyLists = it.data.partyLists.mapIndexed { index, partyListsItem ->
-                        partyListsItem.copy(
-                            isExpanded = index == 0
-                        )
-                    }
+                    partyLists = it.data.partyLists
                 )
                 Resource.Success(data)
             }else if (it is Resource.Error && it.data == null && devicePreference.isOnline().first() == false){
@@ -87,7 +83,9 @@ class VoteRepository @Inject constructor(
         invalidVote: Int,
         candidates: List<Pair<Int, Int>>,
         parties: List<Pair<Int, Int>>?,
-        isParty: Boolean
+        isParty: Boolean,
+        longitude: Double,
+        latitude: Double
     ): Flow<Resource<BasicMessage>> {
         return object : AuthorizedNetworkBoundResource<BasicMessage, BasicResponse>(
             userPreference
@@ -111,7 +109,9 @@ class VoteRepository @Inject constructor(
                         partai = parties?.map {
                             VoteRequest.PartyItem(partaiId = it.first, amount = it.second)
                         },
-                        isPartai = if (isParty) 1 else 0
+                        isPartai = if (isParty) 1 else 0,
+                        longitude = longitude.toString(),
+                        latitude = latitude.toString()
                     )
                 )
             }
@@ -121,7 +121,7 @@ class VoteRepository @Inject constructor(
             }
 
             override suspend fun onSuccess(data: BasicResponse) {
-                localDataSource.removeTempVoteSubmit(tpsId = tps.id, electionId = election.id)
+                localDataSource.onVoteSubmitSuccess(tpsId = tps.id, electionId = election.id)
             }
 
             override suspend fun onFailed(exceptionOrNull: CustomThrowable?) {
@@ -131,8 +131,8 @@ class VoteRepository @Inject constructor(
                     }
                     val totalPartiesVotes = parties?.sumOf { it.second } ?: 0
                     val validVotes = totalCandidatesVotes + totalPartiesVotes
-                    localDataSource.insertOrReplaceTempVoteData(tempVoteData =
-                        TempVoteSubmitEntity(
+                    localDataSource.insertOrReplaceTempVoteData(
+                        tempVoteData = TempVoteSubmitEntity(
                             tpsId = tps.id,
                             electionId = election.id,
                             validVote = validVotes,
@@ -167,15 +167,14 @@ class VoteRepository @Inject constructor(
             }
 
             override suspend fun onSuccess(data: BasicResponse) {
-                localDataSource.removeTempVoteSubmit(tpsId = voteRequest.tpsId, electionId = voteRequest.selectionTypeId)
-                tpsLocalDataSource.decreaseTotalVoteToBeSent(voteRequest.tpsId)
+                localDataSource.onVoteSubmitSuccess(voteRequest.tpsId, voteRequest.selectionTypeId)
             }
         }.asFlow()
     }
 
-    override suspend fun getTempVoteData(): List<VoteRequest> {
+    override suspend fun getTempVoteData(longitude: Double, latitude: Double): List<VoteRequest> {
         return withContext(dispatcher){
-            localDataSource.getTempVoteData().map { it.toRequest() }
+            localDataSource.getTempVoteData().map { it.toRequest(longitude, latitude) }
         }
     }
 }

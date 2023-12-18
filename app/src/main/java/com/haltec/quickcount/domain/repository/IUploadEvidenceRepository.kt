@@ -17,6 +17,6 @@ interface IUploadEvidenceRepository {
     ): Flow<Resource<VoteEvidence>>
 
     fun getPrevData(tps: TPS, election: Election): Flow<Resource<List<VoteEvidence>>>
-    suspend fun getTempUploadEvidence(): List<UploadEvidenceRequest>
+    suspend fun getTempUploadEvidence(longitude: Double, latitude: Double): List<UploadEvidenceRequest>
     fun upload(request: UploadEvidenceRequest): Flow<Resource<VoteEvidence>>
 }

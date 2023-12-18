@@ -14,12 +14,14 @@ interface IVoteRepository {
         tps: TPS, election: Election, invalidVote: Int,
         candidates: List<Pair<Int, Int>>,
         parties: List<Pair<Int, Int>>?,
-        isParty: Boolean
+        isParty: Boolean,
+        longitude: Double,
+        latitude: Double
     ): Flow<Resource<BasicMessage>>
 
     fun vote(
         voteRequest: VoteRequest
     ): Flow<Resource<BasicMessage>>
     
-    suspend fun getTempVoteData(): List<VoteRequest>
+    suspend fun getTempVoteData(longitude: Double, latitude: Double): List<VoteRequest>
 }

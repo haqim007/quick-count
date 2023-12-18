@@ -31,8 +31,7 @@ class CandidateViewAdapter: ListAdapter<VoteData.Candidate, CandidateViewAdapter
             data: VoteData.Candidate
         ){
             binding.apply {
-                tvOrderNumber.text = itemView.context.getString(R.string.candidate_order_number_, data.orderNumber)
-                tvCandidateName.text = data.candidateName
+                tvCandidateName.text = itemView.context.getString(R.string.candidate_number_name_, data.orderNumber, data.candidateName)
                 tvCandidateVote.text = itemView.context.getString(
                     R.string.total_vote_,
                     formatNumberWithSeparator(data.totalCandidateVote)

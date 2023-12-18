@@ -12,9 +12,9 @@ import com.haltec.quickcount.data.preference.UserPreference
 import com.haltec.quickcount.data.remote.datasource.TPSElectionRemoteDataSource
 import com.haltec.quickcount.util.DEFAULT_PAGE_SIZE
 import com.haltec.quickcount.di.DispatcherIO
+import com.haltec.quickcount.domain.model.ElectionFilter
 import com.haltec.quickcount.domain.model.TPSElection
-import com.haltec.quickcount.domain.model.stringToSubmitVoteStatusNumber
-import com.haltec.quickcount.domain.model.stringToSubmitVoteStatusValueText
+import com.haltec.quickcount.domain.model.submitVoteStatus
 import com.haltec.quickcount.domain.repository.ITPSElectionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +33,8 @@ class TPSElectionRepository @Inject constructor(
 ): ITPSElectionRepository {
     
     @OptIn(ExperimentalPagingApi::class)
-    override fun getTPSElections(filter: String) : Flow<PagingData<TPSElection>> {
+    override fun getTPSElections(filter: ElectionFilter) : Flow<PagingData<TPSElection>> {
+        val submitVoteFilter = filter.submitVoteStatus
         return Pager(
             config = PagingConfig(
                 pageSize = DEFAULT_PAGE_SIZE
@@ -42,12 +43,17 @@ class TPSElectionRepository @Inject constructor(
                 userPreference,
                 localDataSource,
                 remoteDataSource,
-                stringToSubmitVoteStatusValueText(filter)
+                submitVoteFilter
             ) {
                 devicePreference.isOnline().first()
             },
             pagingSourceFactory = {
-                localDataSource.getPaging(stringToSubmitVoteStatusNumber(filter))
+                submitVoteFilter?.valueNumber?.let {
+                    localDataSource.getPaging(it)
+                }?: run {
+                    localDataSource.getPaging()
+                }
+                
             }
         ).flow.map {
             it.map {

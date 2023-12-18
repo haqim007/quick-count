@@ -1,5 +1,6 @@
 package com.haltec.quickcount.ui.vote
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.haltec.quickcount.R
 import com.haltec.quickcount.VoteGraphArgs
@@ -26,6 +33,7 @@ import com.haltec.quickcount.domain.model.BasicMessage
 import com.haltec.quickcount.domain.model.SubmitVoteStatus
 import com.haltec.quickcount.domain.model.VoteData
 import com.haltec.quickcount.ui.BaseFragment
+import com.haltec.quickcount.util.capitalizeWords
 import com.haltec.quickcount.util.formatNumberWithSeparator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -42,7 +50,9 @@ class VoteFragment : BaseFragment() {
     private val voteDialog by lazy {
         MaterialAlertDialogBuilder(requireContext())
     }
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     
+    @SuppressLint("MissingPermission")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -54,6 +64,7 @@ class VoteFragment : BaseFragment() {
             findNavController().popBackStack()
         }
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         val args: VoteGraphArgs by navArgs()
         viewModel.setTpsElection(args.tps, args.election)
@@ -83,7 +94,7 @@ class VoteFragment : BaseFragment() {
                     navigateUp()
                 }
             }
-            tvTpsName.text = args.tps.name
+            tvTpsName.text = getString(R.string.tps_name_, capitalizeWords(args.tps.name))
             tvElectionName.text = args.election.title
 
             mcvTotalInvalidVoteView.isVisible = !isEditable
@@ -128,7 +139,24 @@ class VoteFragment : BaseFragment() {
             }
             btnSubmit.setOnClickListener { 
                 if(viewModel.state.value.termsIsApproved){
-                    viewModel.submit()
+                    it.isEnabled = false
+                    it.isClickable = false
+                    fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, object : CancellationToken() {
+                        override fun onCanceledRequested(p0: OnTokenCanceledListener) = CancellationTokenSource().token
+                        override fun isCancellationRequested() = false
+                    }).addOnSuccessListener { location ->
+                        if (location != null){
+                            viewModel.submit(location)
+                        }else{
+                            voteDialog
+                                .setTitle(R.string.error_occured)
+                                .setMessage(R.string.current_location_is_not_detected)
+                                .setPositiveButton(R.string.ok, null)
+                                .show()
+                        }
+                        it.isEnabled = true
+                        it.isClickable = true
+                    }
                 }
             }
             

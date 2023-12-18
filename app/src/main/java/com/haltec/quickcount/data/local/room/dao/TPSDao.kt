@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.haltec.quickcount.data.local.entity.table.RemoteKeys
 import com.haltec.quickcount.data.local.entity.table.TPSEntity
 import com.haltec.quickcount.data.local.entity.table.TPS_TABLE
 
@@ -54,4 +53,19 @@ interface TPSDao {
             }
         }
     }
+
+    @Transaction
+    suspend fun increaseTotalVoteSubmitted(tpsId: Int){
+        val existing = getById(tpsId)
+        existing?.let {
+            update(
+                it.copy(
+                    submitted = ((it.submitted.toIntOrNull() ?: 0) + 1).toString()
+                )
+            )
+        }
+    }
+
+    @Query("SELECT COUNT(*) FROM $TPS_TABLE")
+    suspend fun countAll(): Int
 }

@@ -12,12 +12,13 @@ import com.haltec.quickcount.data.remote.response.toElectionEntities
 import com.haltec.quickcount.data.remote.response.toTPSEntities
 import com.haltec.quickcount.data.remote.response.toUploadedEvidenceEntities
 import com.haltec.quickcount.data.remote.response.toVoteFormEntities
+import com.haltec.quickcount.domain.model.SubmitVoteStatus
 
-class TPSElectionRemoteMediator (
+class TPSElectionRemoteMediator(
     private val userPreference: UserPreference,
     private val localDataSource: TPSElectionLocalDataSource,
     private val remoteDataSource: TPSElectionRemoteDataSource,
-    private val filter: String = "",
+    private val filter: SubmitVoteStatus?,
     isOnline: suspend() -> Boolean = {true}
 ): BaseRemoteMediator<TPSElectionEntity>(
     userPreference, isOnline
@@ -25,7 +26,7 @@ class TPSElectionRemoteMediator (
     
     override suspend fun processData(page: Int, loadType: LoadType): Boolean{
         // val offset = (page - 1) * state.config.pageSize
-        val response = checkToken(userPreference) { remoteDataSource.getTPSElectionList(filter) }
+        val response = checkToken(userPreference) { remoteDataSource.getTPSElectionList(filter?.valueText ?: "") }
         val endOfPaginationReached = true
         val prevKey = null //if(page == 1) null else page - 1
         val nextKey = null //if (endOfPaginationReached) null else page + 1
@@ -45,7 +46,8 @@ class TPSElectionRemoteMediator (
             election = tpsElectionList.toElectionEntities(),
             voteFrom = tpsElectionList.toVoteFormEntities(),
             uploadedEvidence = tpsElectionList.toUploadedEvidenceEntities(),
-            isRefresh = loadType == LoadType.REFRESH && filter.isEmpty()
+            isRefresh = loadType == LoadType.REFRESH && filter == null,
+            filter = filter?.valueNumber ?: ""
         )
         
         return endOfPaginationReached

@@ -24,9 +24,9 @@ enum class SubmitVoteStatus (val label: String, val valueText: String, val value
     PENDING("Belum Dikirim", "pending", ""),
 
     /**
-     * Pending
+     * In Queue
      *
-     * @constructor Create empty Pending
+     * @constructor Create empty In Queue
      */
     IN_QUEUE("Menunggu Dikirim", "in_queue", "-2"),
 

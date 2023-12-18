@@ -52,7 +52,19 @@ class VoteLocalDataSource @Inject constructor(
     }
     suspend fun removeTempVoteSubmit(tpsId: Int, electionId: Int){
         database.voteFormDao().removeTempVoteSubmit(tpsId, electionId)
-        
+    }
+    
+    suspend fun onVoteSubmitSuccess(tpsId: Int, electionId: Int){
+        database.withTransaction {
+            // remove vote data from temp_vote_submit table
+            removeTempVoteSubmit(tpsId, electionId)
+            // decrease total of queue of waiting data to be sent
+            database.tpsDao().decreaseTotalWaitToBeSentData(tpsId)
+            // increase total of submitted vote
+            database.tpsDao().increaseTotalVoteSubmitted(tpsId)
+            // update election status as submitted
+            database.electionDao().updateStatus(tpsId, electionId, SubmitVoteStatus.SUBMITTED.valueNumber)
+        }
     }
     
     suspend fun insertOrReplaceTempVoteData(
@@ -62,7 +74,7 @@ class VoteLocalDataSource @Inject constructor(
             // insert to queue table
             database.voteFormDao().insertOrReplaceTempVoteSubmit(tempVoteData)
             // update the status
-            database.electionDao().updateStatus(tempVoteData.electionId, SubmitVoteStatus.IN_QUEUE.valueNumber)
+            database.electionDao().updateStatus(tempVoteData.tpsId, tempVoteData.electionId, SubmitVoteStatus.IN_QUEUE.valueNumber)
             // increase total of data wait to be sent in tps entity
             database.tpsDao().increaseTotalWaitToBeSentData(tempVoteData.tpsId)
             

@@ -6,6 +6,7 @@ import com.haltec.quickcount.data.local.entity.table.ELECTION_TABLE
 import com.haltec.quickcount.data.local.entity.table.ElectionEntity
 import com.haltec.quickcount.data.local.entity.table.RemoteKeys
 import com.haltec.quickcount.data.local.room.AppDatabase
+import com.haltec.quickcount.domain.model.SubmitVoteStatus
 import javax.inject.Inject
 
 /**
@@ -31,15 +32,36 @@ class ElectionLocalDataSource @Inject constructor(
         remoteKeys: List<RemoteKeys>,
         election: List<ElectionEntity>,
         isRefresh: Boolean = false,
-        isFromTPSElection: Boolean = false
+        isFromTPSElection: Boolean = false,
+        tpsId: Int
     ){
         database.withTransaction { 
             if (isRefresh){
                 database.remoteKeysDao().clearRemoteKeys(ELECTION_TABLE)
-                database.electionDao().clearAll()
+                database.electionDao().clearAll(tpsId)
             }
             database.remoteKeysDao().insertAll(remoteKeys)
-            database.electionDao().insertAll(election, isFromTPSElection)
+
+            val existingInQueueVoteTPSIds: MutableList<Int> = mutableListOf()
+            val existingInQueueVoteElectionIds: MutableList<Int> = mutableListOf()
+            database.voteFormDao().getTempVoteData().forEach {
+                existingInQueueVoteTPSIds.add(it.tpsId)
+                existingInQueueVoteElectionIds.add(it.electionId)
+            }
+            // change status to in queue when in_queue submit vote exists
+            val newElection = election.map { electionEntity ->
+                if (
+                    existingInQueueVoteElectionIds.contains(electionEntity.electionId) &&
+                    existingInQueueVoteTPSIds.contains(electionEntity.tpsId)
+                ){
+                    electionEntity.copy(
+                        statusVote = SubmitVoteStatus.IN_QUEUE.valueNumber
+                    )
+                }else{
+                    electionEntity
+                }
+            }
+            database.electionDao().insertAll(newElection, isFromTPSElection)
         }
     }
 }

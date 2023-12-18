@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">PEMILU DESK LUMAJANG</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="location_permission_required">AKSES LOKASI DIBUTUHKAN</string>
     <string name="location_permission_description">Aplikasi ini membutuhkan akses terhadap lokasi agar sistem wilayah Lumajang dapat berfungsi maksimal</string>
@@ -11,9 +10,9 @@
     <string name="password">Password</string>
     <string name="tps_list_title">TPS tempat anda bertugas</string>
     <string name="open_election">Pilih Pemilu</string>
-    <string name="data_sent_">Data Terkirim : %s</string>
+    <string name="data_sent_">Data Belum Terverifikasi : %s</string>
     <string name="data_verified_">Data Terverifikasi : %s</string>
-    <string name="data_not_verified_">Data Belum Terverifikasi : %s</string>
+    <string name="data_pending_">Data Belum Dikirim : %s</string>
     <string name="choose">Pilih</string>
     <string name="choose_running_election">Pilih Pemilu Berlangsung</string>
     <string name="selfi_at_tps">Yuk, Selfie di TPS</string>
@@ -80,7 +79,7 @@
     <string name="total_party_vote">Suara Partai</string>
     <string name="hasil_suara_tidak_sah">Hasil Suara Tidak Sah</string>
     <string name="data_perolehan_partai_s">Data Perolehan Partai %s</string>
-    <string name="candidate_order_number_">Nomor Urut %d</string>
+    <string name="candidate_number_name_">%d. %s</string>
     <string name="approve_vote_terms">Saya sudah memasukkan dan memeriksa keseluruhan data dengan benar</string>
     <string name="send_data">Kirim Data</string>
     <string name="data_sent">Data Terkirim!</string>
@@ -116,4 +115,5 @@
     <string name="photo_6">Foto 6</string>
     <string name="photo_7">Foto 7</string>
     <string name="data_wait_to_be_sent_">Data Menunggu Terkirim : %s</string>
+    <string name="tps_name_">TPS %S</string>
 </resources>

@@ -161,7 +161,7 @@ class UploadEvidenceRepository @Inject constructor(
         }.asFlow()
     }
 
-    override suspend fun getTempUploadEvidence(): List<UploadEvidenceRequest> {
+    override suspend fun getTempUploadEvidence(longitude: Double, latitude: Double): List<UploadEvidenceRequest> {
         return withContext(dispatcher){
             localDataSource.getTempUploadEvidence().map { 
                 
@@ -170,8 +170,8 @@ class UploadEvidenceRepository @Inject constructor(
                     electionId = it.electionId,
                     type = it.type,
                     description = it.description,
-                    longitude = it.longitude,
-                    latitude = it.latitude,
+                    longitude = longitude.toString(),
+                    latitude = latitude.toString(),
                     image = it.file
                 )
                 

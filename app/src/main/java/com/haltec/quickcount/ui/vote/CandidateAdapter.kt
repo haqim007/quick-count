@@ -36,9 +36,7 @@ class CandidateAdapter(
             callback: Callback
         ){
             binding.apply {
-
-                tvOrderNumber.text = itemView.context.getString(R.string.candidate_order_number_, data.orderNumber)
-                tvCandidateName.text = data.candidateName
+                tvCandidateName.text = itemView.context.getString(R.string.candidate_number_name_, data.orderNumber, data.candidateName)
                 etCandidateVote.setText(data.totalCandidateVote.toString())
                 var vote = data.totalCandidateVote
                 var updateValue = false // flag to allow when to submit change to prevent submit value on scroll because of recycling view

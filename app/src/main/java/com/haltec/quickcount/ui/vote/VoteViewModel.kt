@@ -1,5 +1,6 @@
 package com.haltec.quickcount.ui.vote
 
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.haltec.quickcount.data.mechanism.Resource
@@ -349,7 +350,7 @@ class VoteViewModel @Inject constructor(
         }
     }
     
-    fun submit(){
+    fun submit(location: Location) {
         state.value.apply {
             repository.vote(
                 tps = tps!!,
@@ -359,7 +360,9 @@ class VoteViewModel @Inject constructor(
                 },
                 parties = if (voteData.data?.isParty == true) partiesVote else null ,
                 invalidVote = invalidVote,
-                isParty = voteData.data?.isParty == true
+                isParty = voteData.data?.isParty == true,
+                longitude = location.longitude,
+                latitude = location.latitude
             ).launchCollectLatest { 
                 _state.update { state -> state.copy(submitResult = it) }
             }

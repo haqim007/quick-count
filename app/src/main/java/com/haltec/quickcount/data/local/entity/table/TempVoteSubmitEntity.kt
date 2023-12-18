@@ -29,7 +29,7 @@ data class TempVoteSubmitEntity(
     
     val candidate: List<TempVoteCandidateEntity>? = null
 ){
-    fun toRequest(): VoteRequest {
+    fun toRequest(longitude: Double, latitude: Double): VoteRequest {
         return VoteRequest(
             tpsId = tpsId,
             selectionTypeId = electionId,
@@ -40,7 +40,7 @@ data class TempVoteSubmitEntity(
             candidate = candidate?.map { 
                 VoteRequest.CandidateItem(
                     candidateId = it.candidateId,
-                    amount = amount
+                    amount = it.amount
                 )
             } ?: emptyList(),
             partai = partai?.map { 
@@ -48,7 +48,9 @@ data class TempVoteSubmitEntity(
                     partaiId = it.partaiId,
                     amount = it.amount
                 )
-            }
+            },
+            latitude = latitude.toString(),
+            longitude = longitude.toString()
         )
     }
 }

@@ -28,7 +28,7 @@ class TPSListAdapter(
             
             tps?.let {
                 binding.apply {
-                    tvTpsName.text = capitalizeWords(tps.name)
+                    tvTpsName.text = itemView.context.getString(R.string.tps_name_, capitalizeWords(tps.name))
                     tvTpsLocation.text = itemView.context.getString(
                         R.string.tps_location_,
                         capitalizeWords(tps.village),
@@ -38,7 +38,7 @@ class TPSListAdapter(
                         R.string.data_sent_, tps.submitted.toString()
                     )
                     tvDataUnverified.text = itemView.context.getString(
-                        R.string.data_not_verified_, tps.pending.toString()
+                        R.string.data_pending_, tps.pending.toString()
                     )
                     tvDataVerified.text = itemView.context.getString(
                         R.string.data_verified_, tps.approved.toString()

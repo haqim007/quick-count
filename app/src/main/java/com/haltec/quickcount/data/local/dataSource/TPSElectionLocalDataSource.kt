@@ -12,6 +12,7 @@ import com.haltec.quickcount.data.local.entity.table.VoteFormEntity
 import com.haltec.quickcount.data.local.entity.view.TPSElectionEntity
 import com.haltec.quickcount.data.local.entity.view.TPS_ELECTION_VIEW
 import com.haltec.quickcount.data.local.room.AppDatabase
+import com.haltec.quickcount.domain.model.SubmitVoteStatus
 import javax.inject.Inject
 
 class TPSElectionLocalDataSource @Inject constructor(
@@ -29,6 +30,16 @@ class TPSElectionLocalDataSource @Inject constructor(
         uploadedEvidence: List<UploadedEvidenceEntity>
     ){
         database.withTransaction {
+            
+            //reset current data
+            database.remoteKeysDao().clearRemoteKeys(TPS_ELECTION_VIEW)
+            database.remoteKeysDao().clearRemoteKeys(ELECTION_TABLE)
+            database.voteFormDao().clearAll()
+            database.uploadEvidenceDao().clearAll()
+            database.electionDao().clearAll()
+            database.remoteKeysDao().clearRemoteKeys(TPS_TABLE)
+            database.tpsDao().clearAll()
+            // end of resetting
 
             val tpsRemoteKeys = tps.map {
                 RemoteKeys(
@@ -38,8 +49,26 @@ class TPSElectionLocalDataSource @Inject constructor(
                     nextKey = null
                 )
             }
-
-            tpsLocalDataSource.insertAllAndRemoteKeys(remoteKeys = tpsRemoteKeys, tps, true)
+            
+            database.remoteKeysDao().insertAll(tpsRemoteKeys)
+            
+            val existingInQueueVoteTPSIds: MutableList<Int> = mutableListOf()
+            val existingInQueueVoteElectionIds: MutableList<Int> = mutableListOf()
+            database.voteFormDao().getTempVoteData().forEach {
+                existingInQueueVoteTPSIds.add(it.tpsId)
+                existingInQueueVoteElectionIds.add(it.electionId)
+            }
+            // update total of waitToBeSent
+            val newTps = tps.map {tpsEntity -> 
+                if (existingInQueueVoteTPSIds.contains(tpsEntity.id)){
+                    tpsEntity.copy(
+                        waitToBeSent = existingInQueueVoteTPSIds.count { it == tpsEntity.id }.toString()
+                    )
+                }else{
+                    tpsEntity
+                }
+            }
+            database.tpsDao().insertAll(newTps)
 
             val electionRemoteKeys = election.map {
                 RemoteKeys(
@@ -50,13 +79,22 @@ class TPSElectionLocalDataSource @Inject constructor(
                 )
             }
 
-
-            database.remoteKeysDao().clearRemoteKeys(ELECTION_TABLE)
-            database.voteFormDao().clearAll()
-            database.uploadEvidenceDao().clearAll()
-            database.electionDao().clearAll()
             database.remoteKeysDao().insertAll(electionRemoteKeys)
-            database.electionDao().insertAll(election, false)
+            
+            // change status to in queue when in_queue submit vote exists
+            val newElection = election.map { electionEntity -> 
+                if (
+                    existingInQueueVoteElectionIds.contains(electionEntity.electionId) && 
+                    existingInQueueVoteTPSIds.contains(electionEntity.tpsId)
+                ){
+                    electionEntity.copy(
+                        statusVote = SubmitVoteStatus.IN_QUEUE.valueNumber
+                    )    
+                }else{
+                    electionEntity
+                }
+            }
+            database.electionDao().insertAll(newElection, false)
         }
         
         voteLocalDataSource.insertAll(
@@ -77,16 +115,25 @@ class TPSElectionLocalDataSource @Inject constructor(
         voteFrom: List<VoteFormEntity>,
         remoteKeys: List<RemoteKeys>,
         uploadedEvidence: List<UploadedEvidenceEntity>,
-        isRefresh: Boolean = false
+        isRefresh: Boolean = false,
+        filter: String? = null
     ){
         database.withTransaction {
 
             if (isRefresh){
                 database.remoteKeysDao().clearRemoteKeys(TPS_ELECTION_VIEW)
-                database.remoteKeysDao().clearRemoteKeys(TPS_TABLE)
                 database.remoteKeysDao().clearRemoteKeys(ELECTION_TABLE)
-                database.electionDao().clearAll()
-                database.tpsDao().clearAll()
+                
+                // if filter null means refresh all elections and tps
+                // else only refresh elections by filter value
+                if(filter != null){
+                    database.electionDao().clearByFilter(filter)
+                }else{
+                    database.voteFormDao().clearAll()
+                    database.remoteKeysDao().clearRemoteKeys(TPS_TABLE)
+                    database.electionDao().clearAll()
+                    database.tpsDao().clearAll()
+                }
             }
             
             database.remoteKeysDao().insertAll(remoteKeys)
@@ -100,7 +147,24 @@ class TPSElectionLocalDataSource @Inject constructor(
                 )
             }
             
-            tpsLocalDataSource.insertAllAndRemoteKeys(remoteKeys = tpsRemoteKeys, tps, isRefresh)
+            database.remoteKeysDao().insertAll(tpsRemoteKeys)
+            val existingInQueueVoteTPSIds: MutableList<Int> = mutableListOf()
+            val existingInQueueVoteElectionIds: MutableList<Int> = mutableListOf()
+            database.voteFormDao().getTempVoteData().forEach {
+                existingInQueueVoteTPSIds.add(it.tpsId)
+                existingInQueueVoteElectionIds.add(it.electionId)
+            }
+            // update total of waitToBeSent
+            val newTps = tps.map {tpsEntity ->
+                if (existingInQueueVoteTPSIds.contains(tpsEntity.id)){
+                    tpsEntity.copy(
+                        waitToBeSent = existingInQueueVoteTPSIds.count { it == tpsEntity.id }.toString()
+                    )
+                }else{
+                    tpsEntity
+                }
+            }
+            database.tpsDao().insertAll(newTps)
 
             val electionRemoteKeys = election.map {
                 RemoteKeys(
@@ -112,7 +176,20 @@ class TPSElectionLocalDataSource @Inject constructor(
             }
            
             database.remoteKeysDao().insertAll(electionRemoteKeys)
-            database.electionDao().insertAll(election, true)
+            // change status to in queue when in_queue submit vote exists
+            val newElection = election.map { electionEntity ->
+                if (
+                    existingInQueueVoteElectionIds.contains(electionEntity.electionId) &&
+                    existingInQueueVoteTPSIds.contains(electionEntity.tpsId)
+                ){
+                    electionEntity.copy(
+                        statusVote = SubmitVoteStatus.IN_QUEUE.valueNumber
+                    )
+                }else{
+                    electionEntity
+                }
+            }
+            database.electionDao().insertAll(newElection, true)
         }
 
         voteLocalDataSource.insertAll(voteFrom)

@@ -4,11 +4,13 @@ import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.Manifest.permission.CAMERA
 import android.Manifest.permission.POST_NOTIFICATIONS
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface.OnClickListener
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
@@ -27,11 +29,23 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.work.WorkManager
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.Granularity
+import com.google.android.gms.location.LocationAvailability
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationToken
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.haltec.quickcount.databinding.ActivityMainBinding
 import com.haltec.quickcount.ui.MainViewModel
+import com.haltec.quickcount.ui.util.LocationTrackerManager
 import com.haltec.quickcount.util.ConnectivityObserver
 import com.haltec.quickcount.util.IConnectivityObserver
 import com.haltec.quickcount.util.NotificationChannelEnum
@@ -67,6 +81,7 @@ class MainActivity : AppCompatActivity() {
     private var latestConnectivityState : IConnectivityObserver.Status? = null
     private lateinit var snackbarConnectivityStatus: Snackbar
     private var neverShowConnectivityDialogAgain: Boolean = false
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     
     private val locationTrackerDialog by lazy {
         MaterialAlertDialogBuilder(this)
@@ -206,7 +221,6 @@ class MainActivity : AppCompatActivity() {
 
         setupNotificationChannel()
 
-//        WorkerRunner.runSubmitVoteWorker(this@MainActivity)
         WorkManager.getInstance(this).getWorkInfosByTagLiveData(SUBMIT_WORKER_TAG)
             .observe(this) { workInfo ->
                 workInfo.forEach {
@@ -217,19 +231,29 @@ class MainActivity : AppCompatActivity() {
     
     private fun observeConnectivityChange(){
         val connectivityFlow = connectivityObserver.observer(this@MainActivity).distinctUntilChanged()
+        val locationTracker = LocationTrackerManager(this, intervalMillis = 10000L, minimalDistance = 5.0F)
+        val locationCallback = object: LocationCallback(){
+            override fun onLocationResult(result: LocationResult) {
+                if (result.lastLocation != null){
+                    WorkerRunner.runSubmitVoteWorker(this@MainActivity, result.lastLocation!!)
+                    locationTracker.stopLocationTracking(this)
+                }
+            }
+        }
+        
         lifecycleScope.launch {
             connectivityFlow.collectIndexed { index, status -> 
                 latestConnectivityState = status
-                
                 // run worker on initial network state
                 when(status){
                     IConnectivityObserver.Status.Available -> {
-                        WorkerRunner.runSubmitVoteWorker(this@MainActivity)
+                        locationTracker.startLocationTracking(locationCallback)
                         viewModel.setOnline(true)
                     }
                     IConnectivityObserver.Status.Lost, IConnectivityObserver.Status.Unavailable -> {
                         WorkerRunner.stopSubmitVoteWorker(this@MainActivity)
                         viewModel.setOnline(false)
+                        locationTracker.stopLocationTracking(locationCallback)
                     }
                     else -> {}
                 }

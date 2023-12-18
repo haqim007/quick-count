@@ -6,6 +6,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,6 +14,7 @@ import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.ItemTpsElectionBinding
 import com.haltec.quickcount.domain.model.SubmitVoteStatus
 import com.haltec.quickcount.domain.model.TPSElection
+import com.haltec.quickcount.util.capitalizeWords
 
 
 class TPSElectionListAdapter(
@@ -33,13 +35,14 @@ class TPSElectionListAdapter(
         fun bind(data: TPSElection, callback: TPSElectionListCallback){
 
             binding.apply {
-                tvTpsName.text = data.tpsName
+                tvTpsName.text = itemView.context.getString(R.string.tps_name_, capitalizeWords(data.tpsName))
                 tvElectionName.text = data.electionName
-                tvElectionInfo.text = if (data.statusVote == SubmitVoteStatus.PENDING){
-                    itemView.context.getString(R.string.input_data_before_date_time, data.createdAt)
+                tvElectionInfo.text = if (arrayOf(SubmitVoteStatus.PENDING, SubmitVoteStatus.IN_QUEUE).contains(data.statusVote)){
+                    null
                 }else{
-                    itemView.context.getString(R.string.sent_at_date_time, data.createdAt)
+                    itemView.context.getString(R.string.sent_at_date_time, data.lastVoteUpdated)
                 }
+                tvElectionInfo.isVisible = tvElectionInfo.text != null
                 val statusSpannable = SpannableString(itemView.context.getString(R.string.status_s, data.statusVote.label))
                 val statusColor: Int
                 val borderColor: Int

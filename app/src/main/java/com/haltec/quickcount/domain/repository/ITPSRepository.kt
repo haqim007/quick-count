@@ -10,4 +10,6 @@ interface ITPSRepository {
     fun getTPSList(): Flow<PagingData<TPS>>
     fun getTPS(tpsId: Int): Flow<Resource<TPS>>
     
+    suspend fun countTPS(): Int
+    
 }

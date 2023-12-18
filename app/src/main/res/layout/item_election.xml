@@ -40,7 +40,8 @@
             app:layout_constraintStart_toStartOf="@+id/tv_election_name"
             app:layout_constraintTop_toBottomOf="@id/tv_election_name"
             tools:ignore="SmallSp"
-            tools:text="Terkirim pada 20 Oktober 2023 pukul 05.00" />
+            tools:text="Terkirim pada 20 Oktober 2023 pukul 05.00"
+            />
 
         <TextView
             android:id="@+id/tv_election_status"

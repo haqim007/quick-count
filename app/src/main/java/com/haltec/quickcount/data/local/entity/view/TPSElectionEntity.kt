@@ -2,6 +2,7 @@ package com.haltec.quickcount.data.local.entity.view
 
 import com.haltec.quickcount.domain.model.TPSElection
 import com.haltec.quickcount.domain.model.stringNumberToSubmitVoteStatus
+import com.haltec.quickcount.util.stringToStringDateID
 
 const val TPS_ELECTION_VIEW = "TPS_ELECTION_VIEW"
 data class TPSElectionEntity(
@@ -23,11 +24,13 @@ data class TPSElectionEntity(
     // from election entity
     val electionId: Int,
     val electionName: String,
-    val statusVote: String
+    val statusVote: String,
+    
+    val lastVoteUpdated: String
 ){
     fun toModel() = TPSElection(
         villageCode, address, city, latitude, dpt, createdAt, createdBy, 
         electionName, subdistrict, province, electionId, tpsName, tpsId, 
-        village, longitude, stringNumberToSubmitVoteStatus(statusVote)
+        village, longitude, stringNumberToSubmitVoteStatus(statusVote), stringToStringDateID(lastVoteUpdated) 
     )
 }

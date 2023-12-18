@@ -63,4 +63,8 @@ class TPSRepository @Inject constructor(
         //TODO("Not yet implemented")
         return flowOf()
     }
+
+    override suspend fun countTPS(): Int {
+        return localDataSource.countTPS()
+    }
 }

@@ -71,7 +71,7 @@ data class TPSElectionListResponse(
 		val longitude: String,
 
 		@field:SerializedName("status")
-			val status: String,
+		val status: String,
 
 		@field:SerializedName("submited")
 		val submitted: String,
@@ -108,7 +108,8 @@ data class TPSElectionListResponse(
 				statusVote = stringToSubmitVoteStatus(status),
 				createdBy = capitalizeWords(createdBy),
 				address = address,
-				dpt = dpt
+				dpt = dpt,
+				lastVoteUpdated = tpsInfo.lastVoteUpdated
 			)
 		
 		fun toTPSEntity() = TPSEntity(
@@ -133,7 +134,7 @@ data class TPSElectionListResponse(
 		
 		fun toElectionEntity() = ElectionEntity(
 			id = "${id}$selectionTypeId".toInt(),
-			updatedAt = "",
+			updatedAt = tpsInfo.lastVoteUpdated,
 			createdBy = "",
 			createdAt = "",
 			active = 0,
@@ -144,21 +145,19 @@ data class TPSElectionListResponse(
 		)
 
 		fun toVoteFormEntity(): VoteFormEntity {
-			this.apply {
-				tpsInfo.apply {
-					return VoteFormEntity(
-						tpsId = tpsId,
-						electionId = id,
-						province = province,
-						subdistrict = subdistrict,
-						isPartai = isPartai, village = village,
-						tpsName = tpsName,
-						amount = amount, invalidVote = invalidVote,
-						note = note,
+			tpsInfo.apply {
+				return VoteFormEntity(
+					tpsId = tpsId,
+					electionId = this.selectionTypeId,
+					province = province,
+					subdistrict = subdistrict,
+					isPartai = isPartai, village = village,
+					tpsName = tpsName,
+					amount = amount, invalidVote = invalidVote,
+					note = note,
 
-						partaiList = this@TPSElectionResponse.toPartyEntity()
-					)
-				}
+					partaiList = this@TPSElectionResponse.toPartyEntity()
+				)
 			}
 		}
 

@@ -12,6 +12,7 @@ import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.FragmentElectionActionBinding
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.MainViewModel
+import com.haltec.quickcount.util.capitalizeWords
 
 class ElectionActionFragment : BaseFragment() {
     
@@ -34,7 +35,7 @@ class ElectionActionFragment : BaseFragment() {
             btnLogout.setOnClickListener {
                 activityViewModel.requestToLogout()
             }
-            tvTpsName.text = tps.name
+            tvTpsName.text = getString(R.string.tps_name_, capitalizeWords(tps.name))
             tvTpsLocation.text = getString(R.string.tps_location_, tps.village, tps.subdistrict)
             tvElectionName.text = election.title
             btnUploadEvidence.setOnClickListener { 

@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import androidx.paging.map
 import com.haltec.quickcount.data.mechanism.Resource
 import com.haltec.quickcount.domain.model.TPSElection
+import com.haltec.quickcount.domain.model.stringToElectionFilter
 import com.haltec.quickcount.domain.repository.ITPSElectionRepository
 import com.haltec.quickcount.domain.repository.ITPSRepository
 import com.haltec.quickcount.ui.BaseViewModel
@@ -42,7 +43,7 @@ class TPSElectionListViewModel @Inject constructor(
             state.map { it.filter }
                 .distinctUntilChanged()
                 .flatMapLatest { filter ->
-                    repository.getTPSElections(filter).cachedIn(viewModelScope)
+                    repository.getTPSElections(stringToElectionFilter(filter)).cachedIn(viewModelScope)
                 }.collectLatest { pagingData ->
                     _pagingFlow.emit(pagingData)
                 }

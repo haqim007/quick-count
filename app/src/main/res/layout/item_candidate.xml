@@ -20,12 +20,11 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/mcv_profile_image"
             android:layout_width="35dp"
-            android:layout_height="0dp"
+            android:layout_height="35dp"
             android:layout_marginBottom="8dp"
             app:cardCornerRadius="100dp"
-            app:layout_constraintBottom_toBottomOf="@+id/tv_candidate_name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/tv_order_number">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <ImageView
                 android:id="@+id/iv_profile"
@@ -41,27 +40,17 @@
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
-            android:id="@+id/tv_order_number"
-            style="@style/TextAppearance.Bold.Medium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp"
-            app:layout_constraintStart_toEndOf="@+id/mcv_profile_image"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="8dp"
-            tools:text="Nomor Urut 1" />
-
-        <TextView
             android:id="@+id/tv_candidate_name"
             style="@style/TextAppearance.Bold"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:maxLines="2"
+            app:layout_constraintBottom_toBottomOf="@+id/mcv_profile_image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/mcv_profile_image"
-            app:layout_constraintTop_toBottomOf="@+id/tv_order_number"
-            tools:text="Budiyono S. - Budiyani M." />
+            app:layout_constraintTop_toTopOf="@+id/mcv_profile_image"
+            tools:text="1. Budiyono S. - Budiyani M." />
 
         <TextView
             android:id="@+id/tv_total_title"

@@ -101,6 +101,7 @@ class TPSElectionListFragment : BaseFragment() {
         super.onStart()
 
         val typeChip = binding.cgFilter.findViewById<Chip>(R.id.chip_filter_all)
+        typeChip.isChecked = true
         if (filterItems.contains(typeChip.text.toString())){
             viewModel.setFilter(typeChip.text.toString())
         }

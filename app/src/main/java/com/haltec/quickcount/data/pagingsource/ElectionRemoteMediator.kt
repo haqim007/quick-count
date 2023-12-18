@@ -44,7 +44,8 @@ class ElectionRemoteMediator(
         localDataSource.insertAllAndRemoteKeys(
             remoteKeys,
             electionList.toEntity(),
-            loadType == LoadType.REFRESH
+            loadType == LoadType.REFRESH,
+            tpsId = tpsId
         )
 
         voteLocalDataSource.insertAll(
