@@ -168,7 +168,8 @@ data class TPSElectionListResponse(
 						partaiName = it.partaiName,
 						id = it.id,
 						amount = it.amount,
-						candidateList = this@TPSElectionResponse.toCandidateEntity()
+						candidateList = this@TPSElectionResponse.toCandidateEntity(),
+						noUrut = it.noUrut
 					)
 				} ?: emptyList()
 			}

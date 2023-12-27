@@ -54,7 +54,8 @@ data class VoteFormEntity(
                         totalCandidateVote = candidate.amount,
                         partyId = it.id
                     )
-                }
+                },
+                orderNumber = it.noUrut
             )
         }
         return VoteData(

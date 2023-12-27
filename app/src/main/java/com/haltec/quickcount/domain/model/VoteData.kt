@@ -47,6 +47,7 @@ data class VoteData(
         val isExpanded: Boolean = false,
         val totalPartyVote: Int = 0,
         val totalVote: Int = 0,
+        val orderNumber: Int
     ){
         /**
          * Include party vote, when true it means, there will not be input for party vote. 

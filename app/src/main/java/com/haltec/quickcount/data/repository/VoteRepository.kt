@@ -49,6 +49,7 @@ class VoteRepository @Inject constructor(
                 return localDataSource.getVoteForm(tps.id, election.id)?.toModel(tps.city)
             }
 
+            // TODO: Should load from local instead
             override fun loadResult(data: VoteFormResponse): Flow<VoteData> {
                 return flowOf(data.toModel(tps.city))
             }

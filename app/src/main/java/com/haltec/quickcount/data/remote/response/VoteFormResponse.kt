@@ -89,6 +89,7 @@ data class VoteFormResponse(
 				
 				partaiList = partaiLists?.map { 
 					PartyEntity(
+						noUrut = it.noUrut,
 						partaiName = it.partaiName,
 						id = it.id,
 						amount = it.amount,
@@ -119,6 +120,9 @@ data class PartyListsItemResponse(
 	@field:SerializedName("id")
 	val id: Int,
 
+	@field:SerializedName("no_urut")
+	val noUrut: Int,
+
 	@field:SerializedName("amount")
 	val amount: Int
 ){
@@ -127,7 +131,8 @@ data class PartyListsItemResponse(
 		partyName = partaiName,
 		id,
 		totalPartyVote = amount,
-		totalVote = amount + candidateList.sumOf { it.amount }
+		totalVote = amount + candidateList.sumOf { it.amount },
+		orderNumber = this.noUrut
 	)
 }
 

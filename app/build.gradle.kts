@@ -17,8 +17,8 @@ android {
         applicationId = "com.haltec.quickcount"
         minSdk = 24
         targetSdk = 34
-        versionCode = 25
-        versionName = "1.0.0.25"
+        versionCode = 26
+        versionName = "1.0.0.26"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -47,9 +47,9 @@ android {
             applicationIdSuffix = ".staging"
             isDebuggable = false
             resValue("string", "app_name", "PEMILU DESK LUMAJANG - Staging")
-            dependencies{
-                implementation(libs.chucker.noop)
-            }
+//            dependencies{
+//                implementation(libs.chucker.noop)
+//            }
         }
     }
     compileOptions {
