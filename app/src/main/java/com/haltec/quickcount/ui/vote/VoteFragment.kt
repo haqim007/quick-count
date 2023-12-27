@@ -246,9 +246,12 @@ class VoteFragment : BaseFragment() {
     ): ListAdapter<VoteData.Candidate, out RecyclerView.ViewHolder> {
         
         val adapter = if (isEditable){
-            CandidateAdapter(object: CandidateAdapter.Callback{
+            CandidateAdapter(object: CandidateAdapter.Callback(){
                 override fun onCandidateVoteChange(position: Int, partyId: Int, candidateId: Int, vote: Int) {
                     viewModel.setCandidateVote(partyId, candidateId, vote)
+                }
+                override fun scrollto(position: Int){
+                    binding.rvVote.smoothScrollToPosition(position)
                 }
             })
         }else{

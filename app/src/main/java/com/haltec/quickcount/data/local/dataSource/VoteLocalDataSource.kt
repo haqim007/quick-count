@@ -96,7 +96,23 @@ class VoteLocalDataSource @Inject constructor(
                                 } ?: candidate
                             }
                         )
-                    } ?: party
+                    } ?: run { 
+                        if(party.id == 0){
+                            // update non-partai candidate
+                            party.copy(
+                                candidateList = party.candidateList.map { candidate ->
+                                    val matchingCandidate = tempVoteData.candidate?.firstOrNull { it.candidateId == candidate.id }
+                                    matchingCandidate?.let {
+                                        candidate.copy(
+                                            amount = it.amount
+                                        )
+                                    } ?: candidate
+                                }
+                            )
+                        }else{
+                            party
+                        }
+                    }
                 }
                 
                 database.voteFormDao().updateVoteForm(

@@ -91,7 +91,8 @@ data class ElectionListResponse(
 					partaiName = it.partaiName,
 					id = it.id,
 					amount = it.amount,
-					candidateList = this@ElectionResponse.toCandidateEntity(partyId = it.id)
+					candidateList = this@ElectionResponse.toCandidateEntity(partyId = it.id),
+					noUrut = it.noUrut
 				)
 			} ?: emptyList()
 		}

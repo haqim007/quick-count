@@ -78,7 +78,7 @@
     <string name="total_vote_total">Total Suara</string>
     <string name="total_party_vote">Suara Partai</string>
     <string name="hasil_suara_tidak_sah">Hasil Suara Tidak Sah</string>
-    <string name="data_perolehan_partai_s">Data Perolehan Partai %s</string>
+    <string name="number_party_">%d. %s</string>
     <string name="candidate_number_name_">%d. %s</string>
     <string name="approve_vote_terms">Saya sudah memasukkan dan memeriksa keseluruhan data dengan benar</string>
     <string name="send_data">Kirim Data</string>

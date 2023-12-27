@@ -2,6 +2,7 @@ package com.haltec.quickcount.ui.vote
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -11,8 +12,9 @@ import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.ItemCandidateBinding
 import com.haltec.quickcount.domain.model.VoteData
 
+
 class CandidateAdapter(
-    private val callback: Callback
+    private val callback: Callback,
 ): ListAdapter<VoteData.Candidate, CandidateAdapter.ViewHolder>(ItemDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,13 +29,13 @@ class CandidateAdapter(
     }
 
     class ViewHolder(
-        private val binding: ItemCandidateBinding
+        private val binding: ItemCandidateBinding,
     ): RecyclerView.ViewHolder(binding.root){
 
         fun onBind(
             position: Int,
             data: VoteData.Candidate,
-            callback: Callback
+            callback: Callback,
         ){
             binding.apply {
                 tvCandidateName.text = itemView.context.getString(R.string.candidate_number_name_, data.orderNumber, data.candidateName)
@@ -58,22 +60,39 @@ class CandidateAdapter(
                     updateValue = false
                 }
                 
+                if (callback.focusPosition == position){
+                    etCandidateVote.setSelection(etCandidateVote.text.toString().length)
+                }
+
                 etCandidateVote.setOnFocusChangeListener { v, hasFocus ->
                     val value = etCandidateVote.text.toString().toIntOrNull()
                     if (hasFocus){
                         if (value == null || value == 0){
                             etCandidateVote.setText("")
+                        }else{
+                            etCandidateVote.setSelection(etCandidateVote.text.toString().length)
                         }
                         updateValue = true
                         
                     }else{
-                        v.clearFocus()
                         updateValue = false
                         if (value == null){
                             etCandidateVote.setText("0")
                         }
                     }
                 }
+
+                etCandidateVote.setOnKeyListener { v, keyCode, event ->
+                    if (event.action == KeyEvent.ACTION_DOWN
+                        && event.keyCode == KeyEvent.KEYCODE_ENTER
+                    ) {
+                        callback.scrollto(position+2)
+                        callback.setFocusPosition(position+1)
+                        return@setOnKeyListener false
+                    }
+                    return@setOnKeyListener false   
+                }
+                
                 etCandidateVote.addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -104,8 +123,16 @@ class CandidateAdapter(
         }
     }
 
-    interface Callback{
-        fun onCandidateVoteChange(position: Int, partyId:Int, candidateId: Int, vote: Int)
+    abstract class Callback{
+        
+        private var _focusPosition: Int? = null
+        val focusPosition get() = _focusPosition
+        abstract fun onCandidateVoteChange(position: Int, partyId:Int, candidateId: Int, vote: Int)
+        abstract fun scrollto(position: Int)
+        
+        fun setFocusPosition(position: Int){
+            _focusPosition = position
+        }
     }
 
 

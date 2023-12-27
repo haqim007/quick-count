@@ -89,13 +89,6 @@ object NetworkModuleViewModelComponent {
         @AuthorizedApiConfig
         apiConfig: ApiConfig
     ): ElectionService = apiConfig.createService(ElectionService::class.java)
-
-//    @ViewModelScoped
-//    @Provides
-//    fun provideUploadEvidenceService(
-//        @AuthorizedApiConfig
-//        apiConfig: ApiConfig
-//    ): UploadEvidenceService = apiConfig.createService(UploadEvidenceService::class.java)
     
 }
 

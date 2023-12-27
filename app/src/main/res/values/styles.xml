@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="AlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="alertDialogStyle">@style/CustomAlertDialog</item>
+    </style>
+    
+    <style name="CustomAlertDialog" parent="MaterialAlertDialog.Material3">
+        <item name="backgroundTint">#fafafa</item>
+    </style>
+
     <style name="ModalBottomSheetDialog" parent="Widget.Material3.BottomSheet.Modal">
         <item name="backgroundTint">@android:color/white</item>
         <item name="behavior_peekHeight">800dp</item>

@@ -11,14 +11,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
 import com.haltec.quickcount.R
 import com.haltec.quickcount.databinding.FragmentVoteFormBinding
 import com.haltec.quickcount.ui.BaseFragment
 import com.haltec.quickcount.ui.vote.CandidateAdapter
 import com.haltec.quickcount.ui.vote.VoteViewModel
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -44,9 +44,13 @@ class VoteFormFragment : BaseFragment() {
     }
     
     
-    private val candidateAdapter = CandidateAdapter(object : CandidateAdapter.Callback{
+    private val candidateAdapter = CandidateAdapter(object : CandidateAdapter.Callback(){
         override fun onCandidateVoteChange(position: Int, partyId: Int, candidateId: Int, vote: Int) {
             viewModel.setCandidateVote(partyId, candidateId, vote)
+        }
+        
+        override fun scrollto(position: Int){
+            binding.rvCandidate.smoothScrollToPosition(position)
         }
     })
     
@@ -62,41 +66,43 @@ class VoteFormFragment : BaseFragment() {
             btnClose.setOnClickListener { 
                 findNavController().navigateUp()
             }
-           
             
+            rvCandidate.adapter = candidateAdapter
+            rvCandidate.itemAnimator = null
+            rvCandidate.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+                adapterState = layoutManager.onSaveInstanceState()
+            }
+            var x : Job? = null
             viewModel.state.map { it.onEditParty }.launchCollectLatest { data ->
 
                 data?.let {
-                
-                    tvPartyTitle.text = getString(R.string.data_perolehan_partai_s, data.partyName)
-                    etTotalPartyVote.setText(data.totalPartyVote.toString())
-                   
-                    rvCandidate.adapter = candidateAdapter
-                    rvCandidate.itemAnimator = null
 
                     candidateAdapter.submitList(data.candidateList)
                     layoutManager.onRestoreInstanceState(adapterState)
-                    rvCandidate.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-                        adapterState = layoutManager.onSaveInstanceState()
-                    }
 
-                    etTotalPartyVote.addTextChangedListener {
-                        if (it.toString() != data.totalPartyVote.toString()){
-                            viewModel.setPartyVote(data.id, it.toString().toIntOrNull() ?: 0)
-                        }
-                    }
+                    tvTotalVote.text = it.totalVote.toString()
                 }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.getTotalVote(partyId).collectLatest {
-                    tvTotalVote.text = it.toString()
-                }
+                
             }
             
+            viewLifecycleOwner.lifecycleScope.launch {
+                val data = viewModel.state.map { it.onEditParty }.first()
+                
+                data?.let {
+                    tvPartyTitle.text = data.partyName
+                    etTotalPartyVote.setText(data.totalPartyVote.toString())
+                    etTotalPartyVote.addTextChangedListener {
+                        viewModel.setPartyVote(data.id, it.toString().toIntOrNull() ?: 0)
+                    }
+                }
+            }
+
+            etTotalPartyVote.setOnFocusChangeListener { v, hasFocus ->
+                val value = etTotalPartyVote.text.toString().toIntOrNull() ?: 0
+                if (!hasFocus){
+                    etTotalPartyVote.setText(value.toString())
+                }
+            }
         }
-
-        
-
     }
 }

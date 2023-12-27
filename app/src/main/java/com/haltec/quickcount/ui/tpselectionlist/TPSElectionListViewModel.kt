@@ -43,7 +43,9 @@ class TPSElectionListViewModel @Inject constructor(
             state.map { it.filter }
                 .distinctUntilChanged()
                 .flatMapLatest { filter ->
-                    repository.getTPSElections(stringToElectionFilter(filter)).cachedIn(viewModelScope)
+                    repository
+                        .getTPSElections(stringToElectionFilter(filter))
+                        .cachedIn(viewModelScope)
                 }.collectLatest { pagingData ->
                     _pagingFlow.emit(pagingData)
                 }

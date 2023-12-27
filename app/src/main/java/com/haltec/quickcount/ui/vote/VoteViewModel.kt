@@ -12,22 +12,16 @@ import com.haltec.quickcount.domain.repository.IVoteRepository
 import com.haltec.quickcount.ui.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-typealias CandidateId = Int
-
-@OptIn(FlowPreview::class)
 @HiltViewModel
 class VoteViewModel @Inject constructor(
     @ViewModelScoped
@@ -52,35 +46,29 @@ class VoteViewModel @Inject constructor(
         }
         
         state.map { it.candidatesVote }.distinctUntilChanged()
-            .debounce(3000)
             .launchCollectLatest {
             if (hasInitState){
                 onCandidatesVoteChange(it)
-                
-                // update onEditParty
-                _state.update { state -> state.copy(
-                    onEditParty = state.voteData.data?.partyLists?.firstOrNull { partyItem ->
-                        partyItem.id == state.onEditParty?.id
-                    }
-                ) }
             }
         }
     }
-    
-    private fun onCandidatesVoteChange(
-        candidatesVote: List<CandidateVoteState>
-    ){
-        val newPartyListItem = updateCandidateVote(candidatesVote)
-        val newVoteData = state.value.voteData.data?.copy(
-            partyLists = newPartyListItem,
-        )
-        _state.update { state ->
-            state.copy(
-                voteData = Resource.Success(newVoteData!!)
-            )
+
+    private var updateOnEditPartyStateJob: Job? = null
+    private fun updateOnEditPartyState() {
+        updateOnEditPartyStateJob?.cancel()
+        updateOnEditPartyStateJob = viewModelScope.launch {
+            // delay in case there are too many calls in 3 seconds. only take the last partyLists
+            delay(500)
+            _state.update { state ->
+                state.copy(
+                    onEditParty = state.voteData.data?.partyLists?.firstOrNull { partyItem ->
+                        partyItem.id == state.onEditParty?.id
+                    }
+                )
+            }
         }
     }
-    
+
     fun setTpsElection(tps: TPS, election: Election){
         if (state.value.tps == null || state.value.election == null){
             _state.update { state ->
@@ -93,7 +81,7 @@ class VoteViewModel @Inject constructor(
         }
     }
     
-    fun setInitState(){
+    private fun setInitState(){
         viewModelScope.launch {
             var partiesVote = state.value.partiesVote
             var newCandidatesVote = state.value.candidatesVote
@@ -125,22 +113,6 @@ class VoteViewModel @Inject constructor(
         ) }
     }
 
-    private fun updateCandidatesVoteState(
-        currentCandidatesVote: List<CandidateVoteState>, 
-        partyId: Int,
-        candidateId: Int, 
-        vote: Int
-    ): List<CandidateVoteState> {
-        
-        val currentCandidatesVoteMap = currentCandidatesVote.associateBy { it.candidateId }.toMutableMap()
-
-        currentCandidatesVoteMap[candidateId] = CandidateVoteState(partyId, candidateId, vote)
-        
-        return currentCandidatesVoteMap.values.toList()
-        
-    }
-        
-
     private fun updatePartiesVoteState(currentPartiesVote: List<Pair<Int, Int>>, partyId: Int, vote: Int) =
         currentPartiesVote.filter { pair ->
             pair.first != partyId
@@ -160,6 +132,7 @@ class VoteViewModel @Inject constructor(
                 _state.update { state -> 
                     state.copy(voteData = it) 
                 }
+                
             }
         }
     }
@@ -207,6 +180,42 @@ class VoteViewModel @Inject constructor(
         }
     }
 
+    private var onCandidatesVoteChangeJob: Job? = null
+    private fun onCandidatesVoteChange(
+        candidatesVote: List<CandidateVoteState>
+    ){
+        onCandidatesVoteChangeJob?.cancel()
+        onCandidatesVoteChangeJob = viewModelScope.launch { 
+            delay(3000)
+            val newPartyListItem = updateCandidateVote(candidatesVote)
+            val newVoteData = state.value.voteData.data?.copy(
+                partyLists = newPartyListItem,
+            )
+            _state.update { state ->
+                state.copy(
+                    voteData = Resource.Success(newVoteData!!)
+                )
+            }
+            // update onEditParty
+            updateOnEditPartyState()
+        }
+    }
+
+    private fun updateCandidatesVoteState(
+        currentCandidatesVote: List<CandidateVoteState>,
+        partyId: Int,
+        candidateId: Int,
+        vote: Int
+    ): List<CandidateVoteState> {
+
+        val currentCandidatesVoteMap = currentCandidatesVote.associateBy { it.candidateId }.toMutableMap()
+
+        currentCandidatesVoteMap[candidateId] = CandidateVoteState(partyId, candidateId, vote)
+
+        return currentCandidatesVoteMap.values.toList()
+
+    }
+
     private fun updateCandidateVote(
         candidatesVote: List<CandidateVoteState>
     ): List<VoteData.PartyListsItem> {
@@ -240,15 +249,21 @@ class VoteViewModel @Inject constructor(
         return newPartyListItem ?: listOf()
     }
 
-    private var updatePartyVote: Job? = null
+    private var updatePartyVoteJob: MutableMap<Int, Job> = mutableMapOf()
     fun setPartyVote(partyId: Int, vote: Int){
-        updatePartyVote?.cancel()
-        updatePartyVote = viewModelScope.launch {
+        
+        updatePartyVoteJob[partyId]?.cancel()
+        updatePartyVoteJob[partyId] = viewModelScope.launch {
+            
+            // make sure onCandidatesVoteChangeJob already complete in case it still running before proceed
+            onCandidatesVoteChangeJob?.join()
+            
             val newPartiesVote = updatePartiesVoteState(state.value.partiesVote, partyId, vote)
             val newPartyListItem = updatePartyVote(partyId, vote)
             val newVoteData = state.value.voteData.data?.copy(
                 partyLists = newPartyListItem
             )
+            delay(500)
             _state.update { state ->
                 state.copy(
                     hasInputData =  true,
@@ -256,33 +271,16 @@ class VoteViewModel @Inject constructor(
                     voteData = Resource.Success(newVoteData!!)
                 )
             }
-            delay(3000)
+            updateOnEditPartyState()
         }
-    }
-    
-    fun getTotalVote(partyId: Int): Flow<Int> {
-        return state
-            .map { 
-                it.voteData.data?.partyLists?.first { 
-                    it.id == partyId 
-                }?.totalVote ?: 0 
+
+        // check and remove completed Job
+        val iterator = updatePartyVoteJob.iterator()
+        while (iterator.hasNext()){
+            val it = iterator.next()
+            if (it.value.isCompleted){
+                iterator.remove()
             }
-            .distinctUntilChanged()
-    }
-    
-    fun getCandidateListData(partyId: Int): Flow<List<VoteData.Candidate>> {
-        return state.map { 
-            val item = it.voteData.data?.partyLists?.first { it.id == partyId }
-                ?.candidateList ?: listOf()
-            //dummy
-//            val result = mutableListOf<VoteData.Candidate>()
-//            for (i in 99..105){
-//                result.add(item[0].copy(
-//                    id = i
-//                ))
-//            }
-            //dummy
-            item
         }
     }
 
@@ -314,9 +312,14 @@ class VoteViewModel @Inject constructor(
 
     fun toggleView(partyId: Int){
         val newPartyListsItem = state.value.voteData.data?.partyLists?.map { party ->
-            party.copy(
-                isExpanded = if(party.id == partyId) !party.isExpanded else party.isExpanded
-            )
+            if (party.id == partyId){
+                party.copy(
+                    isExpanded = !party.isExpanded
+                )
+            }else{
+                party
+            }
+            
         } ?: listOf()
         val newData = state.value.voteData.data!!.copy(
             partyLists = newPartyListsItem
@@ -328,18 +331,12 @@ class VoteViewModel @Inject constructor(
         }
     }
 
-    private var invalidVoteJob: Job? = null
     fun setInvalidVote(totalInvalidVote: Int){
-        invalidVoteJob?.cancel()
-        invalidVoteJob = viewModelScope.launch {
-            _state.update { state ->
-                state.copy(
-                    invalidVote = totalInvalidVote
-                )
-            }
-            delay(3000)
+        _state.update { state ->
+            state.copy(
+                invalidVote = totalInvalidVote
+            )
         }
-        
     }
     
     fun setTermIsApproved(checked: Boolean = true){
